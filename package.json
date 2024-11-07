@@ -1,0 +1,25 @@
+{
+  "name": "dv1676",
+  "version": "1.0.0",
+  "description": "Application for hiring scooters and bikes",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Iwinter78/DV1676.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Iwinter78/DV1676/issues"
+  },
+  "homepage": "https://github.com/Iwinter78/DV1676#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "eslint": "^9.14.0"
+  }
+}

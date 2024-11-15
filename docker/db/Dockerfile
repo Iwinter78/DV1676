@@ -1,3 +1,5 @@
+#docker build -t dv1676-db -f docker/db/Dockerfile .
+
 FROM mariadb:latest
 
 ENV MYSQL_ROOT_PASSWORD=root

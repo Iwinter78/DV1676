@@ -4,7 +4,7 @@ services:
     container_name: restapi
     ports:
       - "5000:5000"
-      - "3306:3306"
+      - "3307:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -14,7 +14,7 @@ services:
       - .env
     networks:
       dv1676-network:
-        ipv4_address: 172.22.0.2
+        ipv4_address: 172.22.0.3
     volumes:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: on-failure
@@ -26,7 +26,19 @@ services:
       - "3000:3000"
     networks:
       dv1676-network:
-        ipv4_address: 172.22.0.1
+        ipv4_address: 172.22.0.2
+    restart: always
+    depends_on:
+      - restapi
+
+  simulation:
+    image: dv1676-simulation
+    container_name: simulation
+    ports:
+      - "1337:1337"
+    networks:
+      dv1676-network:
+        ipv4_address: 172.22.0.4
     restart: always
     depends_on:
       - restapi

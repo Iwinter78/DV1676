@@ -2,7 +2,7 @@ import express from 'express';
 
 const app = express();
 
-const port = 5000;
+const port = 1337;
 
 app.get('/', (req, res) => {
     res.json({ message: 'Hello World!' });

@@ -1,6 +1,12 @@
 export default [
-    // ...other config
     {
         ignores: ["node_modules/*"],
+        env: {
+            node: true,
+            es6: true
+        },
+        rules: {
+            "no-console": "off"
+        }
     }
 ];

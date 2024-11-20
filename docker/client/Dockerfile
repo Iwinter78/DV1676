@@ -1,4 +1,5 @@
 #docker build -t dv1676-client -f docker/client/Dockerfile .
+#docker compose run -d client
 
 FROM node:20
 

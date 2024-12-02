@@ -1,10 +1,9 @@
 services:
-  restapi:
-    image: dv1676-restapi
-    container_name: restapi
+  database:
+    image: dv1676-database
+    container_name: database
     ports:
-      - "5000:5000"
-      - "3307:3306"
+      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -14,10 +13,24 @@ services:
       - .env
     networks:
       dv1676-network:
+        ipv4_address: 172.22.0.4
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    restart: always
+
+  restapi:
+    image: dv1676-restapi
+    container_name: restapi
+    ports:
+      - "5000:5000"
+    networks:
+      dv1676-network:
         ipv4_address: 172.22.0.3
     volumes:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-    restart: on-failure
+    restart: always
+    depends_on:
+      - database
 
   client:
     image: dv1676-client

@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 
 // Admin first view after login
 app.get('/admin_view', (req, res) => {
-  res.sendFile(join(__dirname, 'admin_panel/views', 'main.html'));
+  res.sendFile(join(__dirname, 'views/admin_panel', 'main.html'));
 });
 
 // Start the server

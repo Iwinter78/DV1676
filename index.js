@@ -3,6 +3,7 @@ import session from 'express-session';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import process from 'process';
 
 import { exchangeCodeForToken, getUserInfo } from './src/login.js';
 

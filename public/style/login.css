@@ -1,0 +1,26 @@
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: var(--blue);
+}
+
+.login-title {
+    color: var(--white);
+    font-size: 2rem;
+}
+
+.login-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--black);
+    border-radius: 5px;
+    width: 25vw;
+    color: var(--white);
+    background-color: var(--black);
+}

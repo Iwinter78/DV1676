@@ -20,7 +20,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(join(__dirname, 'views')));
 
 app.use(session({
-    secret: '123123123',
+    secret: 'Tl29wV0Cq0URN+XSsoJeYGwPVxbBnXqzKmDxkcki9Nw9WyeXxq6o1xmtIodBx9sb',
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false },

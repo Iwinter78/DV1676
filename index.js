@@ -1,4 +1,5 @@
 import express from 'express';
+import session from 'express-session';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -18,6 +19,13 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(join(__dirname, 'views')));
 
+app.use(session({
+    secret: '123123123',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+}))
+
 app.get('/', (req, res) => {
     const data = {
         client_id: process.env.GITHUB_CLIENT_ID,
@@ -34,11 +42,22 @@ app.get('/callback', async (req, res) => {
     const token = await exchangeCodeForToken(code);
     const userInfo = await getUserInfo(token);
   
-    res.redirect(200, '/home', { userInfo });
+    req.session.userInfo = userInfo;
+
+    res.redirect('/home');
+});
+
+app.get('/logout', (req, res) => {
+    req.session.destroy();
+    res.redirect('/');
 });
 
 app.get('/home', (req, res) => {
-    res.render('home/index');
+    const userInfo = req.session.userInfo;
+    if (!userInfo) {
+        res.redirect('/');
+    }
+    res.render('home/index', userInfo);
 });
 
 // Admin first view after login

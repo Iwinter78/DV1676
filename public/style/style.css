@@ -1,0 +1,13 @@
+@import url('header.css');
+@import url('footer.css');
+@import url('standards.css');
+@import url('map.css');
+
+
+hmtl, body{
+    background-color: var(--bg-color);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--white);
+}

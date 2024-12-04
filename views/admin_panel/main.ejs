@@ -1,0 +1,12 @@
+<%- include('../../public/header.ejs') %>
+  <div id="map"></div>
+  <script>
+      var map = L.map('map').setView([56.186094, 15.603467], 16);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+  </script>
+  
+<%- include('../../public/footer.ejs') %>
+

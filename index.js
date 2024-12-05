@@ -72,7 +72,7 @@ app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
 
-// Route to show the users profile
+/* // Route to show the users profile
 app.get('/profile', async (req, res) => {
     const userId = req.session.userId;
 
@@ -120,4 +120,4 @@ app.get('/history', async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = router; */

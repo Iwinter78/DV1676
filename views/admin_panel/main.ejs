@@ -1,5 +1,17 @@
 <%- include('../../public/header.ejs') %>
   <div id="map"></div>
+
+  <div class="dropdown">
+    <select id="city-select" class="form-select">
+        <option value="" selected disabled>Choose a city</option>
+    </select>
+</div>
+
+  <div class="map-controls">
+    <button id="locate-user" class="btn btn-primary btn-sm btn-light">
+        <i class="bi bi-geo-alt-fill"></i>
+    </button>
+</div>
   <script>
      navigator.geolocation.getCurrentPosition(
         function (position) {
@@ -11,11 +23,33 @@
           maxZoom: 18,
           attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
+
+        const locateButton = document.getElementById('locate-user');
+        locateButton.addEventListener('click', () => {
+            map.locate({ setView: true, maxZoom: 16 });
+        });
+
         L.marker([latitude, longitude]).addTo(map)
           .bindPopup("Här är du!")
           .openPopup();
+
+        const cityDropdown = document.getElementById('city-select');
+        fetch('/cities.json')
+
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((city) => {
+              const option = document.createElement('option');
+              option.value = JSON.stringify({ lat: city.lat, lng: city.lng });
+              option.textContent = city.name;
+              cityDropdown.appendChild(option);
+        });
+    });
+    cityDropdown.addEventListener('change', (e) => {
+            const selectedCity = JSON.parse(e.target.value);
+            map.setView([selectedCity.lat, selectedCity.lng], 14);
+        });
       })
   </script>
   
 <%- include('../../public/footer.ejs') %>
-

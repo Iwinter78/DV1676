@@ -1,0 +1,30 @@
+v<%- include('../../public/header.ejs') %>
+
+<h1>Resehistorik</h1>
+
+<% if (trips.length > 0) { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Starttid</th>
+                <th>Startplats</th>
+                <th>Sluttid</th>
+                <th>Slutplats</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% trips.forEach(trip => { %>
+                <tr>
+                    <td><%= new Date(trip.start_time).toLocaleString() %></td>
+                    <td><%= trip.start_location %></td>
+                    <td><%= new Date(trip.end_time).toLocaleString() %></td>
+                    <td><%= trip.end_location %></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>Du har ännu inga resor registrerade.</p>
+<% } %>
+
+<%- include('../../public/footer.ejs') %>

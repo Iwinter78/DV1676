@@ -3,4 +3,4 @@
 
 FROM mariadb:latest
 
-EXPOSE 3306
+EXPOSE 3307

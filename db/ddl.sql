@@ -14,8 +14,8 @@ DROP TABLE IF EXISTS `bank`;
 -- Primary tables
 CREATE TABLE `users` (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    provider VARCHAR(255) NOT NULL,
-    provider_id VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
     balance DECIMAL(10,2) NOT NULL,
     debt DECIMAL(10,2) NOT NULL,
     role VARCHAR(255) NOT NULL
@@ -74,3 +74,14 @@ CREATE TABLE `bank_log` (
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)
 );
+
+DELIMITER ;;
+CREATE PROCEDURE create_user(
+    IN email VARCHAR(255),
+    IN username VARCHAR(255)
+)
+BEGIN
+    INSERT INTO users (email, username, balance, debt, role)
+    VALUES (email, username, 0.00, 0.00, 'user');
+END;;
+DELIMITER ;

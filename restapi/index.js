@@ -24,7 +24,7 @@ app.post('/api/v1/create/user', async (req, res) => {
     }
 
     try {
-        await createUser(email, username);
+        await createUser(username, email);
 
         const response = {
             message: 'Användare skapad',

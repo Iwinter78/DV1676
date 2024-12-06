@@ -1,0 +1,63 @@
+#docker compose -f docker-compose.dev.yml up
+#docker compose -f docker-compose.dev.yml down
+
+services:
+  restapi-dev:
+    image: node:20
+    container_name: restapi-dev
+    working_dir: /app
+    command: bash -c "npm install && node ./restapi/index.js"
+    ports:
+      - "5000:5000"
+    networks:
+      dv1676-network:
+        ipv4_address: 172.22.0.3
+    volumes:
+      - .:/app
+    restart: always
+    depends_on:
+      - database-dev
+
+  database-dev:
+    image: mariadb:latest
+    container_name: database-dev
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    env_file:
+      - .env
+    networks:
+      dv1676-network:
+        ipv4_address: 172.22.0.4
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./db/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+    restart: always
+
+  client-dev:
+    image: node:20
+    container_name: client-dev
+    working_dir: /app
+    command: bash -c "npm install && node index.js"
+    ports:
+      - "3000:3000"
+    networks:
+      dv1676-network:
+        ipv4_address: 172.22.0.2
+    volumes:
+      - .:/app
+    restart: always
+    depends_on:
+      - restapi-dev
+
+networks:
+    dv1676-network:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.22.0.0/16

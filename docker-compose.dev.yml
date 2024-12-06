@@ -6,7 +6,7 @@ services:
     image: node:20
     container_name: restapi-dev
     working_dir: /app
-    command: bash -c "npm install && node ./restapi/index.js"
+    command: tail -f /dev/null
     ports:
       - "1337:1337"
     networks:
@@ -14,7 +14,9 @@ services:
         ipv4_address: 172.22.0.3
     volumes:
       - .:/app
-    restart: always
+    environment:
+      - NODE_ENV=development
+    restart: "no"
     depends_on:
       - database-dev
 
@@ -42,7 +44,7 @@ services:
     image: node:20
     container_name: client-dev
     working_dir: /app
-    command: bash -c "npm install && node index.js"
+    command: tail -f /dev/null
     ports:
       - "3000:3000"
     networks:
@@ -50,7 +52,9 @@ services:
         ipv4_address: 172.22.0.2
     volumes:
       - .:/app
-    restart: always
+    restart: "no"
+    environment:
+      - NODE_ENV=development
     depends_on:
       - restapi-dev
 

@@ -1,13 +1,12 @@
 import mysql from 'mysql';
-import process from 'process';
 
 export async function connect() {
     const connect = mysql.createConnection({
-        host: 'database',
-        port: 3307,
-        user: process.env.MYSQL_USER,
-        password: process.env.MYSQL_PASSWORD,
-        database: process.env.MYSQL_DATABASE
+        host: 'database-dev',
+        port: 3306,
+        user: 'admin',
+        password: '123123',
+        database: 'magicbike',
     });
 
     return Promise.resolve(connect);

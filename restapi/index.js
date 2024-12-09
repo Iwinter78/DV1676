@@ -1,5 +1,5 @@
 import express from 'express';
-import { createUser } from './src/user.js';
+import * as user from './src/user.js';
 
 const app = express();
 
@@ -24,7 +24,7 @@ app.post('/api/v1/create/user', async (req, res) => {
     }
 
     try {
-        await createUser(username, email);
+        await user.createUser(username, email);
 
         const response = {
             message: 'Användare skapad',
@@ -43,7 +43,37 @@ app.post('/api/v1/create/user', async (req, res) => {
             error: error.message
         });
     }
+});
 
+app.get('/api/v1/user/:email', async (req, res) => {
+    const { email } = req.params;
+
+    if (!email) {
+        return res.status(400).json({
+            message: 'Email krävs',
+            status: 400
+        });
+    }
+
+    try {
+        const user = await user.getUser(email);
+        if (user.length === 0) {
+            return res.status(404).json({
+                message: 'Användare hittades inte',
+                status: 404
+            });
+        }
+
+        res.status(200).json({
+            data: user[0]
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
 });
 
 

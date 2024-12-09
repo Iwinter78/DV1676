@@ -43,7 +43,7 @@ app.get('/callback', async (req, res) => {
     }
     const token = await exchangeCodeForToken(code);
     const userInfo = await getUserInfo(token);
-  
+
     req.session.userInfo = userInfo;
 
     res.redirect('/home');
@@ -64,7 +64,19 @@ app.get('/home', (req, res) => {
 
 // Admin first view after login
 app.get('/admin_view', (req, res) => {
-  res.render('admin_panel/main');
+    res.render('admin_panel/main');
+});
+
+app.get('/admin_panel/customer', (req, res) => {
+    res.render('admin_panel/customer');
+});
+
+app.get('/admin_panel/bike', (req, res) => {
+    res.render('admin_panel/bike');
+});
+
+app.get('/admin_panel/station', (req, res) => {
+    res.render('admin_panel/station');
 });
 
 // Start the server

@@ -27,8 +27,6 @@ services:
     networks:
       dv1676-network:
         ipv4_address: 172.22.0.3
-    volumes:
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     restart: always
     depends_on:
       - database

@@ -17,6 +17,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
+app.use(express.static('src'));
 app.use(express.static('public'));
 app.use(express.static(join(__dirname, 'views')));
 
@@ -70,3 +71,53 @@ app.get('/admin_view', (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+
+/* // Route to show the users profile
+app.get('/profile', async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.redirect('/'); // Om användaren inte är inloggad, skicka dem till startsidan
+    }
+
+    try {
+        const [results] = await db.query('SELECT balance FROM users WHERE provider_id = ?', [userId]);
+
+        if (results.length > 0) {
+            res.render('client/client_detail.ejs', { balance: results[0].balance });
+        } else {
+            res.status(404).send('User not found');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Database error');
+    }
+});
+
+app.get('/history', async (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.redirect('/'); //back to home if the user is not logd in
+    }
+
+    try {
+        // The last 5 travels from thr user
+        const query = `
+            SELECT start_time, start_location, end_time, end_location
+            FROM bike
+            WHERE history_userid = ?
+            ORDER BY start_time DESC
+            LIMIT 5
+        `;
+        const [results] = await db.query(query, [userId]);
+
+        // Render the view and pass the travel data
+        res.render('client/client_travel_history', { trips: results });
+    } catch (error) {
+        console.error('Database error:', error);
+        res.status(500).send('Database error');
+    }
+});
+
+module.exports = router; */

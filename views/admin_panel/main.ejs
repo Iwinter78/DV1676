@@ -1,21 +1,18 @@
 <%- include('../../public/header.ejs') %>
-  <div id="map"></div>
-  <script>
-     navigator.geolocation.getCurrentPosition(
-        function (position) {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          
-          var map = L.map('map').setView([latitude, longitude], 16);
-          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 18,
-          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
-        L.marker([latitude, longitude]).addTo(map)
-          .bindPopup("Här är du!")
-          .openPopup();
-      })
-  </script>
-  
-<%- include('../../public/footer.ejs') %>
+<div id="map"></div>
 
+<div class="dropdown">
+    <select id="city-select" class="form-select">
+        <option value="" selected disabled>Välj en stad</option>
+    </select>
+</div>
+
+<div class="map-controls">
+    <button id="locate-user" class="btn btn-primary btn-sm btn-light">
+        <i class="bi bi-geo-alt-fill"></i>
+    </button>
+</div>
+
+<script src="/js/map.bundle.js" defer></script>
+
+<%- include('../../public/footer.ejs') %>

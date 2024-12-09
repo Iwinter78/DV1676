@@ -85,3 +85,11 @@ BEGIN
     VALUES (email, username, 0.00, 0.00, 'user');
 END;;
 DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE get_user(
+    IN email VARCHAR(255)
+)
+BEGIN
+    SELECT * FROM users WHERE email = email;
+END;;

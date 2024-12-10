@@ -6,11 +6,12 @@ import mysql from 'mysql';
  */
 export async function connect() {
     const connect = mysql.createConnection({
-        host: 'database-dev',
+        host: 'localhost',
         port: 3306,
         user: 'admin',
         password: '123123',
         database: 'magicbike',
+        multipleStatements: true
     });
 
     return Promise.resolve(connect);

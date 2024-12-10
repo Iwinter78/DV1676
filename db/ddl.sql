@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS `bank`;
 
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS get_user;
+DROP PROCEDURE IF EXISTS delete_user;
 
 -- Primary tables
 CREATE TABLE `users` (
@@ -103,16 +104,20 @@ END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE get_user(IN email_param VARCHAR(255))
+CREATE PROCEDURE get_user(
+    IN in_email VARCHAR(255)
+)
 BEGIN
-    SELECT * FROM users WHERE email = email_param;
+    SELECT * FROM users WHERE email = in_email;
 END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE delete_user(IN email_param VARCHAR(255))
+CREATE PROCEDURE delete_user(
+    IN in_email VARCHAR(255)
+)
 BEGIN
-    DELETE FROM users WHERE email = email_param;
+    DELETE FROM users WHERE email = in_email;
 END;;
 DELIMITER ;
 

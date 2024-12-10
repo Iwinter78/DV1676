@@ -1,5 +1,4 @@
 import { connect } from './connect.js';
-import mysql from 'mysql';
 
 /**
  * Creates a new user and stores it in the database
@@ -14,6 +13,11 @@ async function createUser(username, email) {
     db.end();
 }
 
+/**
+ * Functions fetches the user infomartion from the database based on the email
+ * @param {String} email - The email of the user
+ * @returns {Array} - An array containing the user information
+ */
 async function getUser(email) {
     const db = await connect();
     const query = `CALL get_user(?)`;
@@ -31,7 +35,10 @@ async function getUser(email) {
     db.end();
     return response;
 }
-
+/**
+ * Delates a user from the database
+ * @param {String} email - The email of the user
+ */
 async function deleteUser(email) {
     const db = await connect();
     const query = `CALL delete_user(?)`;

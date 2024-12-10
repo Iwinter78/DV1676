@@ -43,7 +43,7 @@ app.get('/callback', async (req, res) => {
     }
     const token = await exchangeCodeForToken(code);
     const userInfo = await getUserInfo(token);
-  
+
     req.session.userInfo = userInfo;
 
     res.redirect('/home');
@@ -64,7 +64,19 @@ app.get('/home', (req, res) => {
 
 // Admin first view after login
 app.get('/admin_view', (req, res) => {
-  res.render('admin_panel/main');
+    res.render('admin_panel/main');
+});
+
+app.get('/admin_panel/customer', (req, res) => {
+    res.render('admin_panel/customer');
+});
+
+app.get('/admin_panel/bike', (req, res) => {
+    res.render('admin_panel/bike');
+});
+
+app.get('/admin_panel/station', (req, res) => {
+    res.render('admin_panel/station');
 });
 
 // Start the server
@@ -72,52 +84,25 @@ app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
 
-/* // Route to show the users profile
+// Route to show the users profile
 app.get('/profile', async (req, res) => {
-    const userId = req.session.userId;
+    const userInfo = req.session.userInfo;
 
-    if (!userId) {
+    if (!userInfo) {
         return res.redirect('/'); // Om användaren inte är inloggad, skicka dem till startsidan
     }
 
-    try {
-        const [results] = await db.query('SELECT balance FROM users WHERE provider_id = ?', [userId]);
+    res.render('client/client_detail.ejs');
 
-        if (results.length > 0) {
-            res.render('client/client_detail.ejs', { balance: results[0].balance });
-        } else {
-            res.status(404).send('User not found');
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Database error');
-    }
 });
 
 app.get('/history', async (req, res) => {
-    const userId = req.session.userId;
+    const userInfo = req.session.userInfo;
 
-    if (!userId) {
+    if (!userInfo) {
         return res.redirect('/'); //back to home if the user is not logd in
     }
 
-    try {
-        // The last 5 travels from thr user
-        const query = `
-            SELECT start_time, start_location, end_time, end_location
-            FROM bike
-            WHERE history_userid = ?
-            ORDER BY start_time DESC
-            LIMIT 5
-        `;
-        const [results] = await db.query(query, [userId]);
+    res.render('client/client_travel_history');
 
-        // Render the view and pass the travel data
-        res.render('client/client_travel_history', { trips: results });
-    } catch (error) {
-        console.error('Database error:', error);
-        res.status(500).send('Database error');
-    }
 });
-
-module.exports = router; */

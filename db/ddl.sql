@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS `station_log`;
 DROP TABLE IF EXISTS `bank_log`;
 
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `city`;
 DROP TABLE IF EXISTS `bike`;
 DROP TABLE IF EXISTS `station`;
 DROP TABLE IF EXISTS `bank`;
@@ -21,24 +22,34 @@ CREATE TABLE `users` (
     role VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE `city` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    city_name VARCHAR(255) NOT NULL UNIQUE,
+    city_gps VARCHAR(255) NOT NULL
+);
+
 -- bike_status: true = available, false = in use
 CREATE TABLE `bike` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     bike_status BOOLEAN NOT NULL DEFAULT true,
     gps VARCHAR(255),
+    city VARCHAR(255),
     start_time TIMESTAMP,
     start_location VARCHAR(255),
     end_time TIMESTAMP,
     end_location VARCHAR(255),
-    history_userid INT,
-    currentuser INT
+    currentuser INT,
+    FOREIGN KEY (currentuser) REFERENCES users(id),
+    FOREIGN KEY (city) REFERENCES city(city_name)
 );
 
 CREATE TABLE `station` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     charge_taken INT,
+    city VARCHAR(255),
     charging_size INT,
-    gps VARCHAR(255)
+    gps VARCHAR(255),
+    FOREIGN KEY (city) REFERENCES city(city_name)
 );
 
 CREATE TABLE `bank` (
@@ -58,7 +69,9 @@ CREATE TABLE `bike_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
-    FOREIGN KEY (id) REFERENCES bike(id)
+    log_userid INT,
+    FOREIGN KEY (id) REFERENCES bike(id),
+    FOREIGN KEY (log_userid) REFERENCES users(id)
 );
 
 CREATE TABLE `station_log` (

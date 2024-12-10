@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/v1/create/user', async (req, res) => {
-    const { email, username} = req.body;
-    console.log(req.body);
+    const username = req.body.username;
+    const email = req.body.email;
 
     if (!email || !username) {
         return res.status(400).json({
@@ -45,8 +45,17 @@ app.post('/api/v1/create/user', async (req, res) => {
     }
 });
 
-app.get('/api/v1/user/:email', async (req, res) => {
-    const { email } = req.params;
+app.get('/api/v1/user', async (req, res) => {
+    let email = req.query.email;
+    console.log(email);
+    console.log(typeof email);
+    let response = await user.getUser(email);
+    console.log(response);
+    res.status(200).json(response);
+});
+
+app.delete('/api/v1/delete/user/:email', async (req, res) => {
+    const email = req.params.email;
 
     if (!email) {
         return res.status(400).json({
@@ -56,27 +65,20 @@ app.get('/api/v1/user/:email', async (req, res) => {
     }
 
     try {
-        const user = await user.getUser(email);
-        if (user.length === 0) {
-            return res.status(404).json({
-                message: 'Användare hittades inte',
-                status: 404
-            });
-        }
+        await user.deleteUser(email);
 
         res.status(200).json({
-            data: user[0]
+            message: 'Användare raderad',
+            status: 200
         });
     } catch (error) {
         res.status(500).json({
             message: 'Något gick fel, försök igen senare',
             status: 500,
-            error: error.message
+            error: error
         });
     }
 });
-
-
 
 app.listen(port, () => {
     console.log(`REST API is listning on ${port}`);

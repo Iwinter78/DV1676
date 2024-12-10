@@ -11,6 +11,9 @@ DROP TABLE IF EXISTS `bike`;
 DROP TABLE IF EXISTS `station`;
 DROP TABLE IF EXISTS `bank`;
 
+DROP PROCEDURE IF EXISTS create_user;
+DROP PROCEDURE IF EXISTS get_user;
+
 -- Primary tables
 CREATE TABLE `users` (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,19 +80,26 @@ CREATE TABLE `bank_log` (
 
 DELIMITER ;;
 CREATE PROCEDURE create_user(
-    IN email VARCHAR(255),
-    IN username VARCHAR(255)
+    IN in_email VARCHAR(255),
+    IN in_username VARCHAR(255)
 )
 BEGIN
     INSERT INTO users (email, username, balance, debt, role)
-    VALUES (email, username, 0.00, 0.00, 'user');
+    VALUES (in_email, in_username, 0.00, 0.00, 'user');
 END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE get_user(
-    IN email VARCHAR(255)
-)
+CREATE PROCEDURE get_user(IN email_param VARCHAR(255))
 BEGIN
-    SELECT * FROM users WHERE email = email;
+    SELECT * FROM users WHERE email = email_param;
 END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE delete_user(IN email_param VARCHAR(255))
+BEGIN
+    DELETE FROM users WHERE email = email_param;
+END;;
+DELIMITER ;
+

@@ -1,5 +1,5 @@
-'use strict';
 import { connect } from './connect.js';
+import mysql from 'mysql';
 
 /**
  * Creates a new user and stores it in the database
@@ -14,24 +14,34 @@ async function createUser(username, email) {
     db.end();
 }
 
-/**
- * Retrives a user from the database
- * @param {String} email - The email of the user
- * @returns {Promise<mysql.RowDataPacket[]>} - Returns a promise with the infomation of the user
- */
 async function getUser(email) {
     const db = await connect();
     const query = `CALL get_user(?)`;
     const values = [email];
-    const result = await db.query(query, values);
+    const response = await new Promise((resolve, reject) => { //Varför är jag tvungen att skapa ett nytt promise?????
+        db.query(query, values, (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+
     db.end();
-    return result;
+    return response;
 }
 
-
-
+async function deleteUser(email) {
+    const db = await connect();
+    const query = `CALL delete_user(?)`;
+    const values = [email];
+    await db.query(query, values);
+    db.end();
+}
 
 export { 
     createUser,
-    getUser
+    getUser,
+    deleteUser
 };

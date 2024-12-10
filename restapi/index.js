@@ -47,11 +47,24 @@ app.post('/api/v1/create/user', async (req, res) => {
 
 app.get('/api/v1/user', async (req, res) => {
     let email = req.query.email;
-    console.log(email);
-    console.log(typeof email);
-    let response = await user.getUser(email);
-    console.log(response);
-    res.status(200).json(response);
+
+    if (!email) {
+        return res.status(400).json({
+            message: 'Email krävs',
+            status: 400
+        });
+    }
+    
+    try {
+        let response = await user.getUser(email);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
 });
 
 app.delete('/api/v1/delete/user/:email', async (req, res) => {

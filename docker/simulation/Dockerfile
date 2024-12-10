@@ -11,6 +11,6 @@ COPY simulation/index.js .
 
 RUN npm install
 
-EXPOSE 1337
+EXPOSE 5001
 
 CMD ["node", "index.js"]

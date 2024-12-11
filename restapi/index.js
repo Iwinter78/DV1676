@@ -93,6 +93,38 @@ app.delete('/api/v1/delete/user/:email', async (req, res) => {
     }
 });
 
+app.post('/api/v1/create/bike', async (req, res) => {
+    const { gps, city } = req.body;
+
+    if (!gps || !city) {
+        return res.status(400).json({
+            message: 'GPS och stad krävs',
+            status: 400
+        });
+    }
+
+    try {
+        await user.createBike(gps, city);
+
+        const response = {
+            message: 'Cykel skapad',
+            status: 201,
+            data: {
+                gps,
+                city,
+            }
+        }
+    
+        res.status(201).json(response);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
+});
+
 app.listen(port, () => {
     console.log(`REST API is listning on ${port}`);
 });

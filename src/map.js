@@ -7,6 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
         (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
+            
+            const customIcon = L.divIcon({
+                className: 'custom-marker',
+                html: '<div style="font-size: 30px; color: #ff00ce; font-weight: bold;">●</div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
 
             const map = L.map('map').setView([latitude, longitude], 16);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -14,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             }).addTo(map);
 
-            L.marker([latitude, longitude]).addTo(map)
+            L.marker([latitude, longitude], {icon: customIcon}).addTo(map)
                 .bindPopup("Här är du!")
                 .openPopup();
 

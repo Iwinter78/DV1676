@@ -15,6 +15,8 @@ DROP TABLE IF EXISTS `bank`;
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS get_user;
 DROP PROCEDURE IF EXISTS delete_user;
+DROP PROCEDURE IF EXISTS create_bike;
+DROP PROCEDURE IF EXISTS update_bike_position;
 
 -- Primary tables
 CREATE TABLE `users` (
@@ -32,28 +34,27 @@ CREATE TABLE `city` (
     city_gps VARCHAR(255) NOT NULL
 );
 
+--start_time TIMESTAMP,
+--start_location VARCHAR(255),
+--end_time TIMESTAMP,
+--end_location VARCHAR(255),
 -- bike_status: true = available, false = in use
 CREATE TABLE `bike` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     bike_status BOOLEAN NOT NULL DEFAULT true,
     gps VARCHAR(255),
     city VARCHAR(255),
-    start_time TIMESTAMP,
-    start_location VARCHAR(255),
-    end_time TIMESTAMP,
-    end_location VARCHAR(255),
     currentuser INT,
-    FOREIGN KEY (currentuser) REFERENCES users(id),
-    FOREIGN KEY (city) REFERENCES city(city_name)
+    FOREIGN KEY (currentuser) REFERENCES users(id)
 );
 
 CREATE TABLE `station` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     charge_taken INT,
-    city VARCHAR(255),
+    city INT,
     charging_size INT,
     gps VARCHAR(255),
-    FOREIGN KEY (city) REFERENCES city(city_name)
+    FOREIGN KEY (city) REFERENCES city(id)
 );
 
 CREATE TABLE `bank` (
@@ -63,14 +64,14 @@ CREATE TABLE `bank` (
 
 -- Log tables
 CREATE TABLE `user_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES users(id)
 );
 
 CREATE TABLE `bike_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     log_userid INT,
@@ -79,14 +80,14 @@ CREATE TABLE `bike_log` (
 );
 
 CREATE TABLE `station_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES station(id)
 );
 
 CREATE TABLE `bank_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)
@@ -121,3 +122,25 @@ BEGIN
 END;;
 DELIMITER ;
 
+DELIMITER ;;
+CREATE PROCEDURE create_bike(
+    IN in_gps VARCHAR(255),
+    IN in_city VARCHAR(255)
+)
+BEGIN
+    INSERT INTO bike (gps, city)
+    VALUES (in_gps, in_city);
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE update_bike_position(
+    IN in_id INT,
+    IN in_gps VARCHAR(255)
+)
+BEGIN
+    UPDATE bike
+    SET gps = in_gps
+    WHERE id = in_id;
+END;;
+DELIMITER ;

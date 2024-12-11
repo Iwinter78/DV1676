@@ -1,9 +1,10 @@
 import express from 'express';
 import * as user from './src/user.js';
+import * as bike from './src/bike.js';
 
 const app = express();
 
-const port = 3000;
+const port = 1337;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -94,7 +95,7 @@ app.delete('/api/v1/delete/user/:email', async (req, res) => {
 });
 
 app.post('/api/v1/create/bike', async (req, res) => {
-    const { gps, city } = req.body;
+    const {gps, city} = req.body;
 
     if (!gps || !city) {
         return res.status(400).json({
@@ -104,7 +105,7 @@ app.post('/api/v1/create/bike', async (req, res) => {
     }
 
     try {
-        await user.createBike(gps, city);
+        await bike.createBike(gps, city);
 
         const response = {
             message: 'Cykel skapad',
@@ -116,6 +117,33 @@ app.post('/api/v1/create/bike', async (req, res) => {
         }
     
         res.status(201).json(response);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
+});
+
+app.put('/api/v1/update/bike', async (req, res) => {
+    const {id, gps} = req.body;
+
+    if (!gps || !id) {
+        return res.status(400).json({
+            message: 'GPS och id krävs',
+            status: 400
+        });
+    }
+
+    try {
+        await bike.updateBikePosition(id, gps);
+
+        res.status(200).json({
+            message: 'Cykel uppdaterad',
+            status: 200
+        });
     } catch (error) {
         res.status(500).json({
             message: 'Något gick fel, försök igen senare',

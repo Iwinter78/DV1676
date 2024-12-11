@@ -33,7 +33,7 @@ async function getUser(email) {
     });
 
     db.end();
-    return response;
+    return response[0];
 }
 /**
  * Delates a user from the database

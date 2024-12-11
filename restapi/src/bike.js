@@ -1,7 +1,7 @@
 import { connect } from './connect.js';
 
 async function createBike() {
-    return 0;
+    const db = await connect();
 }
 
 export { createBike };

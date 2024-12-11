@@ -32,7 +32,9 @@
     "ejs": "^3.1.10",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
-    "promise-mysql": "^5.2.0",
-    "leaflet": "^1.9.4"
+    "leaflet": "^1.9.4",
+    "mysql-promise": "^5.0.0",
+    "mysql2": "^3.11.5",
+    "promise-mysql": "^5.2.0"
   }
 }

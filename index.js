@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import process from 'process';
 
+
 import { exchangeCodeForToken, getUserInfo } from './src/login.js';
 
 // Define __dirname for ES modules
@@ -77,6 +78,10 @@ app.get('/admin_panel/bike', (req, res) => {
 
 app.get('/admin_panel/station', (req, res) => {
     res.render('admin_panel/station');
+});
+
+app.get('/admin_panel/log', (req, res) => {
+
 });
 
 // Start the server

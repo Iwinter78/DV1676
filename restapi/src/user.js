@@ -1,5 +1,4 @@
 import { connect } from './connect.js';
-import mysql from 'mysql';
 
 /**
  * Creates a new user and stores it in the database
@@ -14,28 +13,25 @@ async function createUser(username, email) {
     db.end();
 }
 
-async function getUser(email) {
+async function getUser(username) {
     const db = await connect();
     const query = `CALL get_user(?)`;
-    const values = [email];
-    const response = await new Promise((resolve, reject) => { //Varför är jag tvungen att skapa ett nytt promise?????
-        db.query(query, values, (error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        });
-    });
-
-    db.end();
-    return response;
+    const values = [username];
+    try {
+        const [rows] = await db.query(query, values);
+        db.end();
+        return rows;
+    } catch (error) {
+        db.end();
+        throw error;
+    }
 }
 
-async function deleteUser(email) {
+
+async function deleteUser(username) {
     const db = await connect();
     const query = `CALL delete_user(?)`;
-    const values = [email];
+    const values = [username];
     await db.query(query, values);
     db.end();
 }

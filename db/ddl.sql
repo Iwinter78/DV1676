@@ -103,16 +103,16 @@ END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE get_user(IN email_param VARCHAR(255))
+CREATE PROCEDURE get_user(IN username_param VARCHAR(255))
 BEGIN
-    SELECT * FROM users WHERE email = email_param;
+    SELECT * FROM users WHERE username = username_param;
 END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE delete_user(IN email_param VARCHAR(255))
+CREATE PROCEDURE delete_user(IN username_param VARCHAR(255))
 BEGIN
-    DELETE FROM users WHERE email = email_param;
+    DELETE FROM users WHERE username = username_param;
 END;;
 DELIMITER ;
 

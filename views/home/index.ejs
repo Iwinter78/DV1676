@@ -1,6 +1,9 @@
 <%- include('../../public/header.ejs') %>
-    <main>
-        <p>Inloggad som <%= login %></p>
-        <a href="/logout">Logga ut</a>
-    </main>
+    <div id="map"></div>
+    <div class="map-controls">
+        <button id="locate-user" class="btn btn-primary btn-sm btn-light">
+            <i class="bi bi-geo-alt-fill"></i>
+        </button>
+    </div>
+    <script src="/js/map.bundle.js" defer></script>
 <%- include('../../public/footer.ejs') %>

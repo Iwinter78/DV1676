@@ -1,4 +1,5 @@
 import L from "leaflet";
+//import { decode, encode } from 'open-location-code';
 document.addEventListener('DOMContentLoaded', () => {
     const locateButton = document.getElementById('locate-user');
     const cityDropdown = document.getElementById('city-select');

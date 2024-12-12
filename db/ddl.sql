@@ -116,3 +116,14 @@ BEGIN
 END;;
 DELIMITER ;
 
+DELIMITER ;;
+
+CREATE PROCEDURE get_user_log(IN username_param VARCHAR(255))
+BEGIN
+    SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data
+    FROM users u
+    JOIN user_log ul ON u.id = ul.id
+    WHERE u.username = username_param;
+END;;
+DELIMITER ;
+

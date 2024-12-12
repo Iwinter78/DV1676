@@ -1,30 +1,26 @@
-v<%- include('../../public/header.ejs') %>
+<%- include('../../public/header.ejs') %>
 
-<h1>Resehistorik</h1>
+<h1 class="text-center">Resehistorik för <%= login %></h1>
 
-<% if (trips.length > 0) { %>
-    <table>
+<% if (trips && trips.length > 0) { %>
+    <table class="table table-light table-striped">
         <thead>
             <tr>
-                <th>Starttid</th>
-                <th>Startplats</th>
-                <th>Sluttid</th>
-                <th>Slutplats</th>
+                <th>Tid</th>
+                <th>Loggdata</th>
             </tr>
         </thead>
         <tbody>
             <% trips.forEach(trip => { %>
                 <tr>
-                    <td><%= new Date(trip.start_time).toLocaleString() %></td>
-                    <td><%= trip.start_location %></td>
-                    <td><%= new Date(trip.end_time).toLocaleString() %></td>
-                    <td><%= trip.end_location %></td>
+                    <td><%= trip.log_time ? new Date(trip.log_time).toISOString().replace('T', ' ').split('.')[0] : '--' %></td>
+                    <td><%= trip.log_data || '--' %></td>
                 </tr>
             <% }) %>
         </tbody>
     </table>
 <% } else { %>
-    <p>Du har ännu inga resor registrerade.</p>
+    <p class="text-center">Det finns inga loggar att visa.</p>
 <% } %>
 
 <%- include('../../public/footer.ejs') %>

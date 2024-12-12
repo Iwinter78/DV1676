@@ -112,6 +112,15 @@ app.get('/history', async (req, res) => {
         return res.redirect('/'); //back to home if the user is not logd in
     }
 
-    res.render('client/client_travel_history');
+    const profileResponse = await fetch(`http://localhost:1337/api/v1/history?username=${userInfo.login}`);
+    const profile = await profileResponse.json();
+    const trips = profile[0] || [];
+    const data = {
+        ...userInfo,
+        trips
+    }
+
+    console.log(trips)
+    res.render('client/client_travel_history', data);
 
 });

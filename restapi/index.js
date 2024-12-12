@@ -80,6 +80,16 @@ app.delete('/api/v1/delete/user/:username', async (req, res) => {
     }
 });
 
+
+app.get('/api/v1/history', async (req, res) => {
+    let username = req.query.username;
+    console.log(username);
+    console.log(typeof username);
+    let response = await user.getUserLog(username);
+    console.log(response);
+    res.status(200).json(response);
+});
+
 app.listen(port, () => {
     console.log(`REST API is listning on ${port}`);
 });

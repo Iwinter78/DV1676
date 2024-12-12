@@ -1,0 +1,34 @@
+<%- include('../../public/admin-overview-header.ejs') %>
+
+<form method="GET" class="d-flex mb-3">
+    <select class="form-select me-2" name="type">
+        <option value="">Alla typer</option>
+        <option value="User">Användare</option>
+        <option value="Bike">Cykel</option>
+        <option value="Station">Station</option>
+        <option value="Bank">Bank</option>
+    </select>
+    <button class="btn btn-outline-success" type="submit">Filtrera</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Typ</th>
+            <th scope="col">Tid</th>
+            <th scope="col">Loggdata</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% logs.forEach(log => { %>
+            <% if (!type || log.type === type) { %>
+                <tr>
+                    <td><%= log.id %></td>
+                    <td><%= log.log_time %></td>
+                    <td><%= log.log_data %></td>
+                </tr>
+            <% } %>
+        <% }) %>
+    </tbody>
+</table>

@@ -47,7 +47,6 @@ app.post('/api/v1/create/user', async (req, res) => {
 });
 
 app.get('/api/v1/user', async (req, res) => {
-<<<<<<< HEAD
     let email = req.query.email;
 
     if (!email) {
@@ -67,14 +66,6 @@ app.get('/api/v1/user', async (req, res) => {
             error: error.message
         });
     }
-=======
-    let username = req.query.username;
-    console.log(username);
-    console.log(typeof username);
-    let response = await user.getUser(username);
-    console.log(response);
-    res.status(200).json(response);
->>>>>>> a047c3c392ac54b5b870ad2ff9cf42b478e7f2a9
 });
 
 app.delete('/api/v1/delete/user/:username', async (req, res) => {

@@ -13,27 +13,38 @@ async function createUser(username, email) {
     db.end();
 }
 
-/**
- * Functions fetches the user infomartion from the database based on the email
- * @param {String} email - The email of the user
- * @returns {Array} - An array containing the user information
- */
-async function getUser(email) {
+async function getUser(username) {
     const db = await connect();
     const query = `CALL get_user(?)`;
-    const values = [email];
-    const response = await db.query(query, values);
-    db.end();
-    return response[0][0];
+    const values = [username];
+    try {
+        const [rows] = await db.query(query, values);
+        db.end();
+        return rows;
+    } catch (error) {
+        db.end();
+        throw error;
+    }
 }
-/**
- * Delates a user from the database
- * @param {String} email - The email of the user
- */
-async function deleteUser(email) {
+
+async function getUserLog(username) {
+const db = await connect();
+    const query = `CALL get_user_log(?)`;
+    const values = [username];
+    try {
+        const [rows] = await db.query(query, values);
+        db.end();
+        return rows;
+    } catch (error) {
+        db.end();
+        throw error;
+    }
+}
+
+async function deleteUser(username) {
     const db = await connect();
     const query = `CALL delete_user(?)`;
-    const values = [email];
+    const values = [username];
     await db.query(query, values);
     db.end();
 }
@@ -41,5 +52,6 @@ async function deleteUser(email) {
 export { 
     createUser,
     getUser,
-    deleteUser
+    deleteUser,
+    getUserLog
 };

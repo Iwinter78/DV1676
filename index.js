@@ -6,7 +6,6 @@ import dotenv from 'dotenv';
 import process from 'process';
 
 import { exchangeCodeForToken, getUserInfo } from './src/login.js';
-
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,6 +42,11 @@ app.get('/callback', async (req, res) => {
     }
     const token = await exchangeCodeForToken(code);
     const userInfo = await getUserInfo(token);
+
+    let profile = await fetch(`http://localhost:1337/api/v1/user?username=${userInfo.login}`)
+        .then(response => (response.json()));
+    
+    console.log(profile);
 
     req.session.userInfo = userInfo;
 
@@ -91,9 +95,14 @@ app.get('/profile', async (req, res) => {
     if (!userInfo) {
         return res.redirect('/'); // Om användaren inte är inloggad, skicka dem till startsidan
     }
-
-    res.render('client/client_detail.ejs');
-
+    const profileResponse = await fetch(`http://localhost:1337/api/v1/user?username=${userInfo.login}`);
+    const profile = await profileResponse.json();
+    const profileData = profile['0'][0];
+    const data = {
+        ...userInfo,
+        ...profileData
+    }
+    res.render('client/client_detail', data);
 });
 
 app.get('/history', async (req, res) => {
@@ -103,6 +112,15 @@ app.get('/history', async (req, res) => {
         return res.redirect('/'); //back to home if the user is not logd in
     }
 
-    res.render('client/client_travel_history');
+    const profileResponse = await fetch(`http://localhost:1337/api/v1/history?username=${userInfo.login}`);
+    const profile = await profileResponse.json();
+    const trips = profile[0] || [];
+    const data = {
+        ...userInfo,
+        trips
+    }
+
+    console.log(trips)
+    res.render('client/client_travel_history', data);
 
 });

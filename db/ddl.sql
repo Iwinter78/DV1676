@@ -144,3 +144,10 @@ BEGIN
     WHERE id = in_id;
 END;;
 DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE get_all_bike_positions()
+BEGIN
+    SELECT gps FROM bike;
+END;;
+DELIMITER ;

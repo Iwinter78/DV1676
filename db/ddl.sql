@@ -6,11 +6,11 @@ DROP TABLE IF EXISTS `bike_log`;
 DROP TABLE IF EXISTS `station_log`;
 DROP TABLE IF EXISTS `bank_log`;
 
-DROP TABLE IF EXISTS `users`;
-DROP TABLE IF EXISTS `city`;
 DROP TABLE IF EXISTS `bike`;
 DROP TABLE IF EXISTS `station`;
+DROP TABLE IF EXISTS `city`;
 DROP TABLE IF EXISTS `bank`;
+DROP TABLE IF EXISTS `users`;
 
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS get_user;
@@ -108,16 +108,27 @@ END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE get_user(IN email_param VARCHAR(255))
+CREATE PROCEDURE get_user(IN username_param VARCHAR(255))
 BEGIN
-    SELECT * FROM users WHERE email = email_param;
+    SELECT * FROM users WHERE username = username_param;
 END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE delete_user(IN email_param VARCHAR(255))
+CREATE PROCEDURE delete_user(IN username_param VARCHAR(255))
 BEGIN
-    DELETE FROM users WHERE email = email_param;
+    DELETE FROM users WHERE username = username_param;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+
+CREATE PROCEDURE get_user_log(IN username_param VARCHAR(255))
+BEGIN
+    SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data
+    FROM users u
+    JOIN user_log ul ON u.id = ul.id
+    WHERE u.username = username_param;
 END;;
 DELIMITER ;
 

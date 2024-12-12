@@ -1,11 +1,11 @@
-import mysql from 'mysql';
+import mysqlPromise from 'mysql2/promise';
 
 /**
  * Creates a connection to the database
  * @returns {Promise<mysql.Connection>}
  */
 export async function connect() {
-    const connect = mysql.createConnection({
+    const connect = mysqlPromise.createConnection({
         host: 'localhost',
         port: 3306,
         user: 'admin',

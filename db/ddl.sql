@@ -14,6 +14,11 @@ DROP TABLE IF EXISTS `bank`;
 
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS get_user;
+DROP PROCEDURE IF EXISTS delete_user;
+DROP PROCEDURE IF EXISTS show_user_log;
+DROP PROCEDURE IF EXISTS show_bike_log;
+DROP PROCEDURE IF EXISTS show_station_log;
+DROP PROCEDURE IF EXISTS show_bank_log;
 
 -- Primary tables
 CREATE TABLE `users` (
@@ -116,3 +121,34 @@ BEGIN
 END;;
 DELIMITER ;
 
+DELIMITER ;;
+CREATE PROCEDURE show_user_log()
+BEGIN
+    SELECT * FROM user_log;
+END
+;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE show_bike_log()
+BEGIN
+    SELECT * FROM bike_log;
+END
+;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE show_station_log()
+BEGIN
+    SELECT * FROM station_log;
+END
+;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE show_bank_log()
+BEGIN
+    SELECT * FROM bank_log;
+END
+;;
+DELIMITER ;

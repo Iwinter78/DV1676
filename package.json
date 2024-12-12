@@ -35,6 +35,7 @@
     "leaflet": "^1.9.4",
     "mysql-promise": "^5.0.0",
     "mysql2": "^3.11.5",
+    "open-location-code": "^1.0.3",
     "promise-mysql": "^5.2.0"
   }
 }

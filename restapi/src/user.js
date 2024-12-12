@@ -22,18 +22,9 @@ async function getUser(email) {
     const db = await connect();
     const query = `CALL get_user(?)`;
     const values = [email];
-    const response = await new Promise((resolve, reject) => { //Varför är jag tvungen att skapa ett nytt promise?????
-        db.query(query, values, (error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        });
-    });
-
+    const response = await db.query(query, values);
     db.end();
-    return response[0];
+    return response[0][0];
 }
 /**
  * Delates a user from the database

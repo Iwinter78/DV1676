@@ -1,6 +1,11 @@
 <%- include('../../public/header.ejs') %>
 
-<h1>Profil</h1>
-<p>Din balans: <strong><%= balance %> SEK</strong></p>
-
+<h1><%= login %> Profil</h1>
+<main class="main">
+    <div class="d-flex flex-column justify-content-center align-items-center">
+        <p>Din balans: <strong><%= balance || "ERROR" %> SEK</strong></p>
+        <p>Din balans: <strong><%= debt || "ERROR" %> SEK</strong></p>
+    </div>
+    <a href="/logout" class="btn btn-danger">Logga ut</a>
+</main>
 <%- include('../../public/footer.ejs') %>

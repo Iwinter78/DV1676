@@ -94,6 +94,20 @@ app.delete('/api/v1/delete/user/:email', async (req, res) => {
     }
 });
 
+app.get('/api/v1/bike', async (req, res) => {
+    try {
+        let response = await bike.getAllBikesPosition();
+        res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
+});
+
 app.post('/api/v1/create/bike', async (req, res) => {
     const {gps, city} = req.body;
 

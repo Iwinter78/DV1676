@@ -1,5 +1,6 @@
 import express from 'express';
 import session from 'express-session';
+import cors from 'cors';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -14,6 +15,16 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+app.use(cors(
+    {
+        origin: true,
+        allowedHeaders: ['Content-Type', 'Authorization', 'Access-Control-Allow-Origin'],
+        credentials: true
+    }
+));
+
+app.options('*', cors());
 
 app.set('view engine', 'ejs');
 app.use(express.static('src'));
@@ -60,9 +71,9 @@ app.get('/logout', (req, res) => {
 
 app.get('/home', (req, res) => {
     const userInfo = req.session.userInfo;
-    if (!userInfo) {
-        res.redirect('/');
-    }
+    //if (!userInfo) {
+    //    res.redirect('/');
+    //}
     res.render('home/index', userInfo);
 });
 

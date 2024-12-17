@@ -1,10 +1,12 @@
 <%- include('../../public/header.ejs') %>
+
 <main class="login-page">
+    <img src="/images/kungen.jpg" alt="Logo">
     <h1 class="login-title">Välkommen till MagicBike</h1>
-    <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=<%=client_id%>">
-        <div class="login-button">
-            <p>Logga in med GitHub</p>
+    <a href="https://github.com/login/oauth/authorize?scope=user:email&client_id=<%= client_id %>" class="btn btn-dark center login-button">
+        <div class="icon-container">
+            <i class="bi bi-github fs-1"></i>
         </div>
+        Logga in med GitHub
     </a>
 </main>
-<%- include('../../public/header.ejs') %>

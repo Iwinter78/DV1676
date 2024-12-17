@@ -16,6 +16,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('src'));
 app.use(express.static('public'));
 app.use(express.static(join(__dirname, 'views')));
@@ -26,7 +27,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false },
 }))
-
+// Login page
 app.get('/', (req, res) => {
     const data = {
         client_id: process.env.GITHUB_CLIENT_ID,
@@ -38,26 +39,48 @@ app.get('/callback', async (req, res) => {
     const code = req.query.code; 
 
     if (!code || code === null) {
-        res.status(302).redirect('/');
+        return res.status(302).redirect('/');
     }
     const token = await exchangeCodeForToken(code);
     const userInfo = await getUserInfo(token);
-
+    const email = userInfo.email || null;
+    // Get user info from the database
     let profile = await fetch(`http://localhost:1337/api/v1/user?username=${userInfo.login}`)
         .then(response => (response.json()));
     
-    console.log(profile);
+    console.log("profile information from database", profile);
+    // Check if the user exists in the database or if the email is missing
+    if (!profile || profile.length === 0 || !profile[0][0]?.email) {
+        console.log("Profile is empty or missing email...");
+        req.session.userInfo = {
+            login: userInfo.login,
+            id: userInfo.id,
+            email: email,
+            avatar_url: userInfo.avatar_url,
+            created_at: userInfo.created_at
+        };
 
-    req.session.userInfo = userInfo;
+        return res.redirect('/email');
+    }
 
-    res.redirect('/home');
+    const profileData = profile[0][0];
+    req.session.userInfo = {
+        login: userInfo.login,
+        id: userInfo.id,
+        email: profileData.email || email,
+        avatar_url: userInfo.avatar_url,
+        created_at: userInfo.created_at
+    };
+    console.log('User session created:', req.session.userInfo);
+
+    return res.redirect('/home');
 });
-
+// Logout page
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
 });
-
+// Users home page
 app.get('/home', (req, res) => {
     const userInfo = req.session.userInfo;
     if (!userInfo) {
@@ -70,17 +93,48 @@ app.get('/home', (req, res) => {
 app.get('/admin_view', (req, res) => {
     res.render('admin_panel/main');
 });
-
+// Admin cosutomer view
 app.get('/admin_panel/customer', (req, res) => {
     res.render('admin_panel/customer');
 });
-
+// Admin bike view
 app.get('/admin_panel/bike', (req, res) => {
     res.render('admin_panel/bike');
 });
-
+// Admin station view
 app.get('/admin_panel/station', (req, res) => {
     res.render('admin_panel/station');
+});
+
+app.get('/email', (req, res) => {
+    res.render('login/email');
+});
+
+app.post('/email', async (req, res) => {
+    const email = req.body.email;
+
+    if (email) {
+        req.session.userInfo.email = email;
+        console.log('Email updated in session:', req.session.userInfo);
+            const createResponse = await fetch('http://localhost:1337/api/v1/create/user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: req.session.userInfo.login,
+                    email: req.session.userInfo.email,
+                    balance: 0,
+                    debt: 0,
+                    role: 'user'
+                })
+            });
+
+            const result = await createResponse.json();
+            console.log('User creation response:', result);
+
+            return res.redirect('/home');
+    }
+
+    return res.redirect('/');
 });
 
 // Start the server

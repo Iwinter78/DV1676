@@ -11,16 +11,16 @@
 
 .login-title {
     color: var(--white);
-    font-size: 2rem;
+    font-size: 1.9rem;
 }
 
 .login-button {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    border: 1px solid var(--black);
+    justify-content: center;
+    font-size: 1rem;
+    padding: 6px 12px;
     border-radius: 5px;
-    width: 25vw;
-    color: var(--white);
-    background-color: var(--black);
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: black;
 }

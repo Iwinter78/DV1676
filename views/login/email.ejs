@@ -1,0 +1,20 @@
+<%- include('../../public/header.ejs') %>
+
+<main class="email-page d-flex justify-content-center align-items-center">
+    <div class="email-page_container text-center">
+        <h1 class="email-page_title">Email Verification</h1>
+        <p>Please enter a valid email address</p>
+        <form class="email-page_form" action="/email" method="POST">
+            <input
+                id="email-input"
+                class="email-page_input form-control mb-3"
+                type="email"
+                name="email"
+                placeholder="Email"
+                required
+            >
+            <button class="email-page_button btn btn-primary" type="submit">Submit</button>
+        </form>
+    </div>
+</main>
+<script src="src/login.js"></script>

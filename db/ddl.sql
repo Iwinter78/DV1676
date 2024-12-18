@@ -154,8 +154,8 @@ END;;
 DELIMITER ;
 
 DELIMITER ;;
-CREATE PROCEDURE get_all_bike_positions()
+CREATE PROCEDURE get_all_bikes()
 BEGIN
-    SELECT gps FROM bike;
+    SELECT * FROM bike;
 END;;
 DELIMITER ;

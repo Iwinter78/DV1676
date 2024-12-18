@@ -56,9 +56,9 @@ app.post('/api/v1/create/user', async (req, res) => {
 });
 
 app.get('/api/v1/user', async (req, res) => {
-    let email = req.query.email;
+    let username = req.query.username;
 
-    if (!email) {
+    if (!username) {
         return res.status(400).json({
             message: 'Email krävs',
             status: 400
@@ -66,7 +66,7 @@ app.get('/api/v1/user', async (req, res) => {
     }
     
     try {
-        let response = await user.getUser(email);
+        let response = await user.getUser(username);
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({
@@ -105,7 +105,7 @@ app.delete('/api/v1/delete/user/:username', async (req, res) => {
 
 app.get('/api/v1/bike', async (req, res) => {
     try {
-        let response = await bike.getAllBikesPosition();
+        let response = await bike.getAllBikes();
         res.status(200).json(response);
     } catch (error) {
         console.log(error);

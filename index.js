@@ -148,11 +148,6 @@ app.post('/email', async (req, res) => {
     return res.redirect('/');
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
-
 // Route to show the users profile
 app.get('/profile', async (req, res) => {
     const userInfo = req.session.userInfo;
@@ -189,3 +184,8 @@ app.get('/history', async (req, res) => {
     res.render('client/client_travel_history', data);
 
 });
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
+  });

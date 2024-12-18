@@ -16,16 +16,12 @@ async function createBike(gps, city) {
  * Retrives all the bikes and their positions
  * @returns {Array} - An array containing all bikes and their positions
  */
-async function getAllBikesPosition() {
+async function getAllBikes() {
     const db = await connect();
-    const query = 'CALL get_all_bike_positions()';
+    const query = 'CALL get_all_bikes()';
     const response = await db.query(query);
-    db.end();
-    const bikes = response[0][0].map(bike => ({
-        gps: bike.gps
-    }));
-    
-    return bikes;
+    db.end();    
+    return response[0].slice(0, -1);
 }
 
 /**
@@ -43,6 +39,6 @@ async function updateBikePosition(id, gps) {
 
 export { 
     createBike,
-    getAllBikesPosition,
+    getAllBikes,
     updateBikePosition
 };

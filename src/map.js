@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .bindPopup("Här är du!")
                 .openPopup();
             
-            let bikeCordinates = fetch("http://localhost:1337/api/v1/bike", {
+            let bike = fetch("http://localhost:1337/api/v1/bike", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -42,17 +42,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 credentials: 'include'
             })
                 .then((response) => response.json())
-            
-            
 
-            bikeCordinates.then((data) => {
-                data.forEach((bike) => {
-                    let findCode = openLocationCode.recoverNearest(bike.gps, 56.1, 15.5);
+            
+            bike.then((data) => {
+                let bikes = data[0]
+                bikes.forEach((bike) => {
+
+                    let lat = 0;
+                    let lng = 0;
+
+                    if (bike.city === "Karlskrona") {
+                        lat = 56.1
+                        lng = 15.5
+                    } 
+
+                    let findCode = openLocationCode.recoverNearest(bike.gps, lat, lng);
                     let decodedCordinates = openLocationCode.decode(findCode);
                     let latitude = decodedCordinates.latitudeCenter;
                     let longitude = decodedCordinates.longitudeCenter;
                     
-                    console.log(latitude, longitude);
                     L.marker([latitude, longitude], {icon: bikeIcon}).addTo(map)
                         .bindPopup("Här är en cykel!")
                         .openPopup();

@@ -50,7 +50,7 @@ app.get('/callback', async (req, res) => {
     
     console.log("profile information from database", profile);
     // Check if the user exists in the database or if the email is missing
-    if (!profile || profile.length === 0 || !profile[0][0]?.email) {
+    if (!profile || profile.length === 0 || !profile[0]?.email) {
         console.log("Profile is empty or missing email...");
         req.session.userInfo = {
             login: userInfo.login,
@@ -63,7 +63,7 @@ app.get('/callback', async (req, res) => {
         return res.redirect('/email');
     }
 
-    const profileData = profile[0][0];
+    const profileData = profile[0];
     req.session.userInfo = {
         login: userInfo.login,
         id: userInfo.id,

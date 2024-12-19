@@ -1,3 +1,6 @@
+--executea den -> mariadb --table < use_this_for_database.sql
+CREATE DATABASE IF NOT EXISTS magicbike;
+
 USE magicbike;
 
 SOURCE ddl.sql;

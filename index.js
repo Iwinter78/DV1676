@@ -96,9 +96,18 @@ app.get('/home', (req, res) => {
 app.get('/admin_view', (req, res) => {
     res.render('admin_panel/main');
 });
-// Admin cosutomer view
-app.get('/admin_panel/customer', (req, res) => {
-    res.render('admin_panel/customer');
+
+app.get('/admin_panel/customer', async (req, res) => {
+    const response = await fetch(`http://localhost:1337/api/v1/allUsers`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        const users = data[0];
+    
+    res.render('admin_panel/customer', { users });
 });
 // Admin bike view
 app.get('/admin_panel/bike', (req, res) => {

@@ -159,3 +159,15 @@ BEGIN
     SELECT * FROM bike;
 END;;
 DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE book_bike(
+    in_bike_id INT,
+    in_user_id VARCHAR(255)
+)
+BEGIN
+    UPDATE bike
+    set bike_status = false, currentuser = in_user_id
+    WHERE id = in_bike_id;
+END;;
+DELIMITER ;

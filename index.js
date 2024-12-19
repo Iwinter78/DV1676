@@ -145,6 +145,26 @@ app.post('/email', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+// Update balance for the user
+app.get('/balance', async (req, res) => { 
+    res.render('client/balance');
+});
+
+app.post('/balance', async (req, res) => {
+    const { balance } = req.body;
+    const username = req.session.userInfo.login;
+
+    const profileResponse = await fetch(`http://localhost:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`, {
+        method: 'PUT', // PUT update
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const profile = await profileResponse.json();
+
+    console.log(profile);
+
+    res.redirect('/profile');
+
+});
 
 // Route to show the users profile
 app.get('/profile', async (req, res) => {

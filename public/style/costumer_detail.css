@@ -1,0 +1,14 @@
+.pink-btn {
+    background-color: var(--pink);
+    border-color: var(--pink);
+    color: var(--white);
+}
+.buttons {
+    display: flex;
+    flex-direction: column;
+    padding: 20px; 
+    margin: 1rem;
+}
+.buttons a{
+    margin: 2rem 1rem;
+}

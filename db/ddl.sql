@@ -94,6 +94,8 @@ CREATE TABLE `bank_log` (
     FOREIGN KEY (id) REFERENCES bank(id)
 );
 
+-- Procedures
+-- user procedures
 DELIMITER ;;
 CREATE PROCEDURE create_user(
     IN in_email VARCHAR(255),
@@ -129,6 +131,20 @@ BEGIN
     WHERE u.username = username_param;
 END;;
 DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE update_user_balance(
+    IN in_username VARCHAR(255),
+    IN in_balance DECIMAL(10,2)
+)
+BEGIN
+    UPDATE users
+    SET balance = balance + in_balance
+    WHERE username = in_username;
+END;;
+DELIMITER ;
+
+-- Bike procedures
 
 DELIMITER ;;
 CREATE PROCEDURE create_bike(

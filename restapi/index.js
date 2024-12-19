@@ -1,5 +1,6 @@
 import express from 'express';
 import * as user from './src/user.js';
+import * as bike from './src/bike.js';
 
 const app = express();
 
@@ -46,12 +47,25 @@ app.post('/api/v1/create/user', async (req, res) => {
 });
 
 app.get('/api/v1/user', async (req, res) => {
-    let username = req.query.username;
-    console.log(username);
-    console.log(typeof username);
-    let response = await user.getUser(username);
-    console.log(response);
-    res.status(200).json(response);
+    let email = req.query.email;
+
+    if (!email) {
+        return res.status(400).json({
+            message: 'Email krävs',
+            status: 400
+        });
+    }
+    
+    try {
+        let response = await user.getUser(email);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
 });
 
 app.delete('/api/v1/delete/user/:username', async (req, res) => {
@@ -80,14 +94,77 @@ app.delete('/api/v1/delete/user/:username', async (req, res) => {
     }
 });
 
+app.get('/api/v1/bike', async (req, res) => {
+    try {
+        let response = await bike.getAllBikesPosition();
+        res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
+});
 
-app.get('/api/v1/history', async (req, res) => {
-    let username = req.query.username;
-    console.log(username);
-    console.log(typeof username);
-    let response = await user.getUserLog(username);
-    console.log(response);
-    res.status(200).json(response);
+app.post('/api/v1/create/bike', async (req, res) => {
+    const {gps, city} = req.body;
+
+    if (!gps || !city) {
+        return res.status(400).json({
+            message: 'GPS och stad krävs',
+            status: 400
+        });
+    }
+
+    try {
+        await bike.createBike(gps, city);
+
+        const response = {
+            message: 'Cykel skapad',
+            status: 201,
+            data: {
+                gps,
+                city,
+            }
+        }
+    
+        res.status(201).json(response);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
+});
+
+app.put('/api/v1/update/bike', async (req, res) => {
+    const {id, gps} = req.body;
+
+    if (!gps || !id) {
+        return res.status(400).json({
+            message: 'GPS och id krävs',
+            status: 400
+        });
+    }
+
+    try {
+        await bike.updateBikePosition(id, gps);
+
+        res.status(200).json({
+            message: 'Cykel uppdaterad',
+            status: 200
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
 });
 
 app.listen(port, () => {

@@ -42,15 +42,21 @@ app.get('/callback', async (req, res) => {
     }
     const token = await exchangeCodeForToken(code);
     const userInfo = await getUserInfo(token);
+    const userRole = await getUserRole(token);
 
     let profile = await fetch(`http://localhost:1337/api/v1/user?username=${userInfo.login}`)
         .then(response => (response.json()));
     
+        
     console.log(profile);
 
     req.session.userInfo = userInfo;
 
-    res.redirect('/home');
+    if (userRole === "admin") {
+        res.redirect('/admin_panel/customer');
+    } else {
+        res.redirect('/home');
+    }
 });
 
 app.get('/logout', (req, res) => {
@@ -71,8 +77,17 @@ app.get('/admin_view', (req, res) => {
     res.render('admin_panel/main');
 });
 
-app.get('/admin_panel/customer', (req, res) => {
-    res.render('admin_panel/customer');
+app.get('/admin_panel/customer', async (req, res) => {
+    const response = await fetch(`http://localhost:1337/api/v1/allUsers`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        const users = data[0];
+    
+    res.render('admin_panel/customer', { users });
 });
 
 app.get('/admin_panel/bike', (req, res) => {

@@ -48,20 +48,23 @@ app.get('/callback', async (req, res) => {
     let profile = await fetch(`http://localhost:1337/api/v1/user?username=${userInfo.login}`)
         .then(response => (response.json()));
     
-    console.log("profile information from database", profile);
-    // Check if the user exists in the database or if the email is missing
-    if (!profile || profile.length === 0 || !profile[0]?.email) {
-        console.log("Profile is empty or missing email...");
-        req.session.userInfo = {
-            login: userInfo.login,
-            id: userInfo.id,
-            email: email,
-            avatar_url: userInfo.avatar_url,
-            created_at: userInfo.created_at
-        };
+        const user = profile[0]?.[0]; // Access the first row of the first result set
 
-        return res.redirect('/email');
-    }
+        console.log("User profile:", user);
+        
+        // Check if the user exists and if the email is missing
+        if (!user || !user.email) {
+            console.log("Profile is empty or missing email...");
+            req.session.userInfo = {
+                login: userInfo.login,
+                id: userInfo.id,
+                email: email,
+                avatar_url: userInfo.avatar_url,
+                created_at: userInfo.created_at
+            };
+        
+            return res.redirect('/email');
+        }
 
     const profileData = profile[0];
     req.session.userInfo = {
@@ -114,6 +117,7 @@ app.post('/email', async (req, res) => {
     const email = req.body.email;
 
     if (email) {
+        
         req.session.userInfo.email = email;
         console.log('Email updated in session:', req.session.userInfo);
             const createResponse = await fetch('http://localhost:1337/api/v1/create/user', {

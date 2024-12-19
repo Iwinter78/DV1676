@@ -47,17 +47,17 @@ app.post('/api/v1/create/user', async (req, res) => {
 });
 
 app.get('/api/v1/user', async (req, res) => {
-    let email = req.query.email;
+    let username = req.query.username;
 
-    if (!email) {
+    if (!username) {
         return res.status(400).json({
-            message: 'Email krävs',
+            message: 'Användarnamn krävs',
             status: 400
         });
     }
     
     try {
-        let response = await user.getUser(email);
+        let response = await user.getUser(username);
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({

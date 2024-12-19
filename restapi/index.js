@@ -202,3 +202,8 @@ app.listen(port, () => {
     console.log(`REST API is listning on ${port}`);
 });
 
+app.get('/api/v1/allUsers', async (req, res) => {
+    let response = await user.getAllUsers();
+    console.log(response);
+    res.status(200).json(response);
+});

@@ -62,10 +62,30 @@ async function deleteUser(username) {
     db.end();
 }
 
+async function getAllUsers() {
+    const db = await connect();
+    const query = `CALL get_all_users()`;
+    const [rows] = await db.query(query);
+    db.end();
+    console.log(rows);
+    return rows;
+}
+
+async function getUserRole(username) {
+    const db = await connect();
+    const query = `CALL get_user_role(?)`;
+    const value = [username];
+    const [rows] = await db.query(query, value);
+    db.end();
+    return rows;
+}
+
 export { 
     createUser,
     getUser,
     deleteUser,
     getUserLog,
-    updateUserBalance
+    updateUserBalance,
+    getAllUsers,
+    getUserRole
 };

@@ -1,0 +1,19 @@
+<%- include('../../public/header.ejs') %>
+
+<main class="balance-page d-flex justify-content-center align-items-center">
+    <div class="balance-page_container text-center">
+        <h1 class="balance-page_title">Fyll på saldo</h1>
+        <p>Skiv in önskad summa</p>
+        <form class="balance-page_form" action="/balance" method="POST">
+            <input
+                id="balance-input"
+                class="balance-page_input form-control mb-3"
+                type="number"
+                name="balance"
+                placeholder="Balance"
+                required
+            >
+            <button class="balance-page_button btn btn-primary pink-btn" type="submit">Bekräfta</button>
+        </form>
+    </div>
+</main>

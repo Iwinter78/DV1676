@@ -3,6 +3,7 @@
 @import url('standards.css');
 @import url('map.css');
 @import url('login.css');
+@import url('costumer_detail.css');
 
 hmtl, body{
     background-color: var(--bg-color);

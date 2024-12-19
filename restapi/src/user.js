@@ -41,6 +41,19 @@ const db = await connect();
     }
 }
 
+async function updateUserBalance(username, balance) {
+    const db = await connect();
+    const query = `CALL update_user_balance(?, ?)`;
+    const values = [username, balance];
+    try {
+        await db.query(query, values);
+        db.end();
+    } catch (error) {
+        db.end();
+        throw error;
+    }
+}
+
 async function deleteUser(username) {
     const db = await connect();
     const query = `CALL delete_user(?)`;
@@ -72,6 +85,7 @@ export {
     getUser,
     deleteUser,
     getUserLog,
+    updateUserBalance,
     getAllUsers,
     getUserRole
 };

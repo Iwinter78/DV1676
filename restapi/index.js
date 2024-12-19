@@ -68,6 +68,35 @@ app.get('/api/v1/user', async (req, res) => {
     }
 });
 
+app.put('/api/v1/update/user/balance', async (req, res) => {
+    console.log('Query Params:', req.query);
+
+    const username = req.query.username;
+    const balance = req.query.balance;
+
+    if (!username || isNaN(balance)) {
+        return res.status(400).json({
+            message: 'Användarnamn och saldo krävs',
+            status: 400
+        });
+    }
+
+    try {
+        await user.updateUserBalance(username, balance);
+
+        res.status(200).json({
+            message: 'Användarens saldo uppdaterat',
+            status: 200
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
+});
+
 app.delete('/api/v1/delete/user/:username', async (req, res) => {
     const username = req.params.username;
 
@@ -93,6 +122,8 @@ app.delete('/api/v1/delete/user/:username', async (req, res) => {
         });
     }
 });
+
+// BIKES
 
 app.get('/api/v1/bike', async (req, res) => {
     try {

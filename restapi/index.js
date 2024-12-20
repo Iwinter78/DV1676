@@ -121,6 +121,28 @@ app.get("/api/v1/bike", async (req, res) => {
   }
 });
 
+app.get("/api/v1/bike/:id", async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "Id krävs",
+      status: 400,
+    });
+  }
+
+  try {
+    let response = await bike.getBike(id);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
 app.post("/api/v1/create/bike", async (req, res) => {
   const { gps, city } = req.body;
 
@@ -180,8 +202,8 @@ app.put("/api/v1/update/bike", async (req, res) => {
   }
 });
 
-app.post("/api/v1/bike/book/:id/:username", async (req, res) => {
-  const { id, username } = req.params;
+app.post("/api/v1/bike/book", async (req, res) => {
+  const { id, username } = req.body;
 
   if (!id || !username) {
     return res.status(400).json({

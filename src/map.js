@@ -46,6 +46,11 @@ document.addEventListener("DOMContentLoaded", () => {
     bike.then((data) => {
       let bikes = data[0];
       bikes.forEach((bike) => {
+
+        if (!Boolean(bike.bike_status)) {
+          return;
+        }
+
         let lat = 0;
         let lng = 0;
 

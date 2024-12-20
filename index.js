@@ -100,9 +100,10 @@ app.get("/logout", (req, res) => {
 // Users home page
 app.get("/home", (req, res) => {
   const userInfo = req.session.userInfo;
-  //if (!userInfo) {
-  //    res.redirect('/');
-  //}
+  if (!userInfo) {
+      res.redirect('/');
+  }
+  console.log(userInfo);
   res.render("home/index", userInfo);
 });
 
@@ -195,6 +196,51 @@ app.get("/history", async (req, res) => {
 
   console.log(trips);
   res.render("client/client_travel_history", data);
+});
+
+app.get("/book/confirm/:id", async (req, res) => {
+  let userInfo = req.session.userInfo;
+  let bikeData = await fetch(
+    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+  ).then((response) => response.json());
+
+  console.log(bikeData);
+  console.log(userInfo);
+  let data = {
+    id: req.params.id,
+    userInfo,
+    bike: bikeData[0][0],
+  };
+  res.render("client/client_book", data);
+});
+
+app.post("/book/confirm/:id", async (req, res) => {
+  let userInfo = req.session.userInfo;
+  let bikeData = await fetch(
+    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+  ).then((response) => response.json());
+
+
+  if (Boolean(bikeData[0][0].bike_status) === false) {
+    return res.redirect("/home");
+  }
+
+  await fetch(
+    `http://localhost:1337/api/v1/bike/book`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bike_id: req.params.id,
+        username: userInfo.id,
+      }),
+    },
+  );
+  let result = await response.json();
+  console.log(result);
+  res.redirect("/home");
 });
 
 // Start the server

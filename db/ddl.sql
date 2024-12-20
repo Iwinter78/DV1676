@@ -18,6 +18,8 @@ DROP PROCEDURE IF EXISTS delete_user;
 DROP PROCEDURE IF EXISTS create_bike;
 DROP PROCEDURE IF EXISTS update_bike_position;
 DROP PROCEDURE IF EXISTS delete_user;
+DROP PROCEDURE IF EXISTS get_all_bikes;
+DROP PROCEDURE IF EXISTS get_bike_by_id;
 
 -- Primary tables
 CREATE TABLE `users` (
@@ -157,6 +159,15 @@ DELIMITER ;;
 CREATE PROCEDURE get_all_bikes()
 BEGIN
     SELECT * FROM bike;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE get_bike_by_id(
+    IN bike_id INT
+)
+BEGIN
+    SELECT * FROM bike WHERE id = bike_id;
 END;;
 DELIMITER ;
 

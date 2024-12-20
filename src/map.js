@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
         L.marker([latitude, longitude], { icon: bikeIcon })
           .addTo(map)
           .bindPopup(
-            `Cykel: ${bike.id} <br> <a href="/book/${bike.id}">Boka</a>`,
+            `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`,
           )
           .openPopup();
       });

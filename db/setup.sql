@@ -4,8 +4,8 @@ CREATE DATABASE IF NOT EXISTS magicbike;
 
 USE magicbike;
 
-SOURCE ddl.sql
-SOURCE user_procedures.sql
-SOURCE bike_procedures.sql
-SOURCE insert.sql
+SOURCE ddl.sql;
+SOURCE user_procedures.sql;
+SOURCE bike_procedures.sql;
+SOURCE insert.sql;
 SOURCE insert_bike_city_station.sql;

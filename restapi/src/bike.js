@@ -52,7 +52,7 @@ async function bookBike(id, username) {
 
 /**
  * Retrives infomartion about the bike based on id
- * @param {Number} id - The id of the bike 
+ * @param {Number} id - The id of the bike
  * @returns {Array} - An array containing the bike information
  */
 async function getBike(id) {
@@ -72,4 +72,11 @@ async function returnBike(id) {
   db.end();
 }
 
-export { createBike, getAllBikes, updateBikePosition, bookBike, getBike, returnBike };
+export {
+  createBike,
+  getAllBikes,
+  updateBikePosition,
+  bookBike,
+  getBike,
+  returnBike,
+};

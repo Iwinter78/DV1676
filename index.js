@@ -79,6 +79,33 @@ app.get("/callback", async (req, res) => {
 
     return res.redirect("/email");
   }
+    if (!code || code === null) {
+        return res.status(302).redirect('/');
+    }
+    const token = await exchangeCodeForToken(code);
+    const userInfo = await getUserInfo(token);
+    const email = userInfo.email || null;
+    // Get user info from the database
+    let profile = await fetch(`http://localhost:1337/api/v1/user?username=${userInfo.login}`)
+        .then(response => (response.json()));
+    
+        const user = profile[0]?.[0]; // Access the first row of the first result set
+
+        console.log("User profile:", user);
+        
+        // Check if the user exists and if the email is missing
+        if (!user || !user.email) {
+            console.log("Profile is empty or missing email...");
+            req.session.userInfo = {
+                login: userInfo.login,
+                id: userInfo.id,
+                email: email,
+                avatar_url: userInfo.avatar_url,
+                created_at: userInfo.created_at
+            };
+        
+            return res.redirect('/email');
+        }
 
   const profileData = profile[0][0];
   req.session.userInfo = {
@@ -89,6 +116,15 @@ app.get("/callback", async (req, res) => {
     created_at: userInfo.created_at,
   };
   console.log("User session created:", req.session.userInfo);
+    const profileData = profile[0];
+    req.session.userInfo = {
+        login: userInfo.login,
+        id: userInfo.id,
+        email: profileData.email || email,
+        avatar_url: userInfo.avatar_url,
+        created_at: userInfo.created_at
+    };
+    console.log('User session created:', req.session.userInfo);
 
   return res.redirect("/home");
 });
@@ -116,9 +152,18 @@ app.get("/home", (req, res) => {
 app.get("/admin_view", (req, res) => {
   res.render("admin_panel/main");
 });
-// Admin cosutomer view
-app.get("/admin_panel/customer", (req, res) => {
-  res.render("admin_panel/customer");
+
+app.get('/admin_panel/customer', async (req, res) => {
+    const response = await fetch(`http://localhost:1337/api/v1/allUsers`);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        const users = data[0];
+    
+    res.render('admin_panel/customer', { users });
 });
 // Admin bike view
 app.get("/admin_panel/bike", (req, res) => {
@@ -136,6 +181,21 @@ app.get("/email", (req, res) => {
 app.post("/email", async (req, res) => {
   const email = req.body.email;
 
+    if (email) {
+        
+        req.session.userInfo.email = email;
+        console.log('Email updated in session:', req.session.userInfo);
+            const createResponse = await fetch('http://localhost:1337/api/v1/create/user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: req.session.userInfo.login,
+                    email: req.session.userInfo.email,
+                    balance: 0,
+                    debt: 0,
+                    role: 'user'
+                })
+            });
   if (email) {
     req.session.userInfo.email = email;
     console.log("Email updated in session:", req.session.userInfo);
@@ -154,130 +214,73 @@ app.post("/email", async (req, res) => {
       },
     );
 
-    const result = await createResponse.json();
-    console.log("User creation response:", result);
+            const result = await createResponse.json();
+            console.log('User creation response:', result);
 
-    return res.redirect("/home");
-  }
+            return res.redirect('/home');
+    }
 
-  return res.redirect("/");
+    return res.redirect('/');
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
+});
+// Update balance for the user
+app.get('/balance', async (req, res) => { 
+    res.render('client/balance');
+});
+
+app.post('/balance', async (req, res) => {
+    const { balance } = req.body;
+    const username = req.session.userInfo.login;
+
+    const profileResponse = await fetch(`http://localhost:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`, {
+        method: 'PUT', // PUT update
+        headers: { 'Content-Type': 'application/json' }
+    });
+    const profile = await profileResponse.json();
+
+    console.log(profile);
+
+    res.redirect('/profile');
+
 });
 
 // Route to show the users profile
 app.get("/profile", async (req, res) => {
   const userInfo = req.session.userInfo;
 
-  if (!userInfo) {
-    return res.redirect("/"); // Om användaren inte är inloggad, skicka dem till startsidan
-  }
-  const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
-  );
-  const profile = await profileResponse.json();
-  const profileData = profile["0"][0];
-  const data = {
-    ...userInfo,
-    ...profileData,
-  };
-  res.render("client/client_detail", data);
+    if (!userInfo) {
+        return res.redirect('/'); // Om användaren inte är inloggad, skicka dem till startsidan
+    }
+    const profileResponse = await fetch(`http://localhost:1337/api/v1/user?username=${userInfo.login}`);
+    const profile = await profileResponse.json();
+    const profileData = profile['0'][0];
+    const data = {
+        ...userInfo,
+        ...profileData
+    }
+    res.render('client/client_detail', data);
 });
 
-app.get("/history", async (req, res) => {
-  const userInfo = req.session.userInfo;
+app.get('/history', async (req, res) => {
+    const userInfo = req.session.userInfo;
 
-  if (!userInfo) {
-    return res.redirect("/"); //back to home if the user is not logd in
-  }
+    if (!userInfo) {
+        return res.redirect('/'); //back to home if the user is not logd in
+    }
 
-  const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
-  );
-  const profile = await profileResponse.json();
-  const trips = profile[0] || [];
-  const data = {
-    ...userInfo,
-    trips,
-  };
+    const profileResponse = await fetch(`http://localhost:1337/api/v1/history?username=${userInfo.login}`);
+    const profile = await profileResponse.json();
+    const trips = profile[0] || [];
+    const data = {
+        ...userInfo,
+        trips
+    }
 
-  console.log(trips);
-  res.render("client/client_travel_history", data);
-});
+    console.log(trips)
+    res.render('client/client_travel_history', data);
 
-app.get("/book/confirm/:id", async (req, res) => {
-  let userInfo = req.session.userInfo;
-  let bikeData = await fetch(
-    `http://localhost:1337/api/v1/bike/${req.params.id}`,
-  ).then((response) => response.json());
-
-  console.log(bikeData);
-  console.log(userInfo);
-  let data = {
-    id: req.params.id,
-    userInfo,
-    bike: bikeData[0][0],
-  };
-  res.render("client/client_book", data);
-});
-
-app.post("/book/confirm/:id", async (req, res) => {
-  let userInfo = req.session.userInfo;
-  let bikeData = await fetch(
-    `http://localhost:1337/api/v1/bike/${req.params.id}`,
-  ).then((response) => response.json());
-
-
-  if (Boolean(bikeData[0][0].bike_status) === false) {
-    return res.redirect("/home");
-  }
-
-  await fetch(
-    `http://localhost:1337/api/v1/bike/book`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        bike_id: req.params.id,
-        username: userInfo.id,
-      }),
-    },
-  );
-  res.redirect("/home");
-});
-
-app.post("/book/return/:id", async (req, res) => {
-  let userInfo = req.session.userInfo;
-  let bikeData = await fetch(
-    `http://localhost:1337/api/v1/bike/${req.params.id}`,
-  ).then((response) => response.json());
-
-  if (Boolean(bikeData[0][0].bike_status) === true) {
-    return res.redirect("/home");
-  }
-
-  const returnData = await fetch(
-    `http://localhost:1337/api/v1/bike/return`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        bike_id: req.params.id,
-        username: userInfo.id,
-      }),
-    },
-  );
-
-  if (returnData.status === 200) {
-    res.redirect("/home");
-  }
-
-  console.log(returnData);
-});
-
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
 });

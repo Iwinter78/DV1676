@@ -3,7 +3,7 @@ USE magicbike;
 
 DELETE FROM city;
 DELETE FROM bike;
-DELETE FROM STATION;
+DELETE FROM station;
 
 
 INSERT INTO city (city_name, city_gps) 

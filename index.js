@@ -253,24 +253,20 @@ app.post("/book/confirm/:id", async (req, res) => {
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
-
   if (Boolean(bikeData[0][0].bike_status) === false) {
     return res.redirect("/home");
   }
 
-  await fetch(
-    `http://localhost:1337/api/v1/bike/book`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: req.params.id,
-        username: userInfo.id,
-      }),
+  await fetch(`http://localhost:1337/api/v1/bike/book`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      id: req.params.id,
+      username: userInfo.id,
+    }),
+  });
   res.redirect("/home");
 });
 
@@ -283,18 +279,15 @@ app.post("/book/return/:id", async (req, res) => {
     return res.redirect("/home");
   }
 
-  await fetch(
-    `http://localhost:1337/api/v1/bike/return`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: req.params.id
-      }),
+  await fetch(`http://localhost:1337/api/v1/bike/return`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      id: req.params.id,
+    }),
+  });
 
   res.redirect("/home");
 });

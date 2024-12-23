@@ -1,18 +1,18 @@
 <%- include('../../public/header.ejs') %>
 <main>
-    <form action="/book/confirm/<%= id %>" method="POST">
-        <h1 class="text-center">Bokningsinfomartion</h1>
-        <div class="booking-container">
-            <% if (Boolean(bike.bike_status)) { %>
-                <p>Cykel: <%= id %></p>
-                <p>Tillgänglig: <%= Boolean(bike.bike_status) ? "Ja" : "Nej" %></p>
+    <div class="booking-container">
+        <p>Cykel: <%= id %></p>
+        <p>Tillgänglig: <%= Boolean(bike.bike_status) ? "Ja" : "Nej" %></p>
+        
+        <% if (Boolean(bike.bike_status)) { %>
+            <form action="/book/confirm/<%= id %>" method="POST">
                 <input class="booking-button btn btn-success" type="submit" value="Boka Cykel">
-            <% } else { %>
-                <p>Cykel: <%= id %></p>
-                <p>Tillgänglig: <%= Boolean(bike.bike_status) ? "Ja" : "Nej" %></p>
-                <p class="text-danger">Cykeln är inte tillgänglig</p>
-            <% } %>
-        </div>
-    </form>
+            </form>
+        <% } else { %>
+            <form action="/book/return/<%= id %>" method="POST">
+                <input class="booking-button btn btn-danger" type="submit" value="Återlämna Cykel">
+            </form>
+        <% } %>
+    </div>
 </main>
 <%- include('../../public/footer.ejs') %>

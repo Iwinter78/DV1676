@@ -22,7 +22,6 @@ app.use(
       "Content-Type",
       "Authorization",
       "Access-Control-Allow-Origin",
-      "default-src",
     ],
     credentials: true,
   }),
@@ -80,6 +79,7 @@ app.get("/callback", async (req, res) => {
 
     return res.redirect("/email");
   }
+
   const profileData = profile[0][0];
   req.session.userInfo = {
     login: userInfo.login,
@@ -88,6 +88,8 @@ app.get("/callback", async (req, res) => {
     avatar_url: userInfo.avatar_url,
     created_at: userInfo.created_at,
   };
+  console.log("User session created:", req.session.userInfo);
+
   return res.redirect("/home");
 });
 // Logout page
@@ -99,12 +101,12 @@ app.get("/logout", (req, res) => {
 app.get("/home", (req, res) => {
   const userInfo = req.session.userInfo;
   if (!userInfo) {
-    res.redirect("/");
+      res.redirect('/');
   }
 
   const data = {
     userInfo: userInfo,
-  };
+  }; 
 
   console.log(data);
   res.render("home/index", data);
@@ -114,18 +116,9 @@ app.get("/home", (req, res) => {
 app.get("/admin_view", (req, res) => {
   res.render("admin_panel/main");
 });
-
-app.get("/admin_panel/customer", async (req, res) => {
-  const response = await fetch(`http://localhost:1337/api/v1/allUsers`);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch data: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const users = data[0];
-
-  res.render("admin_panel/customer", { users });
+// Admin cosutomer view
+app.get("/admin_panel/customer", (req, res) => {
+  res.render("admin_panel/customer");
 });
 // Admin bike view
 app.get("/admin_panel/bike", (req, res) => {
@@ -170,29 +163,6 @@ app.post("/email", async (req, res) => {
   return res.redirect("/");
 });
 
-// Update balance for the user
-app.get("/balance", async (req, res) => {
-  res.render("client/balance");
-});
-
-app.post("/balance", async (req, res) => {
-  const { balance } = req.body;
-  const username = req.session.userInfo.login;
-
-  const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`,
-    {
-      method: "PUT", // PUT update
-      headers: { "Content-Type": "application/json" },
-    },
-  );
-  const profile = await profileResponse.json();
-
-  console.log(profile);
-
-  res.redirect("/profile");
-});
-
 // Route to show the users profile
 app.get("/profile", async (req, res) => {
   const userInfo = req.session.userInfo;
@@ -231,6 +201,80 @@ app.get("/history", async (req, res) => {
 
   console.log(trips);
   res.render("client/client_travel_history", data);
+});
+
+app.get("/book/confirm/:id", async (req, res) => {
+  let userInfo = req.session.userInfo;
+  let bikeData = await fetch(
+    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+  ).then((response) => response.json());
+
+  console.log(bikeData);
+  console.log(userInfo);
+  let data = {
+    id: req.params.id,
+    userInfo,
+    bike: bikeData[0][0],
+  };
+  res.render("client/client_book", data);
+});
+
+app.post("/book/confirm/:id", async (req, res) => {
+  let userInfo = req.session.userInfo;
+  let bikeData = await fetch(
+    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+  ).then((response) => response.json());
+
+
+  if (Boolean(bikeData[0][0].bike_status) === false) {
+    return res.redirect("/home");
+  }
+
+  await fetch(
+    `http://localhost:1337/api/v1/bike/book`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bike_id: req.params.id,
+        username: userInfo.id,
+      }),
+    },
+  );
+  res.redirect("/home");
+});
+
+app.post("/book/return/:id", async (req, res) => {
+  let userInfo = req.session.userInfo;
+  let bikeData = await fetch(
+    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+  ).then((response) => response.json());
+
+  if (Boolean(bikeData[0][0].bike_status) === true) {
+    return res.redirect("/home");
+  }
+
+  const returnData = await fetch(
+    `http://localhost:1337/api/v1/bike/return`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bike_id: req.params.id,
+        username: userInfo.id,
+      }),
+    },
+  );
+
+  if (returnData.status === 200) {
+    res.redirect("/home");
+  }
+
+  console.log(returnData);
 });
 
 // Start the server

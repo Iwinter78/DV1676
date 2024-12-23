@@ -54,10 +54,10 @@ CREATE TABLE `bike` (
 CREATE TABLE `station` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     charge_taken INT,
-    city VARCHAR(255),
+    city INT,
     charging_size INT,
     gps VARCHAR(255),
-    FOREIGN KEY (city) REFERENCES city(city_name)
+    FOREIGN KEY (city) REFERENCES city(id)
 );
 
 CREATE TABLE `bank` (

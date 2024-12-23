@@ -4,9 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const openLocationCode = new OpenLocationCode();
   const locateButton = document.getElementById("locate-user");
   const cityDropdown = document.getElementById("city-select");
-  const userData = JSON.parse(
-    document.querySelector('meta[name="userInfo"]').getAttribute("content"),
-  );
+  const userData = JSON.parse(document.querySelector('meta[name="userInfo"]').getAttribute('content'));
   console.log(userData);
 
   navigator.geolocation.getCurrentPosition((position) => {
@@ -50,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     bike.then((data) => {
       let bikes = data[0];
       bikes.forEach((bike) => {
+
         if (bike.currentuser !== userData.id) {
           return;
         }
@@ -76,9 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         L.marker([latitude, longitude], { icon: bikeIcon })
           .addTo(map)
           .bindPopup(
-            bike.bike_status
-              ? `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`
-              : `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a> `,
+            Boolean(bike.bike_status) ? `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>` : `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a> `,
           )
           .openPopup();
       });

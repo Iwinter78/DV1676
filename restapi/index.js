@@ -64,7 +64,7 @@ app.get("/api/v1/user", async (req, res) => {
 
   if (!username) {
     return res.status(400).json({
-      message: "Användarnamn krävs",
+      message: "Email krävs",
       status: 400,
     });
   }
@@ -72,58 +72,6 @@ app.get("/api/v1/user", async (req, res) => {
   try {
     let response = await user.getUser(username);
     res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({
-      message: "Något gick fel, försök igen senare",
-      status: 500,
-      error: error.message,
-    });
-  }
-});
-app.get("/api/v1/history", async (req, res) => {
-  const username = req.query.username;
-  console.log("Username:", username);
-
-  if (!username) {
-    return res.status(400).json({
-      message: "Användarnamn krävs",
-      status: 400,
-    });
-  }
-
-  try {
-    let response = await user.getUserLog(username);
-    console.log("Database Response:", response);
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({
-      message: "Något gick fel, försök igen senare",
-      status: 500,
-      error: error.message,
-    });
-  }
-});
-
-app.put("/api/v1/update/user/balance", async (req, res) => {
-  console.log("Query Params:", req.query);
-
-  const username = req.query.username;
-  const balance = req.query.balance;
-
-  if (!username || isNaN(balance)) {
-    return res.status(400).json({
-      message: "Användarnamn och saldo krävs",
-      status: 400,
-    });
-  }
-
-  try {
-    await user.updateUserBalance(username, balance);
-
-    res.status(200).json({
-      message: "Användarens saldo uppdaterat",
-      status: 200,
-    });
   } catch (error) {
     res.status(500).json({
       message: "Något gick fel, försök igen senare",
@@ -159,14 +107,34 @@ app.delete("/api/v1/delete/user/:username", async (req, res) => {
   }
 });
 
-// BIKES
-
 app.get("/api/v1/bike", async (req, res) => {
   try {
-    let response = await bike.getAllBikesPosition();
+    let response = await bike.getAllBikes();
     res.status(200).json(response);
   } catch (error) {
     console.log(error);
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
+app.get("/api/v1/bike/:id", async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "Id krävs",
+      status: 400,
+    });
+  }
+
+  try {
+    let response = await bike.getBike(id);
+    res.status(200).json(response);
+  } catch (error) {
     res.status(500).json({
       message: "Något gick fel, försök igen senare",
       status: 500,
@@ -234,12 +202,58 @@ app.put("/api/v1/update/bike", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`REST API is listning on ${port}`);
+app.post("/api/v1/bike/book", async (req, res) => {
+  const { id, username } = req.body;
+
+  if (!id || !username) {
+    return res.status(400).json({
+      message: "Id och användarnamn krävs",
+      status: 400,
+    });
+  }
+
+  try {
+    await bike.bookBike(id, username);
+
+    res.status(200).json({
+      message: "Cykel bokad",
+      status: 200,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
 });
 
-app.get("/api/v1/allUsers", async (req, res) => {
-  let response = await user.getAllUsers();
-  console.log(response);
-  res.status(200).json(response);
+app.post("/api/v1/bike/return", async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "Id krävs",
+      status: 400,
+    });
+  }
+
+  try {
+    await bike.returnBike(id);
+
+    res.status(200).json({
+      message: "Cykel återlämnad",
+      status: 200,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
+app.listen(port, () => {
+  console.log(`REST API is listning on ${port}`);
 });

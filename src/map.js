@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const openLocationCode = new OpenLocationCode();
   const locateButton = document.getElementById("locate-user");
   const cityDropdown = document.getElementById("city-select");
+  const userData = JSON.parse(document.querySelector('meta[name="userInfo"]').getAttribute('content'));
+  console.log(userData);
 
   navigator.geolocation.getCurrentPosition((position) => {
     const latitude = position.coords.latitude;
@@ -18,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const bikeIcon = L.divIcon({
       className: "custom-marker",
-      html: '<div style="font-size: 30px; color: #00ff00; font-weight: bold;">🚲</div>',
+      html: '<div style="font-size: 30px; color: #00ff00; font-weight: bold;">●</div>',
       iconSize: [20, 20],
       iconAnchor: [10, 10],
     });
@@ -47,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let bikes = data[0];
       bikes.forEach((bike) => {
 
-        if (!Boolean(bike.bike_status)) {
+        if (bike.currentuser !== userData.id) {
           return;
         }
 
@@ -73,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         L.marker([latitude, longitude], { icon: bikeIcon })
           .addTo(map)
           .bindPopup(
-            `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`,
+            Boolean(bike.bike_status) ? `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>` : `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a> `,
           )
           .openPopup();
       });

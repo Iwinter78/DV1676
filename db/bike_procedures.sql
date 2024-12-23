@@ -1,9 +1,12 @@
 -- Bike Procedures
 
 DROP PROCEDURE IF EXISTS create_bike;
-DROP PROCEDURE IF EXISTS get_user_role;
 DROP PROCEDURE IF EXISTS update_bike_position;
-DROP PROCEDURE IF EXISTS get_all_bike_positions;
+DROP PROCEDURE IF EXISTS get_all_bikes;
+DROP PROCEDURE IF EXISTS get_bike_by_id;
+DROP PROCEDURE IF EXISTS book_bike;
+DROP PROCEDURE IF EXISTS return_bike;
+
 
 DELIMITER ;;
 
@@ -16,12 +19,6 @@ BEGIN
     VALUES (in_gps, in_city);
 END;;
 
-CREATE PROCEDURE get_user_role(IN username_param VARCHAR(255))
-BEGIN
-    SELECT role FROM users
-    where username = username_param;
-END;;
-
 CREATE PROCEDURE update_bike_position(
     IN in_id INT,
     IN in_gps VARCHAR(255)
@@ -32,8 +29,35 @@ BEGIN
     WHERE id = in_id;
 END;;
 
-CREATE PROCEDURE get_all_bike_positions()
+CREATE PROCEDURE get_all_bikes()
 BEGIN
-    SELECT gps FROM bike;
+    SELECT * FROM bike;
 END;;
+
+CREATE PROCEDURE get_bike_by_id(
+    IN bike_id INT
+)
+BEGIN
+    SELECT * FROM bike WHERE id = bike_id;
+END;;
+
+CREATE PROCEDURE book_bike(
+    in_bike_id INT,
+    in_user_id VARCHAR(255)
+)
+BEGIN
+    UPDATE bike
+    set bike_status = false, currentuser = in_user_id
+    WHERE id = in_bike_id;
+END;;
+
+CREATE PROCEDURE return_bike(
+    in_bike_id INT
+)
+BEGIN 
+    UPDATE bike
+    set bike_status = true, currentuser = null
+    WHERE id = in_bike_id;
+END;;
+
 DELIMITER ;

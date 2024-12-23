@@ -22,6 +22,7 @@ app.use(
       "Content-Type",
       "Authorization",
       "Access-Control-Allow-Origin",
+      "default-src",
     ],
     credentials: true,
   }),

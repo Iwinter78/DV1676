@@ -67,6 +67,29 @@ app.get('/api/v1/user', async (req, res) => {
         });
     }
 });
+app.get('/api/v1/history', async (req, res) => {
+    const username = req.query.username;
+    console.log('Username:', username);
+
+    if (!username) {
+        return res.status(400).json({
+            message: 'Användarnamn krävs',
+            status: 400
+        });
+    }
+
+    try {
+        let response = await user.getUserLog(username);
+        console.log('Database Response:', response);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({
+            message: 'Något gick fel, försök igen senare',
+            status: 500,
+            error: error.message
+        });
+    }
+});
 
 app.put('/api/v1/update/user/balance', async (req, res) => {
     console.log('Query Params:', req.query);

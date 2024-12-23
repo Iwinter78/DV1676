@@ -228,6 +228,32 @@ app.post("/api/v1/bike/book", async (req, res) => {
   }
 });
 
+app.post("/api/v1/bike/return", async (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "Id krävs",
+      status: 400,
+    });
+  }
+
+  try {
+    await bike.returnBike(id);
+
+    res.status(200).json({
+      message: "Cykel återlämnad",
+      status: 200,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`REST API is listning on ${port}`);
 });

@@ -6,6 +6,7 @@ DROP PROCEDURE IF EXISTS delete_user;
 DROP PROCEDURE IF EXISTS get_user_log;
 DROP PROCEDURE IF EXISTS update_user_balance;
 DROP PROCEDURE IF EXISTS get_all_users;
+DROP PROCEDURE IF EXISTS get_user_role;
 
 DELIMITER ;;
 CREATE PROCEDURE create_user(
@@ -49,4 +50,11 @@ CREATE PROCEDURE get_all_users()
 BEGIN
     SELECT * FROM users;
 END;;
+
+CREATE PROCEDURE get_user_role(IN username_param VARCHAR(255))
+BEGIN
+    SELECT role FROM users
+    where username = username_param;
+END;;
+
 DELIMITER ;

@@ -12,6 +12,14 @@ DROP TABLE IF EXISTS `city`;
 DROP TABLE IF EXISTS `bank`;
 DROP TABLE IF EXISTS `users`;
 
+DROP PROCEDURE IF EXISTS create_user;
+DROP PROCEDURE IF EXISTS get_user;
+DROP PROCEDURE IF EXISTS delete_user;
+DROP PROCEDURE IF EXISTS create_bike;
+DROP PROCEDURE IF EXISTS update_bike_position;
+DROP PROCEDURE IF EXISTS delete_user;
+DROP PROCEDURE IF EXISTS get_all_bikes;
+DROP PROCEDURE IF EXISTS get_bike_by_id;
 
 -- Primary tables
 CREATE TABLE `users` (
@@ -46,10 +54,10 @@ CREATE TABLE `bike` (
 CREATE TABLE `station` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     charge_taken INT,
-    city VARCHAR(255),
+    city INT,
     charging_size INT,
     gps VARCHAR(255),
-    FOREIGN KEY (city) REFERENCES city(city_name)
+    FOREIGN KEY (city) REFERENCES city(id)
 );
 
 CREATE TABLE `bank` (
@@ -87,3 +95,101 @@ CREATE TABLE `bank_log` (
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)
 );
+
+DELIMITER ;;
+CREATE PROCEDURE create_user(
+    IN in_email VARCHAR(255),
+    IN in_username VARCHAR(255)
+)
+BEGIN
+    INSERT INTO users (email, username, balance, debt, role)
+    VALUES (in_email, in_username, 0.00, 0.00, 'user');
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE get_user(IN username_param VARCHAR(255))
+BEGIN
+    SELECT * FROM users WHERE username = username_param;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE delete_user(IN username_param VARCHAR(255))
+BEGIN
+    DELETE FROM users WHERE username = username_param;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+
+CREATE PROCEDURE get_user_log(IN username_param VARCHAR(255))
+BEGIN
+    SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data
+    FROM users u
+    JOIN user_log ul ON u.id = ul.id
+    WHERE u.username = username_param;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE create_bike(
+    IN in_gps VARCHAR(255),
+    IN in_city VARCHAR(255)
+)
+BEGIN
+    INSERT INTO bike (gps, city)
+    VALUES (in_gps, in_city);
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE update_bike_position(
+    IN in_id INT,
+    IN in_gps VARCHAR(255)
+)
+BEGIN
+    UPDATE bike
+    SET gps = in_gps
+    WHERE id = in_id;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE get_all_bikes()
+BEGIN
+    SELECT * FROM bike;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE get_bike_by_id(
+    IN bike_id INT
+)
+BEGIN
+    SELECT * FROM bike WHERE id = bike_id;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE book_bike(
+    in_bike_id INT,
+    in_user_id VARCHAR(255)
+)
+BEGIN
+    UPDATE bike
+    set bike_status = false, currentuser = in_user_id
+    WHERE id = in_bike_id;
+END;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE return_bike(
+    in_bike_id INT
+)
+BEGIN 
+    UPDATE bike
+    set bike_status = true, currentuser = null
+    WHERE id = in_bike_id;
+END;;
+DELIMITER ;

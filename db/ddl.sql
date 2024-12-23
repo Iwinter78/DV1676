@@ -182,3 +182,14 @@ BEGIN
     WHERE id = in_bike_id;
 END;;
 DELIMITER ;
+
+DELIMITER ;;
+CREATE PROCEDURE return_bike(
+    in_bike_id INT
+)
+BEGIN 
+    UPDATE bike
+    set bike_status = true, currentuser = null
+    WHERE id = in_bike_id;
+END;;
+DELIMITER ;

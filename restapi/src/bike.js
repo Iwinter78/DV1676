@@ -50,7 +50,6 @@ async function bookBike(id, username) {
   db.end();
 }
 
-
 /**
  * Retrives infomartion about the bike based on id
  * @param {Number} id - The id of the bike 
@@ -65,4 +64,12 @@ async function getBike(id) {
   return response[0].slice(0, -1);
 }
 
-export { createBike, getAllBikes, updateBikePosition, bookBike, getBike };
+async function returnBike(id) {
+  const db = await connect();
+  const query = "CALL return_bike(?)";
+  const values = [id];
+  db.query(query, values);
+  db.end();
+}
+
+export { createBike, getAllBikes, updateBikePosition, bookBike, getBike, returnBike };

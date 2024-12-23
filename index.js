@@ -169,10 +169,6 @@ app.post("/email", async (req, res) => {
   return res.redirect("/");
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
 // Update balance for the user
 app.get("/balance", async (req, res) => {
   res.render("client/balance");
@@ -234,4 +230,9 @@ app.get("/history", async (req, res) => {
 
   console.log(trips);
   res.render("client/client_travel_history", data);
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running at http://localhost:${port}`);
 });

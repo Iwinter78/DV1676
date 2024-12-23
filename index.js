@@ -83,7 +83,7 @@ app.get("/callback", async (req, res) => {
   const profileData = profile[0][0];
   req.session.userInfo = {
     login: userInfo.login,
-    id: userInfo.id,
+    id: profileData.id,
     email: profileData.email || email,
     avatar_url: userInfo.avatar_url,
     created_at: userInfo.created_at,
@@ -103,8 +103,13 @@ app.get("/home", (req, res) => {
   if (!userInfo) {
       res.redirect('/');
   }
-  console.log(userInfo);
-  res.render("home/index", userInfo);
+
+  const data = {
+    userInfo: userInfo,
+  }; 
+
+  console.log(data);
+  res.render("home/index", data);
 });
 
 // Admin first view after login

@@ -268,7 +268,7 @@ app.post("/book/confirm/:id", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        bike_id: req.params.id,
+        id: req.params.id,
         username: userInfo.id,
       }),
     },
@@ -277,7 +277,6 @@ app.post("/book/confirm/:id", async (req, res) => {
 });
 
 app.post("/book/return/:id", async (req, res) => {
-  let userInfo = req.session.userInfo;
   let bikeData = await fetch(
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
@@ -286,7 +285,7 @@ app.post("/book/return/:id", async (req, res) => {
     return res.redirect("/home");
   }
 
-  const returnData = await fetch(
+  await fetch(
     `http://localhost:1337/api/v1/bike/return`,
     {
       method: "POST",
@@ -294,17 +293,12 @@ app.post("/book/return/:id", async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        bike_id: req.params.id,
-        username: userInfo.id,
+        id: req.params.id
       }),
     },
   );
 
-  if (returnData.status === 200) {
-    res.redirect("/home");
-  }
-
-  console.log(returnData);
+  res.redirect("/home");
 });
 
 // Start the server

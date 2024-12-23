@@ -239,8 +239,6 @@ app.get("/book/confirm/:id", async (req, res) => {
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
-  console.log(bikeData);
-  console.log(userInfo);
   let data = {
     id: req.params.id,
     userInfo,

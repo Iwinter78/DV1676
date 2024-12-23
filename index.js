@@ -243,9 +243,38 @@ app.post("/book/confirm/:id", async (req, res) => {
       }),
     },
   );
-  let result = await response.json();
-  console.log(result);
   res.redirect("/home");
+});
+
+app.post("/book/return/:id", async (req, res) => {
+  let userInfo = req.session.userInfo;
+  let bikeData = await fetch(
+    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+  ).then((response) => response.json());
+
+  if (Boolean(bikeData[0][0].bike_status) === true) {
+    return res.redirect("/home");
+  }
+
+  const returnData = await fetch(
+    `http://localhost:1337/api/v1/bike/return`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bike_id: req.params.id,
+        username: userInfo.id,
+      }),
+    },
+  );
+
+  if (returnData.status === 200) {
+    res.redirect("/home");
+  }
+
+  console.log(returnData);
 });
 
 // Start the server

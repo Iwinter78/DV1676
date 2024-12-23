@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const locateButton = document.getElementById("locate-user");
   const cityDropdown = document.getElementById("city-select");
   const userData = JSON.parse(document.querySelector('meta[name="userInfo"]').getAttribute('content'));
-  console.log(userData);
 
   navigator.geolocation.getCurrentPosition((position) => {
     const latitude = position.coords.latitude;
@@ -18,9 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
       iconAnchor: [10, 10],
     });
 
-    const bikeIcon = L.divIcon({
+    const avaliableBikeIcon = L.divIcon({
       className: "custom-marker",
       html: '<div style="font-size: 30px; color: #00ff00; font-weight: bold;">●</div>',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    const bookedBikeIcon = L.divIcon({
+      className: "custom-marker",
+      html: '<div style="font-size: 30px; color: #ff0000; font-weight: bold;">●</div>',
       iconSize: [20, 20],
       iconAnchor: [10, 10],
     });
@@ -49,10 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
       let bikes = data[0];
       bikes.forEach((bike) => {
 
-        if (bike.currentuser !== userData.id) {
-          return;
-        }
-
         let lat = 0;
         let lng = 0;
 
@@ -71,11 +73,17 @@ document.addEventListener("DOMContentLoaded", () => {
         let decodedCordinates = openLocationCode.decode(findCode);
         let latitude = decodedCordinates.latitudeCenter;
         let longitude = decodedCordinates.longitudeCenter;
-
-        L.marker([latitude, longitude], { icon: bikeIcon })
+        if (bike.currentuser === userData.id) {
+          L.marker([latitude, longitude], { icon: bookedBikeIcon })
+            .addTo(map)
+            .bindPopup(`Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`)
+            .openPopup();
+          return;
+        }
+        L.marker([latitude, longitude], { icon: avaliableBikeIcon })
           .addTo(map)
           .bindPopup(
-            Boolean(bike.bike_status) ? `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>` : `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a> `,
+            `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`
           )
           .openPopup();
       });

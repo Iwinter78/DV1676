@@ -4,6 +4,8 @@
 @import url('map.css');
 @import url('login.css');
 @import url('booking.css');
+@import url('costumer_detail.css');
+
 
 html, body{
     background-color: var(--bg-color);

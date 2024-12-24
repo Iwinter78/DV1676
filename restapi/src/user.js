@@ -49,4 +49,17 @@ async function deleteUser(username) {
   db.end();
 }
 
-export { createUser, getUser, deleteUser, getUserLog };
+async function updateUserBalance(username, balance) {
+  const db = await connect();
+  const query = `CALL update_user_balance(?, ?)`;
+  const values = [username, balance];
+  try {
+      await db.query(query, values);
+      db.end();
+  } catch (error) {
+      db.end();
+      throw error;
+  }
+}
+
+export { createUser, getUser, deleteUser, getUserLog, updateUserBalance };

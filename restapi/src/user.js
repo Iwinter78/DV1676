@@ -54,11 +54,11 @@ async function updateUserBalance(username, balance) {
   const query = `CALL update_user_balance(?, ?)`;
   const values = [username, balance];
   try {
-      await db.query(query, values);
-      db.end();
+    await db.query(query, values);
+    db.end();
   } catch (error) {
-      db.end();
-      throw error;
+    db.end();
+    throw error;
   }
 }
 

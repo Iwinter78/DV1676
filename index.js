@@ -111,8 +111,23 @@ app.get("/home", (req, res) => {
 });
 
 // Admin first view after login
-app.get("/admin_view", (req, res) => {
-  res.render("admin_panel/main");
+app.get("/admin_view", async (req, res) => {
+  const userInfo = req.session.userInfo;
+
+  // Fetch the user data from the API
+  const userresponse = await fetch(
+    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
+  );
+  const userData = await userresponse.json();
+
+  // Check if the user is an admin
+  const isAdmin = userData.role === "admin";
+
+  // Render the admin panel with dynamic meta tag behavior
+  res.render("admin_panel/main", {
+    userInfo: isAdmin ? null : JSON.stringify(userData),
+    isAdmin,
+  });
 });
 
 app.get("/admin_panel/customer", async (req, res) => {

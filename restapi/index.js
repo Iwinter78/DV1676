@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import * as user from "./src/user.js";
 import * as bike from "./src/bike.js";
+import * as station from "./src/station.js";
 
 const app = express();
 
@@ -309,4 +310,20 @@ app.post("/api/v1/bike/return", async (req, res) => {
 
 app.listen(port, () => {
   console.log(`REST API is listning on ${port}`);
+});
+
+// STATIONS
+
+app.get("/api/v1/stations", async (req, res) => {
+  try {
+    let response = await station.AllStations();
+    res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
 });

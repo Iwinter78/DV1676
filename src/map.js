@@ -91,6 +91,41 @@ document.addEventListener("DOMContentLoaded", () => {
           .openPopup();
       });
     });
+
+    fetch("http://localhost:1337/api/v1/stations", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Access the first array in the response
+        const stations = data[0];
+
+        stations.forEach((station) => {
+          // Parse GPS coordinates
+          const [lat, lng] = station.gps
+            .split(",")
+            .map((coord) => parseFloat(coord.trim()));
+
+          // Add a circle for each station
+          L.circle([lat, lng], {
+            color: "blue",
+            fillColor: "#30a1ff",
+            fillOpacity: 0.4,
+            radius: 30, // Example radius in meters
+          })
+            .addTo(map)
+            .bindPopup(
+              `Station ID: ${station.id}<br>Charging Size: ${station.charging_size}`,
+            );
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching station data:", error);
+      });
+
     locateButton.addEventListener("click", () => {
       map.locate({ setView: true, maxZoom: 16 });
     });

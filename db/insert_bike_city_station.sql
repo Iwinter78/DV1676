@@ -11,12 +11,19 @@ SET @Malmo_id = (SELECT id FROM city WHERE city_name = 'Malmö');
 
 
 INSERT INTO bike (gps, city)
-VALUES 
-('56.1625,15.5878', @Karlskrona_id),
-('56.1630,15.5880', @Karlskrona_id),
-('56.1600,15.5850', @Karlskrona_id),
-('56.1640,15.5900', @Karlskrona_id),
-('56.1650,15.5950', @Karlskrona_id);
+VALUES
+('9F8Q5H6P+FQ', @Karlskrona_id),
+('9F8Q5H6P+JP', @Karlskrona_id),
+('9F8Q5H6P+Q9', @Karlskrona_id),
+('9F8Q5H6P+QH', @Karlskrona_id),
+('9F7JHXWX+4W', @Malmo_id),
+('9F7MH2V2+VX', @Malmo_id),
+('9F7MH2V4+3X', @Malmo_id),
+('9F7MH2Q4+2V', @Malmo_id),
+('9FFW83FC+58', @Stockholm_id),
+('9FFW83FC+V4', @Stockholm_id),
+('9FFW83FF+GP', @Stockholm_id),
+('9FFW83H8+HQ', @Stockholm_id);
 
 
 INSERT INTO station (charge_taken, city, charging_size, gps) 

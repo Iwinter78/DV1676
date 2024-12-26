@@ -59,16 +59,16 @@ document.addEventListener("DOMContentLoaded", () => {
         let lat = 0;
         let lng = 0;
 
-        if (bike.city === "Karlskrona") {
+        if (bike.city === 1) {
           lat = 56.1;
           lng = 15.5;
-        } else if (bike.city === "Stockholm") {
+        } else if (bike.city === 2) { 
           lat = 59.3;
           lng = 18.1;
-        } else if (bike.city === "Malmö") {
+        } else if (bike.city === 3) { 
           lat = 55.6;
           lng = 13.0;
-        }
+        }        
 
         let findCode = openLocationCode.recoverNearest(bike.gps, lat, lng);
         let decodedCordinates = openLocationCode.decode(findCode);

@@ -64,6 +64,63 @@ describe('User features in rest api', () => {
         expect(data.message).toBe('Email och användarnamn krävs');
     });
 
+    test('Should not create a user when missing username', async () => {
+        const email = 'myuser@email.com';
+
+        const mockResponse = {
+            message: 'Email och användarnamn krävs',
+            status: 400,
+            json: () => Promise.resolve({
+                message: 'Email och användarnamn krävs',
+                status: 400
+            })
+        };
+
+        global.fetch.mockResolvedValue(mockResponse);
+
+        const response = await fetch(`${host}/api/v1/create/user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({email}),
+        });
+
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.message).toBe('Email och användarnamn krävs');
+    });
+
+    test('Tries to create a user that is a data type that is not string', async () => {
+        const username = [];
+        const email = null;
+
+        const mockResponse = {
+            message: 'Email och användarnamn krävs',
+            status: 400,
+            json: () => Promise.resolve({
+                message: 'Email och användarnamn krävs',
+                status: 400
+            })
+        };
+
+        global.fetch.mockResolvedValue(mockResponse);
+
+        const response = await fetch(`${host}/api/v1/create/user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({username, email}),
+        });
+
+        const data = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(data.message).toBe('Email och användarnamn krävs');
+    })
+
     test('Should get a user', async () => {
         const username = 'MyUser';
         

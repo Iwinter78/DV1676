@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const customIcon = createIcon("#ff00ce");
     const availableBikeIcon = createIcon("#00ff00");
     const bookedBikeIcon = createIcon("#ff0000");
+    const simIcon = createIcon("#FF7518");
 
     const map = L.map("map").setView([latitude, longitude], 16);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -36,6 +37,23 @@ document.addEventListener("DOMContentLoaded", () => {
       .addTo(map)
       .bindPopup("Här är du!")
       .openPopup();
+
+    // WebSocket for bike movement
+    const bikeMarker = L.marker([latitude, longitude], {
+      icon: simIcon,
+    }).addTo(map);
+
+    const ws = new WebSocket("ws://localhost:5001"); // Connect to your WebSocket server
+    ws.onmessage = (message) => {
+      const data = JSON.parse(message.data);
+      const { id, location } = data;
+
+      // Update the bike marker's position
+      bikeMarker
+        .setLatLng([location[0], location[1]])
+        .bindPopup(`Bike ${id}`)
+        .openPopup();
+    };
 
     async function fetchBikes() {
       try {

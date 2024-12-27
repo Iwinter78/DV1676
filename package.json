@@ -42,6 +42,8 @@
     "mysql-promise": "^5.0.0",
     "mysql2": "^3.11.5",
     "open-location-code": "^1.0.3",
-    "promise-mysql": "^5.2.0"
+    "openrouteservice-js": "^0.4.1",
+    "promise-mysql": "^5.2.0",
+    "ws": "^8.18.0"
   }
 }

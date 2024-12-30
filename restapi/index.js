@@ -140,7 +140,7 @@ app.delete("/api/v1/delete/user/:username", async (req, res) => {
 
   if (!username) {
     return res.status(400).json({
-      message: "username krävs",
+      message: "Användarnamn krävs",
       status: 400,
     });
   }

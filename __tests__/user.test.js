@@ -148,4 +148,79 @@ describe("User features in rest api", () => {
     expect(data.balance).toBe(0);
     expect(data.debt).toBe(0);
   });
+
+  test("Being able to delete a user", async () => {
+    const username = "MyUser";
+
+    const mockResponse = {
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          message: "Användare raderad",
+          status: 200,
+        }),
+    };
+
+    global.fetch.mockResolvedValue(mockResponse);
+
+    const response = await fetch(`${host}/api/v1/delete/user/${username}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.message).toBe("Användare raderad");
+  });
+
+  test("Should not be able to delete a user if the username is missing", async () => {
+    const mockResponse = {
+      status: 400,
+      json: () =>
+        Promise.resolve({
+          message: "Användarnamn krävs",
+          status: 400,
+        }),
+    };
+
+    global.fetch.mockResolvedValue(mockResponse);
+
+    const response = await fetch(`${host}/api/v1/delete/user/`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data.message).toBe("Användarnamn krävs");
+  });
+
+  test("Should update a users balance", async () => {
+    const username = "MyUser";
+    const balance = 100;
+
+    const mockResponse = {
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          message: "Användarens saldo uppdaterat",
+          status: 200,
+        }),
+    };
+
+    global.fetch.mockResolvedValue(mockResponse);
+
+    const response = await fetch(
+      `${host}/api/v1/update/user/balance`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ username, balance }),
+      }
+    );
+
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.message).toBe("Användarens saldo uppdaterat");
+  });
 });

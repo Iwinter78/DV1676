@@ -261,7 +261,7 @@ app.post("/api/v1/bike/book", async (req, res) => {
 
   if (!id || !username) {
     return res.status(400).json({
-      message: "Id och användarnamn krävs",
+      message: "Id och användar-id krävs",
       status: 400,
     });
   }
@@ -287,7 +287,7 @@ app.post("/api/v1/bike/return", async (req, res) => {
 
   if (!id) {
     return res.status(400).json({
-      message: "Id krävs",
+      message: "Användar-id krävs",
       status: 400,
     });
   }

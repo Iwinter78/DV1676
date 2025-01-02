@@ -13,3 +13,12 @@ BEGIN
         OLD.currentuser
     );
 END;
+
+CREATE TRIGGER 'bike_charge_trigger' AFTER UPDATE ON 'bike'
+FOR EACH ROW
+    IF NEW.battery < 20 THEN
+        UPDATE bike
+        SET needs_charge = true
+        WHERE id = NEW.id;
+    END IF;
+END;

@@ -67,6 +67,7 @@ CREATE TABLE `user_log` (
 
 CREATE TABLE `bike_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    bike_id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     log_userid INT,
@@ -87,3 +88,5 @@ CREATE TABLE `bank_log` (
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)
 );
+
+CREATE INDEX 'bike_gps_index' ON 'bike' ('gps');

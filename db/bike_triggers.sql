@@ -14,8 +14,9 @@ BEGIN
     );
 END;
 
-CREATE TRIGGER 'bike_charge_trigger' AFTER UPDATE ON 'bike'
+CREATE TRIGGER `bike_charge_trigger` AFTER UPDATE ON `bike`
 FOR EACH ROW
+BEGIN
     IF NEW.battery < 20 THEN
         UPDATE bike
         SET needs_charge = true

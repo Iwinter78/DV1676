@@ -104,7 +104,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const latitude = decodedCoordinates.latitudeCenter;
           const longitude = decodedCoordinates.longitudeCenter;
 
-          if (bike.currentuser === userData.id || getRole(userData.id) === "admin") {
+          if (
+            bike.currentuser === userData.id ||
+            getRole(userData.id) === "admin"
+          ) {
             L.marker([latitude, longitude], { icon: bookedBikeIcon })
               .addTo(map)
               .bindPopup(

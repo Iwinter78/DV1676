@@ -10,9 +10,9 @@ SET @Stockholm_id = (SELECT id FROM city WHERE city_name = 'Stockholm');
 SET @Malmo_id = (SELECT id FROM city WHERE city_name = 'Malmö');
 
 
-INSERT INTO bike (gps, city)
+INSERT INTO bike (gps, city, battery)
 VALUES
-('9F8Q5H6P+FQ', @Karlskrona_id),
+('9F8Q5H6P+FQ', @Karlskrona_id, 10),
 ('9F8Q5H6P+JP', @Karlskrona_id),
 ('9F8Q5H6P+Q9', @Karlskrona_id),
 ('9F8Q5H6P+QH', @Karlskrona_id),

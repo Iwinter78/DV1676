@@ -27,6 +27,13 @@ async function getUser(username) {
   }
 }
 
+async function getAllUsers() {
+  const db = await connect();
+  const query = `call get_all_users()`;
+  const [rows] = await db.query(query);
+  return rows;
+}
+
 async function getUserLog(username) {
   const db = await connect();
   const query = `CALL get_user_log(?)`;
@@ -62,4 +69,4 @@ async function updateUserBalance(username, balance) {
   }
 }
 
-export { createUser, getUser, deleteUser, getUserLog, updateUserBalance };
+export { createUser, getUser, deleteUser, getUserLog, updateUserBalance, getAllUsers };

@@ -39,7 +39,7 @@ CREATE TABLE `bike` (
     gps VARCHAR(255),
     city INT,
     battery INT DEFAULT 100,
-    status VARCHAR(255) NOT NULL DEFAULT 'Available',
+    status INT DEFAULT 0,
     currentuser INT,
     FOREIGN KEY (currentuser) REFERENCES users(id),
     FOREIGN KEY (city) REFERENCES city(id)

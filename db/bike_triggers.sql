@@ -19,7 +19,7 @@ FOR EACH ROW
 BEGIN
     IF NEW.battery <= 20 THEN
         UPDATE bike
-        SET needs_charge = true
+        SET status = 1
         WHERE id = NEW.id;
     END IF;
 END;

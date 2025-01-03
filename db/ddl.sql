@@ -15,7 +15,11 @@ DROP TABLE IF EXISTS `users`;
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS get_user;
 DROP PROCEDURE IF EXISTS delete_user;
-DROP PROCEDURE IF EXISTS show_user_log;
+DROP PROCEDURE IF EXISTS create_bike;
+DROP PROCEDURE IF EXISTS update_bike_position;
+DROP PROCEDURE IF EXISTS delete_user;
+DROP PROCEDURE IF EXISTS get_user_log;
+DROP PROCEDURE IF EXISTS show_user_logs;
 DROP PROCEDURE IF EXISTS show_bike_log;
 DROP PROCEDURE IF EXISTS show_station_log;
 DROP PROCEDURE IF EXISTS show_bank_log;
@@ -36,28 +40,27 @@ CREATE TABLE `city` (
     city_gps VARCHAR(255) NOT NULL
 );
 
+--start_time TIMESTAMP,
+--start_location VARCHAR(255),
+--end_time TIMESTAMP,
+--end_location VARCHAR(255),
 -- bike_status: true = available, false = in use
 CREATE TABLE `bike` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     bike_status BOOLEAN NOT NULL DEFAULT true,
     gps VARCHAR(255),
     city VARCHAR(255),
-    start_time TIMESTAMP,
-    start_location VARCHAR(255),
-    end_time TIMESTAMP,
-    end_location VARCHAR(255),
     currentuser INT,
-    FOREIGN KEY (currentuser) REFERENCES users(id),
-    FOREIGN KEY (city) REFERENCES city(city_name)
+    FOREIGN KEY (currentuser) REFERENCES users(id)
 );
 
 CREATE TABLE `station` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     charge_taken INT,
-    city VARCHAR(255),
+    city INT,
     charging_size INT,
     gps VARCHAR(255),
-    FOREIGN KEY (city) REFERENCES city(city_name)
+    FOREIGN KEY (city) REFERENCES city(id)
 );
 
 CREATE TABLE `bank` (
@@ -67,14 +70,14 @@ CREATE TABLE `bank` (
 
 -- Log tables
 CREATE TABLE `user_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES users(id)
 );
 
 CREATE TABLE `bike_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     log_userid INT,
@@ -83,14 +86,14 @@ CREATE TABLE `bike_log` (
 );
 
 CREATE TABLE `station_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES station(id)
 );
 
 CREATE TABLE `bank_log` (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)
@@ -132,34 +135,26 @@ BEGIN
 END;;
 DELIMITER ;
 
-DELIMITER ;;
-CREATE PROCEDURE show_user_log()
+CREATE PROCEDURE show_user_logs()
 BEGIN
     SELECT * FROM user_log;
-END
-;;
+END;;
 DELIMITER ;
 
-DELIMITER ;;
 CREATE PROCEDURE show_bike_log()
 BEGIN
     SELECT * FROM bike_log;
-END
-;;
+END;;
 DELIMITER ;
 
-DELIMITER ;;
 CREATE PROCEDURE show_station_log()
 BEGIN
     SELECT * FROM station_log;
-END
-;;
+END;;
 DELIMITER ;
 
-DELIMITER ;;
 CREATE PROCEDURE show_bank_log()
 BEGIN
     SELECT * FROM bank_log;
-END
-;;
+END;;
 DELIMITER ;

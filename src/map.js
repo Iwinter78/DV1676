@@ -156,15 +156,27 @@ document.addEventListener("DOMContentLoaded", () => {
         const stations = data[0];
 
         stations.forEach((station) => {
-          const [lat, lng] = station.gps
-            .split(",")
-            .map((coord) => parseFloat(coord.trim()));
+          console.log("Station data:", station);
 
-          L.circle([lat, lng], {
+          // Parse the GPS string into an array
+          let coordinates;
+
+          coordinates = JSON.parse(station.gps);
+
+          // Ensure coordinates are valid
+          if (!Array.isArray(coordinates) || coordinates.length < 3) {
+            console.error(
+              "Insufficient GPS coordinates for station:",
+              station.id,
+            );
+            return;
+          }
+
+          // Draw the polygon
+          L.polygon(coordinates, {
             color: "blue",
             fillColor: "#30a1ff",
             fillOpacity: 0.4,
-            radius: 12,
           })
             .addTo(map)
             .bindPopup(

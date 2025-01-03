@@ -91,4 +91,4 @@ CREATE TABLE `bank_log` (
     FOREIGN KEY (id) REFERENCES bank(id)
 );
 
-CREATE INDEX 'bike_gps_index' ON 'bike' ('gps');
+CREATE INDEX bike_gps_index ON bike (gps);

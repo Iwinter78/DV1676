@@ -1,0 +1,18 @@
+.booking-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.booking-button {
+    width: 50vw;
+}
+
+@media screen and (max-width: 768px) {
+    .booking-button {
+        width: 100vw;
+    }
+    
+}

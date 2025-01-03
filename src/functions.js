@@ -1,22 +1,15 @@
-
 import { connect } from "../restapi/src/connect.js";
 
-let db;
+async function getUSerBalance(username) {
+  const db = await connect();
+  let sql = `SELECT balance FROM users WHERE username = ?;`;
+  let res;
 
-(async function initializeDatabase() {
-    try {
-        db = await connect();
+  [res] = await db.query(sql, [username]);
 
-        process.on("exit", () => {
-            if (db) {
-                db.end();
-            }
-        });
-    } catch (error) {
-        console.error("Failed to connect to the database:", error);
-        process.exit(1);
-    }
-})();
+  console.table(res);
+  return { balance: res[0].balance };
+}
 
 async function showLogs() {
     let userLogs = `CALL show_user_logs();`;
@@ -38,4 +31,4 @@ async function showLogs() {
         throw error;
     }
 }
-export {showLogs}
+export { getUSerBalance, showLogs }

@@ -1,4 +1,3 @@
-USE magicbike;
 
 -- Drop existing tables
 DROP TABLE IF EXISTS `user_log`;
@@ -29,8 +28,8 @@ CREATE TABLE `users` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL,
-    balance DECIMAL(10,2) NOT NULL,
-    debt DECIMAL(10,2) NOT NULL,
+    balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    debt DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     role VARCHAR(255) NOT NULL
 );
 
@@ -49,9 +48,10 @@ CREATE TABLE `bike` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     bike_status BOOLEAN NOT NULL DEFAULT true,
     gps VARCHAR(255),
-    city VARCHAR(255),
+    city INT,
     currentuser INT,
-    FOREIGN KEY (currentuser) REFERENCES users(id)
+    FOREIGN KEY (currentuser) REFERENCES users(id),
+    FOREIGN KEY (city) REFERENCES city(id)
 );
 
 CREATE TABLE `station` (
@@ -65,19 +65,20 @@ CREATE TABLE `station` (
 
 CREATE TABLE `bank` (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    cashisking DECIMAL(10,2)
+    cashisking DECIMAL(10,2) NOT NULL DEFAULT 0.00
 );
 
 -- Log tables
 CREATE TABLE `user_log` (
-    id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES users(id)
 );
 
 CREATE TABLE `bike_log` (
-    id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    bike_id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     log_userid INT,
@@ -86,14 +87,14 @@ CREATE TABLE `bike_log` (
 );
 
 CREATE TABLE `station_log` (
-    id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES station(id)
 );
 
 CREATE TABLE `bank_log` (
-    id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)
@@ -162,3 +163,5 @@ BEGIN
     SELECT * FROM bank_log;
 END;;
 DELIMITER ;
+
+CREATE INDEX 'bike_gps_index' ON 'bike' ('gps');

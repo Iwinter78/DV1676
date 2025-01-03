@@ -6,6 +6,9 @@
         <p>Din balans: <strong><%= balance || "ERROR" %> SEK</strong></p>
         <p>Din skuld: <strong><%= debt || "ERROR" %> SEK</strong></p>
     </div>
-    <a href="/logout" class="btn btn-danger">Logga ut</a>
+    <div class="buttons">
+        <a href="/balance" class="btn btn-primary pink-btn">Fyll på Saldo</a>
+        <a href="/logout" class="btn btn-danger">Logga ut</a>
+    </div>
 </main>
 <%- include('../../public/footer.ejs') %>

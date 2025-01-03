@@ -8,6 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('meta[name="userInfo"]').getAttribute("content"),
   );
 
+  async function getRole(user) {
+    const response = await fetch(
+      `http://localhost:1337/api/v1/user?username=${user}`,
+    );
+    const data = await response.json();
+    return data[0][0].role;
+  }
+
   navigator.geolocation.getCurrentPosition(async (position) => {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
@@ -25,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const availableBikeIcon = createIcon("#00ff00");
     const bookedBikeIcon = createIcon("#ff0000");
     const simIcon = createIcon("#FF7518");
+    const needsAttentionIcon = createIcon("#FFA500");
 
     const map = L.map("map").setView([latitude, longitude], 16);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -95,11 +104,18 @@ document.addEventListener("DOMContentLoaded", () => {
           const latitude = decodedCoordinates.latitudeCenter;
           const longitude = decodedCoordinates.longitudeCenter;
 
-          if (bike.currentuser === userData.id) {
+          if (bike.currentuser === userData.id || getRole(userData.id) === "admin") {
             L.marker([latitude, longitude], { icon: bookedBikeIcon })
               .addTo(map)
               .bindPopup(
                 `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`,
+              )
+              .openPopup();
+          } else if (bike.status === 1) {
+            L.marker([latitude, longitude], { icon: needsAttentionIcon })
+              .addTo(map)
+              .bindPopup(
+                `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Flytta till laddningstation</a>`,
               )
               .openPopup();
           } else {

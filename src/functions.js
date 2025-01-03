@@ -1,5 +1,5 @@
 
-import { connect } from "./restapi/src/connect.js";
+import { connect } from "../restapi/src/connect.js";
 
 let db;
 
@@ -19,18 +19,23 @@ let db;
 })();
 
 async function showLogs() {
-    let userLogs = `CALL show_user_log();`;
-    let bikeLogs = `CALL show_bike_log();`;
-    let stationLogs = `CALL show_station_log();`;
-    let bankLogs = `CALL show_bank_log();`;
+    let userLogs = `CALL show_user_logs();`;
+    let bikeLogs = `CALL show_bike_logs();`;
+    let stationLogs = `CALL show_station_logs();`;
+    let bankLogs = `CALL show_bank_logs();`;
 
     try {
-        await db.query(userLogs);
-        await db.query(bikeLogs);
-        await db.query(stationLogs);
-        await db.query(bankLogs);
+        userLogs = await db.query(userLogs);
+        bikeLogs = await db.query(bikeLogs);
+        stationLogs = await db.query(stationLogs);
+        bankLogs = await db.query(bankLogs);
+
+        let data = [userLogs, bikeLogs, stationLogs, bankLogs]
+        return data
+
     } catch (error) {
         console.error("Error executing queries:", error);
         throw error;
     }
 }
+export {showLogs}

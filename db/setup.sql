@@ -9,5 +9,6 @@ SOURCE bike_procedures.sql;
 SOURCE station_procedures.sql;
 SOURCE insert.sql
 SOURCE insert_bike_city_station.sql
+SOURCE bike_triggers.sql
 
 

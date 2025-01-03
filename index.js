@@ -332,3 +332,12 @@ app.post("/book/return/:id", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });
+
+app.post('/deleteUser/:username', async (req, res) => {
+  const username = req.params.username;
+
+  await fetch(`http://localhost:1337/api/v1/delete/user/:${username}`);
+
+  res.redirect('admin_panel/customer');
+
+});

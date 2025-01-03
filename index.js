@@ -4,6 +4,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import process from 'process';
+import { showLogs } from './src/functions.js';
 
 
 import { exchangeCodeForToken, getUserInfo } from './src/login.js';
@@ -84,8 +85,12 @@ app.get('/admin_panel/station', (req, res) => {
     res.render('admin_panel/station');
 });
 
-app.get('/admin_panel/log', (req, res) => {
-
+app.get('/admin_panel/log', async (req, res) => {
+    let data = await showLogs();
+    let output = {
+        logs: data
+    };
+    res.render('admin_panel/log', output);
 });
 
 // Start the server

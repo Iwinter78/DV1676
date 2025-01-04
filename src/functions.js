@@ -11,19 +11,28 @@ async function getUSerBalance(username) {
   return { balance: res[0].balance };
 }
 
-async function showLogs() {
-    let userLogs = `CALL show_user_logs();`;
-    let bikeLogs = `CALL show_bike_logs();`;
-    let stationLogs = `CALL show_station_logs();`;
-    let bankLogs = `CALL show_bank_logs();`;
+async function showLogs(type = null) {
+    const queries = {
+        User: `CALL show_user_logs();`,
+        Bike: `CALL show_bike_logs();`,
+        Station: `CALL show_station_logs();`,
+        Bank: `CALL show_bank_logs();`
+    };
 
+    let db = await connect();
     try {
-        userLogs = await db.query(userLogs);
-        bikeLogs = await db.query(bikeLogs);
-        stationLogs = await db.query(stationLogs);
-        bankLogs = await db.query(bankLogs);
+        let data = [];
+        console.log(type);
 
-        let data = [userLogs, bikeLogs, stationLogs, bankLogs]
+        if (type && queries[type]) {
+            const result = await db.query(queries[type]);
+            data = result[0][0];
+        } else if (type === null){
+            for (let key in queries) {
+                const result = await db.query(queries[key]);
+                data = data.concat(result[0][0]);
+            };
+        }
         return data
 
     } catch (error) {

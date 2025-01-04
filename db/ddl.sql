@@ -37,6 +37,8 @@ CREATE TABLE `bike` (
     bike_status BOOLEAN NOT NULL DEFAULT true,
     gps VARCHAR(255),
     city INT,
+    battery INT DEFAULT 100,
+    status INT DEFAULT 0,
     currentuser INT,
     FOREIGN KEY (currentuser) REFERENCES users(id),
     FOREIGN KEY (city) REFERENCES city(id)
@@ -92,4 +94,4 @@ CREATE TABLE `bank_log` (
     FOREIGN KEY (id) REFERENCES bank(id)
 );
 
-CREATE INDEX 'bike_gps_index' ON 'bike' ('gps');
+CREATE INDEX bike_gps_index ON bike (gps);

@@ -153,11 +153,16 @@ app.get("/admin_panel/station", (req, res) => {
 });
 
 app.get('/admin_panel/log', async (req, res) => {
-    let data = await showLogs();
-    let output = {
-        logs: data
-    };
-    res.render('admin_panel/log', output);
+  const type = req.query.type || null;
+  try {
+    const logs = await showLogs(type);
+    console.log("Fetched logs:", logs);
+    res.render('admin_panel/log', { logs, type });
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    res.status(500).send("Internal Server Error")
+  }
+
 });
 
 app.get("/email", (req, res) => {

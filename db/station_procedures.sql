@@ -5,3 +5,4 @@ CREATE PROCEDURE get_all_stations()
 BEGIN
     SELECT * FROM station;
 END;;
+DELIMITER ;

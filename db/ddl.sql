@@ -11,18 +11,6 @@ DROP TABLE IF EXISTS `city`;
 DROP TABLE IF EXISTS `bank`;
 DROP TABLE IF EXISTS `users`;
 
-DROP PROCEDURE IF EXISTS create_user;
-DROP PROCEDURE IF EXISTS get_user;
-DROP PROCEDURE IF EXISTS delete_user;
-DROP PROCEDURE IF EXISTS create_bike;
-DROP PROCEDURE IF EXISTS update_bike_position;
-DROP PROCEDURE IF EXISTS delete_user;
-DROP PROCEDURE IF EXISTS get_user_log;
-DROP PROCEDURE IF EXISTS show_user_logs;
-DROP PROCEDURE IF EXISTS show_bike_logs;
-DROP PROCEDURE IF EXISTS show_station_logs;
-DROP PROCEDURE IF EXISTS show_bank_logs;
-
 -- Primary tables
 CREATE TABLE `users` (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -71,6 +59,7 @@ CREATE TABLE `bank` (
 -- Log tables
 CREATE TABLE `user_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    log_type VARCHAR(255) NOT NULL DEFAULT "User",
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES users(id)
@@ -78,6 +67,7 @@ CREATE TABLE `user_log` (
 
 CREATE TABLE `bike_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    log_type VARCHAR(255) NOT NULL DEFAULT "Bike",
     bike_id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
@@ -88,6 +78,7 @@ CREATE TABLE `bike_log` (
 
 CREATE TABLE `station_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    log_type VARCHAR(255) NOT NULL DEFAULT "Station",
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES station(id)
@@ -95,73 +86,10 @@ CREATE TABLE `station_log` (
 
 CREATE TABLE `bank_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    log_type VARCHAR(255) NOT NULL DEFAULT "Bank",
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)
 );
-
-DELIMITER ;;
-CREATE PROCEDURE create_user(
-    IN in_email VARCHAR(255),
-    IN in_username VARCHAR(255)
-)
-BEGIN
-    INSERT INTO users (email, username, balance, debt, role)
-    VALUES (in_email, in_username, 0.00, 0.00, 'user');
-END;;
-DELIMITER ;
-
-DELIMITER ;;
-CREATE PROCEDURE get_user(IN username_param VARCHAR(255))
-BEGIN
-    SELECT * FROM users WHERE username = username_param;
-END;;
-DELIMITER ;
-
-DELIMITER ;;
-CREATE PROCEDURE delete_user(IN username_param VARCHAR(255))
-BEGIN
-    DELETE FROM users WHERE username = username_param;
-END;;
-DELIMITER ;
-
-DELIMITER ;;
-
-CREATE PROCEDURE get_user_log(IN username_param VARCHAR(255))
-BEGIN
-    SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data
-    FROM users u
-    JOIN user_log ul ON u.id = ul.id
-    WHERE u.username = username_param;
-END;;
-DELIMITER ;
-
-DELIMITER ;;
-CREATE PROCEDURE show_user_logs()
-BEGIN
-    SELECT * FROM user_log;
-END;;
-DELIMITER ;
-
-DELIMITER ;;
-CREATE PROCEDURE show_bike_logs()
-BEGIN
-    SELECT * FROM bike_log;
-END;;
-DELIMITER ;
-
-DELIMITER ;;
-CREATE PROCEDURE show_station_logs()
-BEGIN
-    SELECT * FROM station_log;
-END;;
-DELIMITER ;
-
-DELIMITER ;;
-CREATE PROCEDURE show_bank_logs()
-BEGIN
-    SELECT * FROM bank_log;
-END;;
-DELIMITER ;
 
 CREATE INDEX 'bike_gps_index' ON 'bike' ('gps');

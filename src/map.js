@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
               popupContent = `
                 Cykel: ${bike.id} <br>
                 Status: ${bike.status} <br>
-                Används av: ${bike.currentuser || 'None'} <br>
+                Används av: ${bike.currentuser || 'Ingen'} <br>
                 Battery: ${bike.battery}% <br>
                 <a href="/book/confirm/${bike.id}">Boka</a>
               `;

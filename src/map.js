@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const bookedBikeIcon = createIcon("#ff0000");
     const simIcon = createIcon("#FF7518");
     const needsAttentionIcon = createIcon("#FFA500");
+    const outOfOrderIcon = createIcon("#000000");
     const chargingMode = bookedBikeIcon;
 
     const map = L.map("map").setView([latitude, longitude], 16);
@@ -151,28 +152,26 @@ document.addEventListener("DOMContentLoaded", () => {
           if (stationCheck.isInStation) {
             // Bike is in a charging station
             if (bike.status === 1) {
-              bikeIcon = needsAttentionIcon;
-              popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Behöver laddas`;
-            } else if (bike.status === 2) {
               bikeIcon = chargingMode;
-              popupContent = `Cykel: ${bike.id} <br> Laddning pågår i station ${stationCheck.stationId}`;
+              popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Laddning pågår`;
+            } else if (bike.status === 2) {
+              bikeIcon = outOfOrderIcon;
+              popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Ur funktion`;
             } else {
               bikeIcon = availableBikeIcon;
               popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
             }
           } else {
-            if (
-              bike.currentuser === userData.id ||
-              getRole(userData.login) === "admin"
-            ) {
+            if (bike.currentuser === userData.id) {
               bikeIcon = bookedBikeIcon;
               popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`;
+              return;
             } else if (bike.status === 1) {
               bikeIcon = needsAttentionIcon;
               popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
-            } else {
-              bikeIcon = availableBikeIcon;
-              popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
+            } else if (bike.status === 2) {
+              bikeIcon = outOfOrderIcon;
+              popupContent = `Cykel: ${bike.id} <br> Ur funktion`;
             }
           }
 

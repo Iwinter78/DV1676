@@ -147,7 +147,7 @@ app.get("/admin_panel/customer", async (req, res) => {
 app.get("/admin_panel/bike", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/bike`);
 
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
 
@@ -161,7 +161,7 @@ app.get("/admin_panel/bike", async (req, res) => {
 app.get("/admin_panel/station", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/stations`);
 
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
 

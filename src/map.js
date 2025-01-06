@@ -151,25 +151,25 @@ document.addEventListener("DOMContentLoaded", () => {
               bikeIcon = chargingMode;
               popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Laddning pågår`;
             } else if (bike.status === 2) {
-              bikeIcon = outOfOrderIcon; 
+              bikeIcon = outOfOrderIcon;
               popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Ur funktion`;
             } else {
               bikeIcon = availableBikeIcon;
               popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
             }
           } else {
-            if (userRole === 'admin') {
+            if (userRole === "admin") {
               if (bike.status === 1) {
                 bikeIcon = needsAttentionIcon;
               } else if (bike.status === 2) {
-                bikeIcon = outOfOrderIcon; 
+                bikeIcon = outOfOrderIcon;
               } else {
                 bikeIcon = availableBikeIcon;
               }
               popupContent = `
                 Cykel: ${bike.id} <br>
                 Status: ${bike.status} <br>
-                Används av: ${bike.currentuser || 'Ingen'} <br>
+                Används av: ${bike.currentuser || "Ingen"} <br>
                 Battery: ${bike.battery}% <br>
                 <a href="/book/confirm/${bike.id}">Boka</a>
               `;
@@ -273,8 +273,8 @@ document.addEventListener("DOMContentLoaded", () => {
       map.setView([selectedCity.lat, selectedCity.lng], 15);
     });
     L.marker([latitude, longitude], { icon: customIcon })
-    .addTo(map)
-    .bindPopup("Här är du!")
-    .openPopup();
+      .addTo(map)
+      .bindPopup("Här är du!")
+      .openPopup();
   });
 });

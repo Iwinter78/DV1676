@@ -23,6 +23,8 @@ FOR EACH ROW
 BEGIN
     IF NEW.battery <= 20 THEN
         SET NEW.status = 1;
+    ELSE
+        SET NEW.status = 0;
     END IF;
 END;;
 DELIMITER ;
@@ -33,6 +35,8 @@ FOR EACH ROW
 BEGIN
     IF NEW.battery <= 20 THEN
         SET NEW.status = 1;
+    ELSE
+        SET NEW.status = 0;
     END IF;
 END;;
 DELIMITER ;

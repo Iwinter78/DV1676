@@ -337,7 +337,7 @@ app.get("/api/v1/getAllUsers", async (req, res) => {
     res.status(500).json({
       message: "Något gick fel, försök igen senare",
       status: 500,
-      error: error.message
+      error: error.message,
     });
   }
-})
+});

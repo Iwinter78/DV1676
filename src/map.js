@@ -44,11 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    L.marker([latitude, longitude], { icon: customIcon })
-      .addTo(map)
-      .bindPopup("Här är du!")
-      .openPopup();
-
     // WebSocket for bike movement
     const bikeMarker = L.marker([latitude, longitude], {
       icon: simIcon,
@@ -134,13 +129,11 @@ document.addEventListener("DOMContentLoaded", () => {
             lng = 13.0;
           }
 
-          // Decode Open Location Code
           const findCode = openLocationCode.recoverNearest(bike.gps, lat, lng);
           const decodedCoordinates = openLocationCode.decode(findCode);
           const latitude = decodedCoordinates.latitudeCenter;
           const longitude = decodedCoordinates.longitudeCenter;
 
-          // Check if bike is in a station
           const stationCheck = await checkBikeInAnyStation([
             latitude,
             longitude,
@@ -149,8 +142,11 @@ document.addEventListener("DOMContentLoaded", () => {
           let bikeIcon;
           let popupContent;
 
+          // First check if user is admin
+          const userRole = await getRole(userData.login);
+
+          // Then modify the bike display logic
           if (stationCheck.isInStation) {
-            // Bike is in a charging station
             if (bike.status === 1) {
               bikeIcon = chargingMode;
               popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Laddning pågår`;
@@ -162,16 +158,33 @@ document.addEventListener("DOMContentLoaded", () => {
               popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
             }
           } else {
-            if (bike.currentuser === userData.id) {
-              bikeIcon = bookedBikeIcon;
-              popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`;
-              return;
-            } else if (bike.status === 1) {
-              bikeIcon = needsAttentionIcon;
-              popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
-            } else if (bike.status === 2) {
-              bikeIcon = outOfOrderIcon;
-              popupContent = `Cykel: ${bike.id} <br> Ur funktion`;
+            if (userRole === "admin") {
+              if (bike.status === 1) {
+                bikeIcon = needsAttentionIcon;
+              } else if (bike.status === 2) {
+                bikeIcon = outOfOrderIcon;
+              } else {
+                bikeIcon = availableBikeIcon;
+              }
+              popupContent = `
+                Cykel: ${bike.id} <br>
+                Status: ${bike.status} <br>
+                Används av: ${bike.currentuser || "Ingen"} <br>
+                Battery: ${bike.battery}% <br>
+                <a href="/book/confirm/${bike.id}">Boka</a>
+              `;
+            } else {
+              if (bike.currentuser === userData.id) {
+                bikeIcon = bookedBikeIcon;
+                popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`;
+                return;
+              } else if (bike.status === 1) {
+                bikeIcon = needsAttentionIcon;
+                popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
+              } else if (bike.status === 2) {
+                bikeIcon = outOfOrderIcon;
+                popupContent = `Cykel: ${bike.id} <br> Ur funktion`;
+              }
             }
           }
 
@@ -259,5 +272,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedCity = JSON.parse(e.target.value);
       map.setView([selectedCity.lat, selectedCity.lng], 15);
     });
+    L.marker([latitude, longitude], { icon: customIcon })
+      .addTo(map)
+      .bindPopup("Här är du!")
+      .openPopup();
   });
 });

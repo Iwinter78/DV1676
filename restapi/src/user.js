@@ -69,4 +69,11 @@ async function updateUserBalance(username, balance) {
   }
 }
 
-export { createUser, getUser, deleteUser, getUserLog, updateUserBalance, getAllUsers };
+export {
+  createUser,
+  getUser,
+  deleteUser,
+  getUserLog,
+  updateUserBalance,
+  getAllUsers,
+};

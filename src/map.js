@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const bookedBikeIcon = createIcon("#ff0000");
     const simIcon = createIcon("#FF7518");
     const needsAttentionIcon = createIcon("#FFA500");
+    const outOfOrderIcon = createIcon("#000000");
+    const chargingMode = bookedBikeIcon;
 
     const map = L.map("map").setView([latitude, longitude], 16);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -41,11 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
-
-    L.marker([latitude, longitude], { icon: customIcon })
-      .addTo(map)
-      .bindPopup("Här är du!")
-      .openPopup();
 
     // WebSocket for bike movement
     const bikeMarker = L.marker([latitude, longitude], {
@@ -78,12 +75,46 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    function isPointInStation(bikeCords, stationCords) {
+      const polygonCords = stationCords.map((cord) => L.latLng(cord));
+
+      const polygon = L.polygon(polygonCords);
+
+      const bikePoint = L.latLng(bikeCords);
+
+      return polygon.getBounds().contains(bikePoint);
+    }
+
+    async function checkBikeInAnyStation(bike) {
+      const response = await fetch("http://localhost:1337/api/v1/stations");
+      const data = await response.json();
+      const stations = data[0];
+
+      for (const station of stations) {
+        const stationCoordinates = JSON.parse(station.gps);
+
+        if (isPointInStation(bike, stationCoordinates)) {
+          return {
+            isInStation: true,
+            stationId: station.id,
+            chargingSize: station.charging_size,
+          };
+        }
+      }
+
+      return {
+        isInStation: false,
+        stationId: null,
+        chargingSize: null,
+      };
+    }
+
     async function displayBikes() {
       try {
         const data = await fetchBikes();
         const bikes = data[0];
 
-        bikes.forEach((bike) => {
+        bikes.forEach(async (bike) => {
           let lat = 0;
           let lng = 0;
 
@@ -98,37 +129,69 @@ document.addEventListener("DOMContentLoaded", () => {
             lng = 13.0;
           }
 
-          // Decode Open Location Code
           const findCode = openLocationCode.recoverNearest(bike.gps, lat, lng);
           const decodedCoordinates = openLocationCode.decode(findCode);
           const latitude = decodedCoordinates.latitudeCenter;
           const longitude = decodedCoordinates.longitudeCenter;
 
-          if (
-            bike.currentuser === userData.id ||
-            getRole(userData.id) === "admin"
-          ) {
-            L.marker([latitude, longitude], { icon: bookedBikeIcon })
-              .addTo(map)
-              .bindPopup(
-                `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`,
-              )
-              .openPopup();
-          } else if (bike.status === 1) {
-            L.marker([latitude, longitude], { icon: needsAttentionIcon })
-              .addTo(map)
-              .bindPopup(
-                `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Flytta till laddningstation</a>`,
-              )
-              .openPopup();
+          const stationCheck = await checkBikeInAnyStation([
+            latitude,
+            longitude,
+          ]);
+
+          let bikeIcon;
+          let popupContent;
+
+          // First check if user is admin
+          const userRole = await getRole(userData.login);
+
+          // Then modify the bike display logic
+          if (stationCheck.isInStation) {
+            if (bike.status === 1) {
+              bikeIcon = chargingMode;
+              popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Laddning pågår`;
+            } else if (bike.status === 2) {
+              bikeIcon = outOfOrderIcon;
+              popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> Ur funktion`;
+            } else {
+              bikeIcon = availableBikeIcon;
+              popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
+            }
           } else {
-            L.marker([latitude, longitude], { icon: availableBikeIcon })
-              .addTo(map)
-              .bindPopup(
-                `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`,
-              )
-              .openPopup();
+            if (userRole === "admin") {
+              if (bike.status === 1) {
+                bikeIcon = needsAttentionIcon;
+              } else if (bike.status === 2) {
+                bikeIcon = outOfOrderIcon;
+              } else {
+                bikeIcon = availableBikeIcon;
+              }
+              popupContent = `
+                Cykel: ${bike.id} <br>
+                Status: ${bike.status} <br>
+                Används av: ${bike.currentuser || "Ingen"} <br>
+                Battery: ${bike.battery}% <br>
+                <a href="/book/confirm/${bike.id}">Boka</a>
+              `;
+            } else {
+              if (bike.currentuser === userData.id) {
+                bikeIcon = bookedBikeIcon;
+                popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`;
+                return;
+              } else if (bike.status === 1) {
+                bikeIcon = needsAttentionIcon;
+                popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
+              } else if (bike.status === 2) {
+                bikeIcon = outOfOrderIcon;
+                popupContent = `Cykel: ${bike.id} <br> Ur funktion`;
+              }
+            }
           }
+
+          L.marker([latitude, longitude], { icon: bikeIcon })
+            .addTo(map)
+            .bindPopup(popupContent)
+            .openPopup();
         });
       } catch (error) {
         console.error("Error displaying bikes:", error);
@@ -209,5 +272,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedCity = JSON.parse(e.target.value);
       map.setView([selectedCity.lat, selectedCity.lng], 15);
     });
+    L.marker([latitude, longitude], { icon: customIcon })
+      .addTo(map)
+      .bindPopup("Här är du!")
+      .openPopup();
   });
 });

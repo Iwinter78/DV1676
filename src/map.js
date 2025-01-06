@@ -142,10 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
           let bikeIcon;
           let popupContent;
 
-          // First check if user is admin
           const userRole = await getRole(userData.login);
 
-          // Then modify the bike display logic
           if (stationCheck.isInStation) {
             if (bike.status === 1) {
               bikeIcon = chargingMode;
@@ -190,8 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           L.marker([latitude, longitude], { icon: bikeIcon })
             .addTo(map)
-            .bindPopup(popupContent)
-            .openPopup();
+            .bindPopup(popupContent);
         });
       } catch (error) {
         console.error("Error displaying bikes:", error);
@@ -252,6 +249,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     displayStations();
+
+    //async function displayParkingZones() {
+    //  
+    //}
 
     locateButton.addEventListener("click", () => {
       map.locate({ setView: true, maxZoom: 16 });

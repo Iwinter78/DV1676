@@ -1,5 +1,4 @@
 DELIMITER ;;
-
 CREATE TRIGGER `bike_log_trigger` AFTER UPDATE ON `bike`
 FOR EACH ROW
 BEGIN

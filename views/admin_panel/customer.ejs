@@ -29,17 +29,17 @@
                       <button type="button" class="btn btn-secondary">Edit</button>
                     </td>
                     <td>
-                      <form id="deleteUserForm" action="/deleteUser/<%= row.username %>" method="POST">
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                      <form class="deleteUserForm" action="/deleteUser/<%= row.username %>" method="POST">
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal<%= row.username %>">
                             Delete
                         </button>
                       </form>
 
-                      <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                      <div class="modal fade" id="confirmDeleteModal<%= row.username %>" tabindex="-1" aria-labelledby="confirmDeleteModalLabel<%= row.username %>" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel<%= row.username %>">Confirm Deletion</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+                                    <button type="button" class="btn btn-danger confirmDeleteButton" data-username="<%= row.username %>">Delete</button>
                                 </div>
                             </div>
                         </div>
@@ -55,21 +55,25 @@
                     </td>
                 </tr>
               <% } %>
-              
-                <script>
-                    document.getElementById('deleteUserForm').addEventListener('submit', function (event) {
-                        event.preventDefault(); // Prevent the form from submitting instantly
-                        $('#confirmDeleteModal').modal('show');
-                    });
-                
-                    document.getElementById('confirmDeleteButton').addEventListener('click', function () {
-                        document.getElementById('deleteUserForm').submit(); // Submit form
-                    });
-                </script>
-                
-            </div>
-          </table>
+
+            </table>
       </div>
     </div>
   </div>
 </div> 
+
+<script>
+    document.querySelectorAll('.deleteUserForm').forEach((form) => {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent form from submitting instantly
+        });
+    });
+
+    document.querySelectorAll('.confirmDeleteButton').forEach((button) => {
+        button.addEventListener('click', function () {
+            const username = button.getAttribute('data-username');
+            const form = document.querySelector(`.deleteUserForm[action='/deleteUser/${username}']`);
+            form.submit(); // Submit the form
+        });
+    });
+</script>

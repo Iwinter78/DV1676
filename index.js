@@ -336,8 +336,22 @@ app.listen(port, () => {
 app.post('/deleteUser/:username', async (req, res) => {
   const username = req.params.username;
 
-  await fetch(`http://localhost:1337/api/v1/delete/user/:${username}`);
+  // Wait for the fetch request to complete
+  try {
+    const response = await fetch(`http://localhost:1337/api/v1/delete/user/${username}`, {
+      method: 'DELETE',
+    });
 
-  res.redirect('admin_panel/customer');
+    // Check if the deletion was successful
+    if (response.ok) {
+      console.log(`User ${username} deleted successfully`);
+    } else {
+      console.log(`Failed to delete user: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error occurred while trying to delete the user:', error);
+  }
 
+  // Redirect after the fetch request
+  res.redirect('/admin_panel/customer');
 });

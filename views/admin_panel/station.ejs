@@ -12,9 +12,19 @@
                     <thead>
                         <th scope="col">Station ID</th>
                         <th scope="col">Charging Size</th>
-                        <th scope="col">Charge Available</th>
+                        <th scope="col">Charge In Use</th>
+                        <th scope="col">City</th>
                         <th scope="col">GPS</th>
                     </thead>
+                    <% for (const row of stations) { %>
+                        <tr>
+                            <td><%= row.id %></td>
+                            <td><%= row.charging_size %></td>
+                            <td><%= row.charge_taken %></td>
+                            <td><%= row.city %></td>
+                            <td><%= row.gps %></td>
+                        </tr>
+                    <% } %>
                 </table>
             </div>
         </div>

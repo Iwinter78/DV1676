@@ -131,7 +131,7 @@ app.get("/admin_view", async (req, res) => {
 });
 
 app.get("/admin_panel/customer", async (req, res) => {
-  const response = await fetch(`http://localhost:1337/api/v1/allUsers`);
+  const response = await fetch(`http://localhost:1337/api/v1/getAllUsers`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -139,16 +139,37 @@ app.get("/admin_panel/customer", async (req, res) => {
 
   const data = await response.json();
   const users = data[0];
+  console.log(data[0]);
 
   res.render("admin_panel/customer", { users });
 });
 // Admin bike view
-app.get("/admin_panel/bike", (req, res) => {
-  res.render("admin_panel/bike");
+app.get("/admin_panel/bike", async (req, res) => {
+  const response = await fetch(`http://localhost:1337/api/v1/bike`);
+
+  if(!response.ok) {
+    throw new Error(`Failed to fetch data: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  const bikes = data[0];
+  console.log(data[0]);
+
+  res.render("admin_panel/bike", { bikes });
 });
 // Admin station view
-app.get("/admin_panel/station", (req, res) => {
-  res.render("admin_panel/station");
+app.get("/admin_panel/station", async (req, res) => {
+  const response = await fetch(`http://localhost:1337/api/v1/stations`);
+
+  if(!response.ok) {
+    throw new Error(`Failed to fetch data: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  const stations = data[0];
+  console.log(data[0]);
+
+  res.render("admin_panel/station", { stations });
 });
 
 app.get("/email", (req, res) => {

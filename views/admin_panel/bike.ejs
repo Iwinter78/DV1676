@@ -23,6 +23,15 @@
                         <th scope="col">City</th>
                         <th scope="col">Current User</th>
                     </thead>
+                    <% for (const row of bikes) { %>
+                        <tr>
+                            <td><%= row.id %></td>
+                            <td><%= row.gps %></td>
+                            <td><%= row.battery %></td>
+                            <td><%= row.city %></td>
+                            <td><%= row.currentuser %></td>
+                        </tr>
+                    <% } %>
                 </table>
             </div>
         </div>

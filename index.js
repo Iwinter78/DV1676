@@ -68,7 +68,7 @@ app.get("/callback", async (req, res) => {
 
   console.log("profile information from database", profile);
   // Check if the user exists in the database or if the email is missing
-  if (!profile || profile.length === 0 || !profile[0]?.email) {
+  if (!profile || profile.length === 0 || !profile[0][0]?.email) {
     console.log("Profile is empty or missing email...");
     req.session.userInfo = {
       login: userInfo.login,
@@ -147,7 +147,7 @@ app.get("/admin_panel/customer", async (req, res) => {
 app.get("/admin_panel/bike", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/bike`);
 
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
 
@@ -161,7 +161,7 @@ app.get("/admin_panel/bike", async (req, res) => {
 app.get("/admin_panel/station", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/stations`);
 
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
 

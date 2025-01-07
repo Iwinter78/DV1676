@@ -57,4 +57,16 @@ BEGIN
     where username = username_param;
 END;;
 
+CREATE PROCEDURE edit_user(
+    IN in_username VARCHAR(255),
+    IN in_balance DECIMAL(10,2),
+    IN in_debt DECIMAL(10,2)
+)
+BEGIN
+    UPDATE users
+    SET balance = in_balance,
+        debt = in_debt
+    WHERE username = in_username;
+END;;
+
 DELIMITER ;

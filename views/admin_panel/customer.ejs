@@ -26,7 +26,55 @@
                     <td><%= row.debt %></td>
                     <td><%= row.role %></td>
                     <td>
-                      <button type="button" class="btn btn-secondary">Edit</button>
+                      <form class="editUserForm" action="/editUser/<%= row.username %>" method="POST">
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmEditModal<%= row.username %>">
+                          Edit
+                        </button>
+                      </form>
+
+                      <div class="modal fade" id="confirmEditModal<%= row.username %>" tabindex="-1" aria-labelledby="confirmEditModalLabel<%= row.username %>" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel<%= row.username %>">Edit User</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <div class="mb-3">
+                                      <label for="id<%= row.username %>" class="form-label">ID:</label>
+                                      <input type="text" class="form-control-plaintext" id="id<%= row.username %>" value="<%= row.id %>" readonly>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label for="username<%= row.username %>" class="form-label">Username:</label>
+                                      <input type="text" class="form-control-plaintext" id="username<%= row.username %>" value="<%= row.username %>" readonly>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label for="email<%= row.username %>" class="form-label">Email:</label>
+                                      <input type="text" class="form-control-plaintext" id="email<%= row.username %>" value="<%= row.email %>" readonly>
+                                  </div>
+                                  <div class="mb-3">
+                                      <label for="role<%= row.username %>" class="form-label">Role:</label>
+                                      <input type="text" class="form-control-plaintext" id="role<%= row.username %>" value="<%= row.role %>" readonly>
+                                  </div>
+                                  
+                                  <!-- Bara de två som går att ändra -->
+                                  <div class="mb-3">
+                                      <label for="balance<%= row.username %>" class="form-label">Balance:</label>
+                                      <input type="text" class="form-control" id="balance<%= row.username %>" name="balance" value="<%= row.balance %>">
+                                  </div>
+                                  <div class="mb-3">
+                                      <label for="debt<%= row.username %>" class="form-label">Debt:</label>
+                                      <input type="text" class="form-control" id="debt<%= row.username %>" name="debt" value="<%= row.debt %>">
+                                  </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary confirmEditButton" data-username="<%= row.username %>">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                      </div>
                     </td>
                     <td>
                       <form class="deleteUserForm" action="/deleteUser/<%= row.username %>" method="POST">
@@ -76,4 +124,39 @@
             form.submit(); // Submit the form
         });
     });
+
+    document.querySelectorAll('.editUserForm').forEach((form) => {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+        });
+    });
+
+    // Confirm and submit edit form with updated values
+    document.querySelectorAll('.confirmEditButton').forEach((button) => {
+    button.addEventListener('click', async function () {
+        console.log("Edit button clicked");  // Check if this gets logged when clicked
+        
+        const username = button.getAttribute('data-username');
+        const balance = document.getElementById(`balance${username}`).value;
+        const debt = document.getElementById(`debt${username}`).value;
+
+        console.log("Username:", username);
+        console.log("Balance:", balance);
+        console.log("Debt:", debt);
+
+        console.log(JSON.stringify({balance: balance, debt: debt}));
+
+        const response = await fetch(`/editUser/${username}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  balance: balance,
+                  debt: debt })
+            });
+        
+    });
+});
+
 </script>

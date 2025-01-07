@@ -341,3 +341,37 @@ app.get("/api/v1/getAllUsers", async (req, res) => {
     });
   }
 });
+
+app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
+  // Log the entire body to verify that it's being sent properly
+  console.log("Request Body:", req.body);  
+
+  // Extract username, balance, and debt from the body (note: username is also in the URL)
+  const usernameFromUrl = req.params.username;
+  const balance = req.body.balance;
+  const debt = req.body.debt;
+
+
+    console.log("Before calling editUser");
+
+    // Call the editUser function (assuming it's a method of the `user` object)
+  try {
+    const response = await user.editUser(usernameFromUrl, balance, debt);
+
+    if(response.ok) {
+      return res.status(200).send("Fixed");
+    }
+  } catch {
+    res.status(500).send("Internal Server Error");
+  }
+    
+    console.log("After calling editUser");
+
+    // Log the result of the operation if any
+
+    // Send a response (you can send a success message or other data)
+    console.log("User updated successfully");
+
+
+});
+

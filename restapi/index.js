@@ -161,6 +161,9 @@ app.delete("/api/v1/delete/user/:username", async (req, res) => {
   }
 });
 
+
+
+
 app.get("/api/v1/bike", async (req, res) => {
   try {
     let response = await bike.getAllBikes();
@@ -342,36 +345,49 @@ app.get("/api/v1/getAllUsers", async (req, res) => {
   }
 });
 
+app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
+  const id = req.params.id;
+  const newSize = req.body.charging_size;
+  try {
+    let result = await station.editChargingSize(id, newSize);
+  
+    if (result.affectedRows > 0) { // Assuming affectedRows is returned from the DB operation
+      return res.status(200).send("Charging size changed");
+    } else {
+      return res.status(404).send("Station not found or no change made");
+    }
+  } catch (error) {
+    console.error('Error in editChargingSize API:', error); // Added for debugging
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
-  // Log the entire body to verify that it's being sent properly
   console.log("Request Body:", req.body);  
 
-  // Extract username, balance, and debt from the body (note: username is also in the URL)
   const usernameFromUrl = req.params.username;
   const balance = req.body.balance;
   const debt = req.body.debt;
 
 
-    console.log("Before calling editUser");
+  console.log("Before calling editUser");
 
-    // Call the editUser function (assuming it's a method of the `user` object)
   try {
-    const response = await user.editUser(usernameFromUrl, balance, debt);
+    let result = await user.editUser(usernameFromUrl, balance, debt);
 
-    if(response.ok) {
+    if(result.affectedRows > 0) {
       return res.status(200).send("Fixed");
+    } else {
+      return res.status(404).send("User not found or no changes made")
     }
-  } catch {
+  } catch (error) {
+    console.error('Error in editUserAdminPanel API:', error)
     res.status(500).send("Internal Server Error");
   }
-    
-    console.log("After calling editUser");
 
-    // Log the result of the operation if any
+  console.log("After calling editUser");
 
-    // Send a response (you can send a success message or other data)
-    console.log("User updated successfully");
+  console.log("User updated successfully");
 
 
 });
-

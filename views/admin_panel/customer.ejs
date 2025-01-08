@@ -144,9 +144,10 @@
         console.log("Balance:", balance);
         console.log("Debt:", debt);
 
+
         console.log(JSON.stringify({balance: balance, debt: debt}));
 
-        const response = await fetch(`/editUser/${username}`, {
+        await fetch(`/editUser/${username}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,8 +155,18 @@
                 body: JSON.stringify({
                   balance: balance,
                   debt: debt })
-            });
+            })
         
+            .then(response => {
+                return Promise.resolve(response);
+            })
+
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating balance/debt.');
+            });
+            console.log("After first fetch")
+            location.reload();
     });
 });
 

@@ -70,13 +70,12 @@ async function updateUserBalance(username, balance) {
 }
 
 async function editUser(username, balance, debt) {
-  console.log("Before editUser in user.js function")
   const db = await connect();
   const query = `CALL edit_user(?, ?, ?)`;
   const values = [username, balance, debt];
-  await db.query(query, values);
+  const response = await db.query(query, values);
   db.end();
-  console.log("After editUser in user.js function");
+  return response[0];
 }
 
 export {

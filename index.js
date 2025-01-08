@@ -381,11 +381,37 @@ app.put('/editUser/:username', async (req, res) => {
     console.log("User updated successfully");
 
     // Redirect after successful update, appending a timestamp to prevent cache issues
-    return res.redirect('/admin_panel/customer?' + new Date().getTime());
 
   } catch (error) {
     // Catch any errors during fetch or other operations
     console.error("Error during fetch:", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+app.put('/editChargingSize/:id', async (req, res) =>{
+  const id = req.params.id;
+  const charging_size = req.body.charging_size;
+
+  try {
+    const response = await fetch(`http://localhost:1337/api/v1/stations/editChargingSize/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: id,
+        charging_size: charging_size
+      })
+    });
+  
+    if (response.ok) {
+      return res.status(200).send("done");
+    }
+
+    res.redirect('/admin_panel/station');
+  } catch (error) {
+    console.error('Error in /editChargingSize:', error); // Added for debugging
     return res.status(500).send("Internal Server Error");
   }
 });

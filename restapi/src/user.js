@@ -69,6 +69,15 @@ async function updateUserBalance(username, balance) {
   }
 }
 
+async function editUser(username, balance, debt) {
+  const db = await connect();
+  const query = `CALL edit_user(?, ?, ?)`;
+  const values = [username, balance, debt];
+  const response = await db.query(query, values);
+  db.end();
+  return response[0];
+}
+
 export {
   createUser,
   getUser,
@@ -76,4 +85,5 @@ export {
   getUserLog,
   updateUserBalance,
   getAllUsers,
+  editUser
 };

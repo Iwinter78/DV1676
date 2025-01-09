@@ -13,8 +13,8 @@
         <tbody>
             <% trips.forEach(trip => { %>
                 <tr>
-                    <td><%= trip.log_time ? new Date(trip.log_time).toISOString().replace('T', ' ').split('.')[0] : '--' %></td>
-                    <td><%= trip.log_data || '--' %></td>
+                    <td><%= trip.log_time %></td>
+                    <td><%= trip.log_data %></td>
                 </tr>
             <% }) %>
         </tbody>

@@ -351,8 +351,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const coordinates = JSON.parse(zone.gps);
 
         L.polygon(coordinates, {
-          color: "green",
-          fillColor: "#00ff00",
+          color: "pink",
+          fillColor: "#ff00ff",
           fillOpacity: 0.4,
         }).addTo(map).bindPopup(`
             Parkeringzon <br> ID: ${zone.id} 

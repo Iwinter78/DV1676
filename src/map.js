@@ -109,10 +109,53 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     }
 
+    async function setAmountOfBikesInZone(zoneId, amount) {
+      const response = await fetch(`http://localhost:1337/api/v1/parking/${zoneId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      if (response.status === 200) {
+        await drawParkingZones();
+      }
+    }
+
+    async function checkBikeInAnyParking(bike) {
+      const response = await fetch("http://localhost:1337/api/v1/parking");
+      const data = await response.json();
+      const parkingZones = data[0];
+
+      for (const zone of parkingZones) {
+        await setAmountOfBikesInZone(zone.id, 0);
+      }
+
+      for (const zone of parkingZones) {
+        const zoneCoordinates = JSON.parse(zone.gps);
+        //console.log(zone.id);
+        //await setAmountOfBikesInZone(zone.id, 0);
+
+        if (isPointInStation(bike, zoneCoordinates)) {
+          await setAmountOfBikesInZone(zone.id, zone.bikes_in_zone + 1);
+          return {
+            isInParking: true,
+            zoneId: zone.id,
+            bikesInZone: zone.bikes_in_zone,
+          };
+        }
+      }
+
+      return {
+        isInParking: false,
+        zoneId: null,
+        bikesInZone: null,
+      };
+    }
+
     async function displayBikes() {
       try {
         const data = await fetchBikes();
         const bikes = data[0];
+        const userRole = await getRole(userData.login);
 
         bikes.forEach(async (bike) => {
           let lat = 0;
@@ -139,10 +182,13 @@ document.addEventListener("DOMContentLoaded", () => {
             longitude,
           ]);
 
+          const parkingCheck = await checkBikeInAnyParking([
+            latitude,
+            longitude,
+          ]);
+
           let bikeIcon;
           let popupContent;
-
-          const userRole = await getRole(userData.login);
 
           if (stationCheck.isInStation) {
             if (bike.status === 1) {
@@ -154,6 +200,38 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
               bikeIcon = availableBikeIcon;
               popupContent = `Cykel: ${bike.id} <br> I laddningsstation ${stationCheck.stationId} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
+            }
+          } else if (parkingCheck.isInParking) {
+            if (userRole === "admin") {
+              if (bike.status === 1) {
+                bikeIcon = needsAttentionIcon;
+              } else if (bike.status === 2) {
+                bikeIcon = outOfOrderIcon;
+              } else {
+                bikeIcon = availableBikeIcon;
+              }
+              popupContent = `
+                Cykel: ${bike.id} <br>
+                Status: ${bike.status} <br>
+                Används av: ${bike.currentuser || "Ingen"} <br>
+                Battery: ${bike.battery}% <br>
+                I parkeringszon ${parkingCheck.zoneId} <br>
+                <a href="/book/confirm/${bike.id}">Boka</a>
+              `;
+            } else {
+              if (bike.currentuser === userData.id) {
+                bikeIcon = bookedBikeIcon;
+                popupContent = `Cykel: ${bike.id} <br> I parkeringszon ${parkingCheck.zoneId} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`;
+              } else if (bike.status === 1) {
+                bikeIcon = needsAttentionIcon;
+                popupContent = `Cykel: ${bike.id} <br> I parkeringszon ${parkingCheck.zoneId} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
+              } else if (bike.status === 2) {
+                bikeIcon = outOfOrderIcon;
+                popupContent = `Cykel: ${bike.id} <br> I parkeringszon ${parkingCheck.zoneId} <br> Ur funktion`;
+              } else {
+                bikeIcon = availableBikeIcon;
+                popupContent = `Cykel: ${bike.id} <br> I parkeringszon ${parkingCheck.zoneId} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
+              }
             }
           } else {
             if (userRole === "admin") {
@@ -175,13 +253,15 @@ document.addEventListener("DOMContentLoaded", () => {
               if (bike.currentuser === userData.id) {
                 bikeIcon = bookedBikeIcon;
                 popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`;
-                return;
               } else if (bike.status === 1) {
                 bikeIcon = needsAttentionIcon;
                 popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
               } else if (bike.status === 2) {
                 bikeIcon = outOfOrderIcon;
                 popupContent = `Cykel: ${bike.id} <br> Ur funktion`;
+              } else {
+                bikeIcon = availableBikeIcon;
+                popupContent = `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`;
               }
             }
           }
@@ -250,9 +330,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
     displayStations();
 
-    //async function displayParkingZones() {
-    //  
-    //}
+    async function fetchParking() {
+      try {
+        const response = await fetch("http://localhost:1337/api/v1/parking", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        return response.json();
+      } catch (error) {
+        console.error("Error fetching parking:", error);
+        return [];
+      }
+    }
+
+    async function drawParkingZones() {
+      const data = await fetchParking();
+      const parkingZones = data[0];
+
+      parkingZones.forEach((zone) => {
+        const coordinates = JSON.parse(zone.gps);
+
+        L.polygon(coordinates, {
+          color: "green",
+          fillColor: "#00ff00",
+          fillOpacity: 0.4,
+        }).addTo(map).bindPopup(`
+            Parkeringzon <br> ID: ${zone.id} 
+            <br> Antal cyklar i zon ${zone.bikes_in_zone}
+            `);
+      });
+    }
+
+    drawParkingZones();
 
     locateButton.addEventListener("click", () => {
       map.locate({ setView: true, maxZoom: 16 });

@@ -3,6 +3,7 @@ import cors from "cors";
 import * as user from "./src/user.js";
 import * as bike from "./src/bike.js";
 import * as station from "./src/station.js";
+import * as parking from "./src/parking.js";
 
 const app = express();
 
@@ -22,10 +23,6 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-  res.json({ message: "Hello World!" });
-});
 
 app.post("/api/v1/create/user", async (req, res) => {
   const username = req.body.username;
@@ -74,6 +71,20 @@ app.get("/api/v1/user", async (req, res) => {
     let response = await user.getUser(username);
     res.status(200).json(response);
   } catch (error) {
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
+app.get("/api/v1/getAllUsers", async (req, res) => {
+  try {
+    let response = await user.getAllUsers();
+    res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "Något gick fel, försök igen senare",
       status: 500,
@@ -308,10 +319,6 @@ app.post("/api/v1/bike/return", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`REST API is listning on ${port}`);
-});
-
 // STATIONS
 
 app.get("/api/v1/stations", async (req, res) => {
@@ -328,16 +335,21 @@ app.get("/api/v1/stations", async (req, res) => {
   }
 });
 
-app.get("/api/v1/getAllUsers", async (req, res) => {
+// PARKING ZONES
+
+app.get("/api/v1/parking", async (req, res) => {
   try {
-    let response = await user.getAllUsers();
+    let response = await parking.allParking();
     res.status(200).json(response);
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       message: "Något gick fel, försök igen senare",
       status: 500,
       error: error.message,
     });
   }
+});
+
+app.listen(port, () => {
+  console.log(`REST API is listning on ${port}`);
 });

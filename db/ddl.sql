@@ -59,7 +59,7 @@ CREATE TABLE `parking_zones` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     city INT,
     gps VARCHAR(255),
-    bikes_in_zone INT,
+    bikes_in_zone INT DEFAULT 0,
     FOREIGN KEY (city) REFERENCES city(id)
 );
 

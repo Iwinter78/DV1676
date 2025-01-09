@@ -8,9 +8,9 @@ DROP PROCEDURE IF EXISTS show_bank_logs;
 DELIMITER ;;
 CREATE PROCEDURE get_user_log(IN username_param VARCHAR(255))
 BEGIN
-    SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data
+    SELECT u.id AS user_id, u.username, bl.log_time, bl.log_data
     FROM users u
-    JOIN user_log ul ON u.id = ul.id
+JOIN bike_log bl ON u.id = bl.log_userid
     WHERE u.username = username_param;
 END;;
 

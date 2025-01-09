@@ -350,6 +350,33 @@ app.get("/api/v1/parking", async (req, res) => {
   }
 });
 
+app.put("/api/v1/parking/:id", async (req, res) => {
+  const id = req.params.id;
+  const { amount } = req.body;
+
+  if (!id) {
+    return res.status(400).json({
+      message: "Id krävs",
+      status: 400,
+    });
+  }
+
+  try {
+    await parking.updateAmountOfBikes(id, amount);
+
+    res.status(200).json({
+      message: "Parkering uppdaterad",
+      status: 200,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`REST API is listning on ${port}`);
 });

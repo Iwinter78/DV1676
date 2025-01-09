@@ -268,19 +268,26 @@ app.get("/history", async (req, res) => {
   if (!userInfo) {
     return res.redirect("/"); //back to home if the user is not logd in
   }
+  try {
+    const profileResponse = await fetch(
+      `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
+    );
 
-  const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
-  );
-  const profile = await profileResponse.json();
-  const trips = profile[0] || [];
-  const data = {
-    ...userInfo,
-    trips,
-  };
+    if (!profileResponse.ok) {
+      console.error("Faild to fetch history", profileResponse.statusText);
+      return res.status(500).send("Error fetching history.");
+    }
 
-  console.log(trips);
-  res.render("client/client_travel_history", data);
+    const profile = await profileResponse.json();
+    const trips = profile[0] || [];
+    const data = {
+      ...userInfo,
+      trips,
+    };
+
+    console.log(trips);
+    res.render("client/client_travel_history", data);
+  } catch(error) {}
 });
 
 app.get("/book/confirm/:id", async (req, res) => {

@@ -5,34 +5,34 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "lint": "eslint .",
-      "lint:fix": "eslint . --fix",
-      "test-build": "npx webpack && node index.js"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "test-build": "npx webpack && node index.js"
     },
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/Iwinter78/DV1676.git"
+        "type": "git",
+        "url": "git+https://github.com/Iwinter78/DV1676.git"
     },
     "author": "",
     "license": "ISC",
     "bugs": {
-      "url": "https://github.com/Iwinter78/DV1676/issues"
+        "url": "https://github.com/Iwinter78/DV1676/issues"
     },
     "homepage": "https://github.com/Iwinter78/DV1676#readme",
     "devDependencies": {
-      "@eslint/js": "^9.14.0",
-      "eslint": "^9.14.0",
-      "globals": "^15.12.0",
-      "webpack-cli": "^5.1.4"
+        "@eslint/js": "^9.14.0",
+        "eslint": "^9.14.0",
+        "globals": "^15.12.0",
+        "webpack-cli": "^5.1.4"
     },
     "dependencies": {
-      "bootstrap-icons": "^1.11.3",
-      "dotenv": "^16.4.5",
-      "ejs": "^3.1.10",
-      "express": "^4.21.1",
-      "express-session": "^1.18.1",
-      "leaflet": "^1.9.4"
+        "bootstrap-icons": "^1.11.3",
+        "dotenv": "^16.4.5",
+        "ejs": "^3.1.10",
+        "express": "^4.21.1",
+        "express-session": "^1.18.1",
+        "leaflet": "^1.9.4",
+        "ws": "^8.18.0"
     }
-  }
-  
+}

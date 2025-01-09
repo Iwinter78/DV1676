@@ -35,16 +35,18 @@ async function getAllUsers() {
 }
 
 async function getUserLog(username) {
-  const db = await connect();
-  const query = `CALL get_user_log(?)`;
-  const values = [username];
+  let db;
   try {
+    db = await connect();
+    const query = `CALL get_user_log(?)`;
+    const values = [username];
     const [rows] = await db.query(query, values);
-    db.end();
     return rows;
   } catch (error) {
-    db.end();
+    console.error("Error fetching user log:", error);
     throw error;
+  } finally {
+    if (db) await db.end();
   }
 }
 

@@ -6,7 +6,6 @@ BEGIN
     SELECT * FROM station;
 END;;
 
-
 CREATE PROCEDURE edit_charging_size(
     IN in_id INT,
     IN in_charging_size INT

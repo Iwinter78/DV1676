@@ -14,6 +14,7 @@ const __dirname = dirname(__filename);
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use(
@@ -148,7 +149,7 @@ app.get("/admin_panel/customer", async (req, res) => {
 app.get("/admin_panel/bike", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/bike`);
 
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
 
@@ -162,7 +163,7 @@ app.get("/admin_panel/bike", async (req, res) => {
 app.get("/admin_panel/station", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/stations`);
 
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
 
@@ -348,6 +349,95 @@ app.post("/book/return/:id", async (req, res) => {
 
   res.redirect("/home");
 });
+
+
+
+app.post('/deleteUser/:username', async (req, res) => {
+  const username = req.params.username;
+
+  try {
+    const response = await fetch(`http://localhost:1337/api/v1/delete/user/${username}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      console.log(`User ${username} deleted successfully`);
+    } else {
+      console.log(`Failed to delete user: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error occurred while trying to delete the user:', error);
+  }
+
+  res.redirect('/admin_panel/customer');
+});
+
+app.put('/editUser/:username', async (req, res) => {
+  console.log("Route hit: /editUser/:username");
+  const username = req.params.username;
+  const balance = req.body.balance;
+  const debt = req.body.debt;
+
+  console.log("Balance:", balance);
+  console.log("Debt:", debt);
+
+  try {
+    // Making the request to the other API endpoint inside the backend
+    const response = await fetch(`http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        balance: balance,
+        debt: debt 
+      })
+    });
+
+    if (response.ok) {
+      // If the API call fails, respond with an error
+      return res.status(200).send("done");
+    }
+
+    console.log("User updated successfully");
+
+    // Redirect after successful update, appending a timestamp to prevent cache issues
+
+  } catch (error) {
+    // Catch any errors during fetch or other operations
+    console.error("Error during fetch:", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+app.put('/editChargingSize/:id', async (req, res) =>{
+  const id = req.params.id;
+  const charging_size = req.body.charging_size;
+
+  try {
+    const response = await fetch(`http://localhost:1337/api/v1/stations/editChargingSize/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: id,
+        charging_size: charging_size
+      })
+    });
+  
+    if (response.ok) {
+      return res.status(200).send("done");
+    }
+
+    res.redirect('/admin_panel/station');
+  } catch (error) {
+    console.error('Error in /editChargingSize:', error); // Added for debugging
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+
 
 // Start the server
 app.listen(port, () => {

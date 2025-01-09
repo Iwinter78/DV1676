@@ -2,6 +2,7 @@ DROP DATABASE IF EXISTS magicbike;
 CREATE DATABASE IF NOT EXISTS magicbike;
 USE magicbike;
 
+SOURCE parking_zone_procedures.sql;
 SOURCE schema.sql;
 SOURCE ddl.sql;
 SOURCE user_procedures.sql;

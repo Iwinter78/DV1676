@@ -23,6 +23,11 @@ BEGIN
     SELECT * FROM users WHERE username = username_param;
 END;;
 
+CREATE PROCEDURE get_user_balance(IN userid_param INT)
+BEGIN
+    SELECT balance FROM users WHERE id = userid_param;
+END;;
+
 CREATE PROCEDURE delete_user(IN username_param VARCHAR(255))
 BEGIN
     DELETE FROM users WHERE username = username_param;

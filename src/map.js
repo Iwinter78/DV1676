@@ -1,11 +1,9 @@
 import L from "leaflet";
 import { OpenLocationCode } from "open-location-code";
 
-// Global state
 let stationCounters = {};
 let parkingZoneCounters = {};
 
-// Utility Functions
 function createIcon(color) {
   return L.divIcon({
     className: "custom-marker",
@@ -15,14 +13,18 @@ function createIcon(color) {
   });
 }
 
-function isPointInStation(bikeCords, stationCords) {
-  const polygonCords = stationCords.map((cord) => L.latLng(cord));
-  const polygon = L.polygon(polygonCords);
-  const bikePoint = L.latLng(bikeCords);
-  return polygon.getBounds().contains(bikePoint);
+function isPointInStation(bikeCoords, stationCoords) {
+  if (!bikeCoords || !stationCoords || !Array.isArray(stationCoords)) {
+      return false;
+  }
+
+  const point = L.latLng(bikeCoords[0], bikeCoords[1]);
+  const polygonCoords = stationCoords.map(coord => L.latLng(coord[0], coord[1]));
+  const polygon = L.polygon(polygonCoords);
+  
+  return polygon.getBounds().contains(point);
 }
 
-// API Functions
 async function getRole(user) {
   const response = await fetch(
     `http://localhost:1337/api/v1/user?username=${user}`,
@@ -71,7 +73,6 @@ async function fetchParking() {
   }
 }
 
-// Location Check Functions
 async function checkBikeInAnyStation(bike) {
   const response = await fetch("http://localhost:1337/api/v1/parking");
   const data = await response.json();
@@ -79,15 +80,15 @@ async function checkBikeInAnyStation(bike) {
 
   for (const zone of parkingZones) {
     const zoneCoordinates = JSON.parse(zone.gps);
+    parkingZoneCounters[zone.id] = 0;
 
     if (isPointInStation(bike, zoneCoordinates)) {
+      console.log(zone.id);
       if (!stationCounters[zone.id]) {
         stationCounters[zone.id] = 1;
       } else {
         stationCounters[zone.id]++;
       }
-
-      console.log(stationCounters);
 
       return {
         isInParking: true,
@@ -104,36 +105,48 @@ async function checkBikeInAnyStation(bike) {
 }
 
 async function checkBikeInAnyParking(bike) {
+  if (!bike || !Array.isArray(bike)) {
+      console.error('Invalid bike data:', bike);
+      return { isInParking: false, zoneId: null, bikeCount: 0 };
+  }
+
   const response = await fetch("http://localhost:1337/api/v1/parking");
   const data = await response.json();
   const parkingZones = data[0];
 
+  const bikePoint = {
+      lat: bike[0],
+      lng: bike[1]
+  };
+
   for (const zone of parkingZones) {
-    const zoneCoordinates = JSON.parse(zone.gps);
+      const zoneCoordinates = JSON.parse(zone.gps);
+      console.log(`Checking bike coordinates [${bikePoint.lat}, ${bikePoint.lng}] against zone ${zone.id}`);
 
-    if (isPointInStation(bike, zoneCoordinates)) {
-      if (!parkingZoneCounters[zone.id]) {
-        parkingZoneCounters[zone.id] = 1;
-      } else {
-        parkingZoneCounters[zone.id]++;
+      if (isPointInStation([bikePoint.lat, bikePoint.lng], zoneCoordinates)) {
+          console.log(`Found bike in zone ${zone.id}`);
+          
+          if (!parkingZoneCounters[zone.id]) {
+              parkingZoneCounters[zone.id] = 1;
+          } else {
+              parkingZoneCounters[zone.id]++;
+          }
+
+          return {
+              isInParking: true,
+              zoneId: zone.id,
+              bikeCount: parkingZoneCounters[zone.id]
+          };
       }
-
-      return {
-        isInParking: true,
-        zoneId: zone.id,
-        bikeCount: parkingZoneCounters[zone.id],
-      };
-    }
   }
 
   return {
-    isInParking: false,
-    zoneId: null,
-    bikeCount: 0,
+      isInParking: false,
+      zoneId: null,
+      bikeCount: 0
   };
 }
 
-// Display Functions
 async function displayBikes(map, userData, openLocationCode, icons) {
   try {
     const data = await fetchBikes();
@@ -253,8 +266,33 @@ async function displayBikes(map, userData, openLocationCode, icons) {
 
 async function displayStations(map) {
   try {
-    const data = await fetchStations();
-    const stations = data[0];
+    stationCounters = {};
+    
+    const [bikesResponse, stationsResponse] = await Promise.all([
+      fetchBikes(),
+      fetchStations()
+    ]);
+
+    const bikes = bikesResponse[0];
+    const stations = stationsResponse[0];
+
+    // Count bikes in stations first
+    for (const bike of bikes) {
+      const findCode = new OpenLocationCode().recoverNearest(
+        bike.gps,
+        bike.city === 1 ? 56.1 : bike.city === 2 ? 59.3 : 55.6,
+        bike.city === 1 ? 15.5 : bike.city === 2 ? 18.1 : 13.0
+      );
+      const coords = new OpenLocationCode().decode(findCode);
+      
+      for (const station of stations) {
+        const stationCoords = JSON.parse(station.gps);
+        if (isPointInStation([coords.latitudeCenter, coords.longitudeCenter], stationCoords)) {
+          stationCounters[station.id] = (stationCounters[station.id] || 0) + 1;
+          break;
+        }
+      }
+    }
 
     stations.forEach((station) => {
       let coordinates = JSON.parse(station.gps);
@@ -274,7 +312,7 @@ async function displayStations(map) {
         .bindPopup(
           `Station ID: ${station.id}
           <br>Charging Size: ${station.charging_size}
-          <br>Antal cyklar i station: ${bikeCount}`,
+          <br>Antal cyklar i station: ${bikeCount}`
         );
     });
   } catch (error) {
@@ -283,25 +321,47 @@ async function displayStations(map) {
 }
 
 async function drawParkingZones(map) {
-  const data = await fetchParking();
-  const parkingZones = data[0];
+  parkingZoneCounters = {};
+  
+  const [bikesResponse, parkingResponse] = await Promise.all([
+    fetchBikes(),
+    fetchParking()
+  ]);
 
-  parkingZones.forEach((zone) => {
+  const bikes = bikesResponse[0];
+  const parkingZones = parkingResponse[0];
+
+  for (const bike of bikes) {
+    const findCode = new OpenLocationCode().recoverNearest(
+      bike.gps,
+      bike.city === 1 ? 56.1 : bike.city === 2 ? 59.3 : 55.6,
+      bike.city === 1 ? 15.5 : bike.city === 2 ? 18.1 : 13.0
+    );
+    const coords = new OpenLocationCode().decode(findCode);
+    
+    for (const zone of parkingZones) {
+      const zoneCoords = JSON.parse(zone.gps);
+      if (isPointInStation([coords.latitudeCenter, coords.longitudeCenter], zoneCoords)) {
+        parkingZoneCounters[zone.id] = (parkingZoneCounters[zone.id] || 0) + 1;
+        break;
+      }
+    }
+  }
+
+  parkingZones.forEach(zone => {
     const coordinates = JSON.parse(zone.gps);
-    const currentCount = parkingZoneCounters[zone.id] || 0;
+    const bikeCount = parkingZoneCounters[zone.id] || 0;
 
     L.polygon(coordinates, {
       color: "pink",
       fillColor: "#ff00ff",
-      fillOpacity: 0.4,
-    }).addTo(map).bindPopup(`
-          Parkeringzon <br> ID: ${zone.id} 
-          <br> Antal cyklar i zon: ${currentCount}
-          `);
+      fillOpacity: 0.4
+    })
+    .addTo(map)
+    .bindPopup(`Parkeringszon ${zone.id}<br>Antal cyklar: ${bikeCount}`);
   });
 }
 
-// Main Initialization
 document.addEventListener("DOMContentLoaded", () => {
   const openLocationCode = new OpenLocationCode();
   const locateButton = document.getElementById("locate-user");
@@ -310,7 +370,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('meta[name="userInfo"]').getAttribute("content"),
   );
 
-  // Create icons
   const icons = {
     custom: createIcon("#ff00ce"),
     availableBike: createIcon("#00ff00"),
@@ -318,13 +377,12 @@ document.addEventListener("DOMContentLoaded", () => {
     sim: createIcon("#FF7518"),
     needsAttention: createIcon("#FFA500"),
     outOfOrder: createIcon("#000000"),
-    charging: createIcon("#ff0000"), // Same as bookedBike
+    charging: createIcon("#ff0000"),
   };
 
   navigator.geolocation.getCurrentPosition(async (position) => {
     const { latitude, longitude } = position.coords;
 
-    // Initialize map
     const map = L.map("map").setView([latitude, longitude], 16);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 18,
@@ -332,7 +390,6 @@ document.addEventListener("DOMContentLoaded", () => {
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    // Initialize WebSocket
     const bikeMarker = L.marker([latitude, longitude], {
       icon: icons.sim,
     }).addTo(map);
@@ -347,23 +404,19 @@ document.addEventListener("DOMContentLoaded", () => {
         .openPopup();
     };
 
-    // Display all map elements
     await displayBikes(map, userData, openLocationCode, icons);
     await displayStations(map);
     await drawParkingZones(map);
 
-    // Add user marker
     L.marker([latitude, longitude], { icon: icons.custom })
       .addTo(map)
       .bindPopup("Här är du!")
       .openPopup();
 
-    // Event Listeners
     locateButton.addEventListener("click", () => {
       map.locate({ setView: true, maxZoom: 16 });
     });
 
-    // Initialize city dropdown
     fetch("/cities.json")
       .then((response) => response.json())
       .then((data) => {

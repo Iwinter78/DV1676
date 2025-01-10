@@ -14,7 +14,19 @@
             <% trips.forEach(trip => { %>
                 <tr>
                     <td><%= trip.log_time %></td>
-                    <td><%= trip.log_data %></td>
+                    <td>
+                        <% 
+                            let logData = trip.log_data;
+                            let cityNames = { 1: 'Karlskrona', 2: 'Stockholm', 3: 'Malmö' };
+                            let cityMatch = logData.match(/City: (\d+)/);
+                            if (cityMatch) {
+                                let cityNumber = parseInt(cityMatch[1]);
+                                let cityName = cityNames[cityNumber] || cityMatch[1];
+                                logData = logData.replace(/City: \d+/, `City: ${cityName}`);
+                            }
+                        %>
+                        <%= logData %>
+                    </td>
                 </tr>
             <% }) %>
         </tbody>

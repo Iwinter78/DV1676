@@ -278,11 +278,22 @@ app.post("/api/v1/bike/book", async (req, res) => {
   if (!id || !userid) {
     return res.status(400).json({
       message: "Id och användarnamn krävs",
-      status: 400,
+      status: 400
     });
   }
 
   try {
+
+    let userBalance = await user.getUserBalance(userid);
+    console.log("User balance:", userBalance);
+
+    if (userBalance <= 0) {
+      return res.status(402).json({
+        message: "Fyll på saldot innan du boka en cykel",
+        status: 402,
+      });
+    }
+
     await bike.bookBike(id, userid);
 
     res.status(200).json({

@@ -315,7 +315,7 @@ app.post("/book/confirm/:id", async (req, res) => {
     return res.redirect("/home");
   }
 
-  await fetch(`http://localhost:1337/api/v1/bike/book`, {
+  const response = await fetch(`http://localhost:1337/api/v1/bike/book`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -325,6 +325,15 @@ app.post("/book/confirm/:id", async (req, res) => {
       userid: userInfo.id,
     }),
   });
+
+  if (response.status === 402) {
+    return res.send(`
+      <script>
+        alert("Fyll på saldot innan du boka en cykel");
+        window.location.href = "/balance";
+      </script>
+    `);
+  }
   res.redirect("/home");
 });
 

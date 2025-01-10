@@ -17,4 +17,12 @@ async function editChargingSize(stationId, newSize) {
   return response[0];
 }
 
-export { AllStations, editChargingSize };
+async function updateAmountOfBikes(id, amount) {
+  const db = await connect();
+  const query = "CALL update_amount_of_bikes_station(?, ?)";
+  const response = await db.query(query, [id, amount]);
+  db.end();
+  return response[0];
+}
+
+export { AllStations, editChargingSize, updateAmountOfBikes };

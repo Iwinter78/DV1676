@@ -322,7 +322,7 @@ app.post("/book/confirm/:id", async (req, res) => {
     },
     body: JSON.stringify({
       id: req.params.id,
-      username: userInfo.id,
+      userid: userInfo.id,
     }),
   });
   res.redirect("/home");

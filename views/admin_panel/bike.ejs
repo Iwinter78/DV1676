@@ -3,17 +3,13 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-8">
-            <form class="d-flex mb-3" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
-            <select class="form-select mb-3" aria-label="">
+            <!-- <select class="form-select mb-3" aria-label="">
                 <option selected>Select city</option>
                 <option value="1">Karlskrona</option>
                 <option value="2">Stockholm</option>
                 <option value="3">Göteborg</option>
                 <option value="4">Malmö</option>
-            </select>
+            </select> -->
             <div class="table">
                 <table class="table" style="max-width: 100%;">
                     <thead>
@@ -22,14 +18,42 @@
                         <th scope="col">Battery</th>
                         <th scope="col">City</th>
                         <th scope="col">Current User</th>
+                        <th scope="col">Status</th>
                     </thead>
                     <% for (const row of bikes) { %>
                         <tr>
                             <td><%= row.id %></td>
                             <td><%= row.gps %></td>
                             <td><%= row.battery %></td>
-                            <td><%= row.city %></td>
-                            <td><%= row.currentuser %></td>
+                            <td>
+                                <% if (row.city === 1) { %>
+                                    Karlskrona
+                                <% } else if (row.city === 2) { %>
+                                    Stockholm
+                                <% } else if (row.city === 3) { %>
+                                    Malmö
+                                <% } else { %>
+                                    Unknown City
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (!row.currentuser) { %>
+                                    No current User
+                                <% } else { %>
+                                    <%= row.currentuser %>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (row.status === 0) { %>
+                                    Available
+                                <% } else if (row.status === 1 ) { %>
+                                    <a href="#" data-toggle="popover" title="Attention needed" data-content="Bike status 1: Bike has low battery and needs charging or bike has low battery and is in charge">Attention needed</a>
+                                <% } else if (row.status === 2) { %>
+                                    Out of Order
+                                <% } else { %>
+                                    Unknown Status
+                                <% } %>
+                            </td>
                         </tr>
                     <% } %>
                 </table>

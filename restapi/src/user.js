@@ -85,5 +85,5 @@ export {
   getUserLog,
   updateUserBalance,
   getAllUsers,
-  editUser
+  editUser,
 };

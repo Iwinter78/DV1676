@@ -329,15 +329,16 @@ app.post("/book/return/:id", async (req, res) => {
   res.redirect("/home");
 });
 
-
-
-app.post('/deleteUser/:username', async (req, res) => {
+app.post("/deleteUser/:username", async (req, res) => {
   const username = req.params.username;
 
   try {
-    const response = await fetch(`http://localhost:1337/api/v1/delete/user/${username}`, {
-      method: 'DELETE',
-    });
+    const response = await fetch(
+      `http://localhost:1337/api/v1/delete/user/${username}`,
+      {
+        method: "DELETE",
+      },
+    );
 
     if (response.ok) {
       console.log(`User ${username} deleted successfully`);
@@ -345,13 +346,13 @@ app.post('/deleteUser/:username', async (req, res) => {
       console.log(`Failed to delete user: ${response.statusText}`);
     }
   } catch (error) {
-    console.error('Error occurred while trying to delete the user:', error);
+    console.error("Error occurred while trying to delete the user:", error);
   }
 
-  res.redirect('/admin_panel/customer');
+  res.redirect("/admin_panel/customer");
 });
 
-app.put('/editUser/:username', async (req, res) => {
+app.put("/editUser/:username", async (req, res) => {
   console.log("Route hit: /editUser/:username");
   const username = req.params.username;
   const balance = req.body.balance;
@@ -362,16 +363,19 @@ app.put('/editUser/:username', async (req, res) => {
 
   try {
     // Making the request to the other API endpoint inside the backend
-    const response = await fetch(`http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          balance: balance,
+          debt: debt,
+        }),
       },
-      body: JSON.stringify({ 
-        balance: balance,
-        debt: debt 
-      })
-    });
+    );
 
     if (response.ok) {
       // If the API call fails, respond with an error
@@ -381,7 +385,6 @@ app.put('/editUser/:username', async (req, res) => {
     console.log("User updated successfully");
 
     // Redirect after successful update, appending a timestamp to prevent cache issues
-
   } catch (error) {
     // Catch any errors during fetch or other operations
     console.error("Error during fetch:", error);
@@ -389,34 +392,35 @@ app.put('/editUser/:username', async (req, res) => {
   }
 });
 
-app.put('/editChargingSize/:id', async (req, res) =>{
+app.put("/editChargingSize/:id", async (req, res) => {
   const id = req.params.id;
   const charging_size = req.body.charging_size;
 
   try {
-    const response = await fetch(`http://localhost:1337/api/v1/stations/editChargingSize/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `http://localhost:1337/api/v1/stations/editChargingSize/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          charging_size: charging_size,
+        }),
       },
-      body: JSON.stringify({
-        id: id,
-        charging_size: charging_size
-      })
-    });
-  
+    );
+
     if (response.ok) {
       return res.status(200).send("done");
     }
 
-    res.redirect('/admin_panel/station');
+    res.redirect("/admin_panel/station");
   } catch (error) {
-    console.error('Error in /editChargingSize:', error); // Added for debugging
+    console.error("Error in /editChargingSize:", error); // Added for debugging
     return res.status(500).send("Internal Server Error");
   }
 });
-
-
 
 // Start the server
 app.listen(port, () => {

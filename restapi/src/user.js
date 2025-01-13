@@ -27,6 +27,21 @@ async function getUser(username) {
   }
 }
 
+async function getUserBalance(userid) {
+  const db = await connect();
+  const query = `CALL get_user_balance(?)`;
+  const values = [userid];
+  const [rows] = await db.query(query, values);
+  db.end();
+  console.log("Full result from get_user_balance:", rows[0]);
+  if (rows.length > 0) {
+    const balance = rows[0][0].balance;
+    console.log("User has balance:", balance);
+    return parseFloat(balance);
+  } else {
+    throw new Error("User not found");
+  }
+}
 async function getAllUsers() {
   const db = await connect();
   const query = `call get_all_users()`;
@@ -35,16 +50,18 @@ async function getAllUsers() {
 }
 
 async function getUserLog(username) {
-  const db = await connect();
-  const query = `CALL get_user_log(?)`;
-  const values = [username];
+  let db;
   try {
+    db = await connect();
+    const query = `CALL get_user_log(?)`;
+    const values = [username];
     const [rows] = await db.query(query, values);
-    db.end();
     return rows;
   } catch (error) {
-    db.end();
+    console.error("Error fetching user log:", error);
     throw error;
+  } finally {
+    if (db) await db.end();
   }
 }
 
@@ -69,4 +86,22 @@ async function updateUserBalance(username, balance) {
   }
 }
 
-export { createUser, getUser, deleteUser, getUserLog, updateUserBalance, getAllUsers };
+async function editUser(username, balance, debt) {
+  const db = await connect();
+  const query = `CALL edit_user(?, ?, ?)`;
+  const values = [username, balance, debt];
+  const response = await db.query(query, values);
+  db.end();
+  return response[0];
+}
+
+export {
+  createUser,
+  getUser,
+  deleteUser,
+  getUserLog,
+  updateUserBalance,
+  getAllUsers,
+  editUser,
+  getUserBalance
+};

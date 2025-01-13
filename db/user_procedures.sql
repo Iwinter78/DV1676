@@ -23,6 +23,11 @@ BEGIN
     SELECT * FROM users WHERE username = username_param;
 END;;
 
+CREATE PROCEDURE get_user_balance(IN userid_param INT)
+BEGIN
+    SELECT balance FROM users WHERE id = userid_param;
+END;;
+
 CREATE PROCEDURE delete_user(IN username_param VARCHAR(255))
 BEGIN
     DELETE FROM users WHERE username = username_param;
@@ -55,6 +60,18 @@ CREATE PROCEDURE get_user_role(IN username_param VARCHAR(255))
 BEGIN
     SELECT role FROM users
     where username = username_param;
+END;;
+
+CREATE PROCEDURE edit_user(
+    IN in_username VARCHAR(255),
+    IN in_balance DECIMAL(10,2),
+    IN in_debt DECIMAL(10,2)
+)
+BEGIN
+    UPDATE users
+    SET balance = in_balance,
+        debt = in_debt
+    WHERE username = in_username;
 END;;
 
 DELIMITER ;

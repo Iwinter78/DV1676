@@ -23,10 +23,82 @@
                             <td><%= row.charge_taken %></td>
                             <td><%= row.city %></td>
                             <td><%= row.gps %></td>
+                            <td>
+                                <form class="editSizeForm" action="/editChargingSize/<%= row.id %>" method="POST">
+                                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmEditModal<%= row.id %>">
+                                    Edit
+                                  </button>
+                                </form>
+
+                                <div class="modal fade" id="confirmEditModal<%= row.id %>" tabindex="-1" aria-labelledby="confirmEditModalLabel<%= row.id %>" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="confirmEditModalLabel<%= row.id %>">Edit Charging Size</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="id<%= row.id %>" class="form-label">ID:</label>
+                                                    <input type="text" class="form-control-plaintext" id="id<%= row.id %>" value="<%= row.id %>">
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="chargingSize<%= row.id %>" class="form-label">New Charging Size:</label>
+                                                    <input type="number" class="form-control" id="chargingSize<%= row.id %>" value="<%= row.charging_size %>">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="button" class="btn btn-primary confirmEditButton" data-id="<%= row.id %>">Confirm</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     <% } %>
                 </table>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<script>
+    document.querySelectorAll('.editSizeForm').forEach((form) => {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+        });
+    });
+
+    document.querySelectorAll('.confirmEditButton').forEach(async (button) => {
+        button.addEventListener('click', async function () {
+            const stationId = this.getAttribute('data-id');
+            const newSize = document.getElementById(`chargingSize${stationId}`).value;
+
+            if (!newSize) {
+                alert('Please enter a new charging size.');
+                return;
+            }
+            console.log("Before first fetch");
+            await fetch(`/editChargingSize/${stationId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ charging_size: newSize }),
+            })
+
+            
+            .then(response => {
+                return Promise.resolve(response);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the charging size.');
+            });
+            console.log("After first Fetch");
+            location.reload();
+        });
+    });
+
+</script>

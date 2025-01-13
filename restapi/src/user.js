@@ -86,6 +86,7 @@ async function updateUserBalance(username, balance) {
   }
 }
 
+
 async function editUser(username, balance, debt) {
   const db = await connect();
   const query = `CALL edit_user(?, ?, ?)`;

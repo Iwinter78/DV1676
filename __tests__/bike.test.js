@@ -1,5 +1,4 @@
 import { jest, describe, expect, test } from "@jest/globals";
-import e from "express";
 const host = "http://localhost:1337";
 
 describe("Bike features in rest api", () => {

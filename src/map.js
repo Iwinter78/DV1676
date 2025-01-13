@@ -110,11 +110,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function setAmountOfBikesInZone(zoneId, amount) {
-      const response = await fetch(`http://localhost:1337/api/v1/parking/${zoneId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount }),
-      });
+      const response = await fetch(
+        `http://localhost:1337/api/v1/parking/${zoneId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount }),
+        },
+      );
       if (response.status === 200) {
         await drawParkingZones();
       }

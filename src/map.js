@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     };
 
-
     async function fetchStations() {
       try {
         const response = await fetch("http://localhost:1337/api/v1/stations", {

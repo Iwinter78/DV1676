@@ -47,8 +47,8 @@ function broadcastBikes() {
           bikes.map((bike) => ({
             id: bike.id,
             location: [bike.location[1], bike.location[0]], // Convert to [lat, lng] for the client
-          }))
-        )
+          })),
+        ),
       );
     }
   });

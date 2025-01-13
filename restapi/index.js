@@ -268,17 +268,30 @@ app.put("/api/v1/update/bike", async (req, res) => {
 });
 
 app.post("/api/v1/bike/book", async (req, res) => {
-  const { id, username } = req.body;
+  const { id, userid } = req.body;
+  console.log(id);
+  console.log(userid);
 
-  if (!id || !username) {
+  if (!id || !userid) {
     return res.status(400).json({
       message: "Id och användarnamn krävs",
-      status: 400,
+      status: 400
     });
   }
 
   try {
-    await bike.bookBike(id, username);
+
+    let userBalance = await user.getUserBalance(userid);
+    console.log("User balance:", userBalance);
+
+    if (userBalance <= 0) {
+      return res.status(402).json({
+        message: "Fyll på saldot innan du boka en cykel",
+        status: 402,
+      });
+    }
+
+    await bike.bookBike(id, userid);
 
     res.status(200).json({
       message: "Cykel bokad",
@@ -427,9 +440,8 @@ app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
   const newSize = req.body.charging_size;
   try {
     let result = await station.editChargingSize(id, newSize);
-
+  
     if (result.affectedRows > 0) {
-      // Assuming affectedRows is returned from the DB operation
       return res.status(200).send("Charging size changed");
     } else {
       return res.status(404).send("Station not found or no change made");

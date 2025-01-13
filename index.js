@@ -5,6 +5,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import process from "process";
+import { showLogs } from "./src/functions.js";
 
 import { exchangeCodeForToken, getUserInfo } from "./src/login.js";
 // Define __dirname for ES modules
@@ -173,6 +174,19 @@ app.get("/admin_panel/station", async (req, res) => {
   res.render("admin_panel/station", { stations });
 });
 
+app.get('/admin_panel/log', async (req, res) => {
+  const type = req.query.type || null;
+  try {
+    const logs = await showLogs(type);
+    console.log("Fetched logs:", logs);
+    res.render('admin_panel/log', { logs, type });
+  } catch (error) {
+    console.error("Error fetching logs:", error);
+    res.status(500).send("Internal Server Error")
+  }
+
+});
+
 app.get("/email", (req, res) => {
   res.render("login/email");
 });
@@ -255,19 +269,26 @@ app.get("/history", async (req, res) => {
   if (!userInfo) {
     return res.redirect("/"); //back to home if the user is not logd in
   }
+  try {
+    const profileResponse = await fetch(
+      `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
+    );
 
-  const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
-  );
-  const profile = await profileResponse.json();
-  const trips = profile[0] || [];
-  const data = {
-    ...userInfo,
-    trips,
-  };
+    if (!profileResponse.ok) {
+      console.error("Faild to fetch history", profileResponse.statusText);
+      return res.status(500).send("Error fetching history.");
+    }
 
-  console.log(trips);
-  res.render("client/client_travel_history", data);
+    const profile = await profileResponse.json();
+    const trips = profile[0] || [];
+    const data = {
+      ...userInfo,
+      trips,
+    };
+
+    console.log(trips);
+    res.render("client/client_travel_history", data);
+  } catch(error) {}
 });
 
 app.get("/book/confirm/:id", async (req, res) => {
@@ -294,16 +315,25 @@ app.post("/book/confirm/:id", async (req, res) => {
     return res.redirect("/home");
   }
 
-  await fetch(`http://localhost:1337/api/v1/bike/book`, {
+  const response = await fetch(`http://localhost:1337/api/v1/bike/book`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       id: req.params.id,
-      username: userInfo.id,
+      userid: userInfo.id,
     }),
   });
+
+  if (response.status === 402) {
+    return res.send(`
+      <script>
+        alert("Fyll på saldot innan du boka en cykel");
+        window.location.href = "/balance";
+      </script>
+    `);
+  }
   res.redirect("/home");
 });
 

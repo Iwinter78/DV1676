@@ -104,4 +104,21 @@ describe("Station features in rest api", () => {
       expect(typeof station.bikes_in_station).toBe("number");
     });
   });
+
+  test("Check for returning correct status and msg on failure", async () => {
+    global.fetch.mockResolvedValue({
+      json: () => Promise.resolve({ 
+        message: "Något gick fel, försök igen senare",
+        status: 500,
+        error: "Procedure get_all_stations does not exist",
+      }),
+    });
+
+    let response = await fetch(`${host}/api/v1/stations`);
+    let data = await response.json();
+
+    expect(data.status).toBe(500);
+    expect(data.message).toBe("Något gick fel, försök igen senare");
+    expect(data.error).toBe("Procedure get_all_stations does not exist");
+  });
 });

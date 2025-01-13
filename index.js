@@ -5,7 +5,6 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import process from "process";
-import { showLogs } from "./src/functions.js";
 
 import { exchangeCodeForToken, getUserInfo } from "./src/login.js";
 // Define __dirname for ES modules
@@ -14,7 +13,6 @@ const __dirname = dirname(__filename);
 dotenv.config();
 
 const app = express();
-app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use(
@@ -174,19 +172,6 @@ app.get("/admin_panel/station", async (req, res) => {
   res.render("admin_panel/station", { stations });
 });
 
-app.get('/admin_panel/log', async (req, res) => {
-  const type = req.query.type || null;
-  try {
-    const logs = await showLogs(type);
-    console.log("Fetched logs:", logs);
-    res.render('admin_panel/log', { logs, type });
-  } catch (error) {
-    console.error("Error fetching logs:", error);
-    res.status(500).send("Internal Server Error")
-  }
-
-});
-
 app.get("/email", (req, res) => {
   res.render("login/email");
 });
@@ -269,26 +254,19 @@ app.get("/history", async (req, res) => {
   if (!userInfo) {
     return res.redirect("/"); //back to home if the user is not logd in
   }
-  try {
-    const profileResponse = await fetch(
-      `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
-    );
 
-    if (!profileResponse.ok) {
-      console.error("Faild to fetch history", profileResponse.statusText);
-      return res.status(500).send("Error fetching history.");
-    }
+  const profileResponse = await fetch(
+    `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
+  );
+  const profile = await profileResponse.json();
+  const trips = profile[0] || [];
+  const data = {
+    ...userInfo,
+    trips,
+  };
 
-    const profile = await profileResponse.json();
-    const trips = profile[0] || [];
-    const data = {
-      ...userInfo,
-      trips,
-    };
-
-    console.log(trips);
-    res.render("client/client_travel_history", data);
-  } catch(error) {}
+  console.log(trips);
+  res.render("client/client_travel_history", data);
 });
 
 app.get("/book/confirm/:id", async (req, res) => {
@@ -315,25 +293,16 @@ app.post("/book/confirm/:id", async (req, res) => {
     return res.redirect("/home");
   }
 
-  const response = await fetch(`http://localhost:1337/api/v1/bike/book`, {
+  await fetch(`http://localhost:1337/api/v1/bike/book`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       id: req.params.id,
-      userid: userInfo.id,
+      username: userInfo.id,
     }),
   });
-
-  if (response.status === 402) {
-    return res.send(`
-      <script>
-        alert("Fyll på saldot innan du boka en cykel");
-        window.location.href = "/balance";
-      </script>
-    `);
-  }
   res.redirect("/home");
 });
 
@@ -357,99 +326,6 @@ app.post("/book/return/:id", async (req, res) => {
   });
 
   res.redirect("/home");
-});
-
-app.post("/deleteUser/:username", async (req, res) => {
-  const username = req.params.username;
-
-  try {
-    const response = await fetch(
-      `http://localhost:1337/api/v1/delete/user/${username}`,
-      {
-        method: "DELETE",
-      },
-    );
-
-    if (response.ok) {
-      console.log(`User ${username} deleted successfully`);
-    } else {
-      console.log(`Failed to delete user: ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Error occurred while trying to delete the user:", error);
-  }
-
-  res.redirect("/admin_panel/customer");
-});
-
-app.put("/editUser/:username", async (req, res) => {
-  console.log("Route hit: /editUser/:username");
-  const username = req.params.username;
-  const balance = req.body.balance;
-  const debt = req.body.debt;
-
-  console.log("Balance:", balance);
-  console.log("Debt:", debt);
-
-  try {
-    // Making the request to the other API endpoint inside the backend
-    const response = await fetch(
-      `http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          balance: balance,
-          debt: debt,
-        }),
-      },
-    );
-
-    if (response.ok) {
-      // If the API call fails, respond with an error
-      return res.status(200).send("done");
-    }
-
-    console.log("User updated successfully");
-
-    // Redirect after successful update, appending a timestamp to prevent cache issues
-  } catch (error) {
-    // Catch any errors during fetch or other operations
-    console.error("Error during fetch:", error);
-    return res.status(500).send("Internal Server Error");
-  }
-});
-
-app.put("/editChargingSize/:id", async (req, res) => {
-  const id = req.params.id;
-  const charging_size = req.body.charging_size;
-
-  try {
-    const response = await fetch(
-      `http://localhost:1337/api/v1/stations/editChargingSize/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: id,
-          charging_size: charging_size,
-        }),
-      },
-    );
-
-    if (response.ok) {
-      return res.status(200).send("done");
-    }
-
-    res.redirect("/admin_panel/station");
-  } catch (error) {
-    console.error("Error in /editChargingSize:", error); // Added for debugging
-    return res.status(500).send("Internal Server Error");
-  }
 });
 
 // Start the server

@@ -1,7 +1,6 @@
-const { connect } = await import('./restapi/connect.js');
+const { connect } = require("../restapi/src/connect.js");
 const OpenLocationCode = require("open-location-code").OpenLocationCode;
 const olc = new OpenLocationCode();
-
 
 // Generate a random destination near the start point
 function randomDest(start) {
@@ -10,7 +9,6 @@ function randomDest(start) {
   const randomLatOffset = (Math.random() - 0.5) * 0.01;
   return [startLng + randomLngOffset, startLat + randomLatOffset];
 }
-
 
 async function fetchBikes() {
   try {

@@ -210,13 +210,10 @@ describe("User features in rest api", () => {
 
     global.fetch.mockResolvedValue(mockResponse);
 
-    const response = await fetch(
-      `${host}/api/v1/update/user/balance`,
-      {
-        method: "PUT",
-        body: JSON.stringify({ username, balance }),
-      }
-    );
+    const response = await fetch(`${host}/api/v1/update/user/balance`, {
+      method: "PUT",
+      body: JSON.stringify({ username, balance }),
+    });
 
     const data = await response.json();
 

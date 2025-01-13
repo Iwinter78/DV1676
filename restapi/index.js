@@ -327,3 +327,17 @@ app.get("/api/v1/stations", async (req, res) => {
     });
   }
 });
+
+app.get("/api/v1/getAllUsers", async (req, res) => {
+  try {
+    let response = await user.getAllUsers();
+    res.status(200).json(response);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Något gick fel, försök igen senare",
+      status: 500,
+      error: error.message,
+    });
+  }
+});

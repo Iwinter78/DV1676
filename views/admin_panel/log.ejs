@@ -1,0 +1,45 @@
+<%- include('../../public/admin-overview-header.ejs') %>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-8">            
+            <form method="GET" class="d-flex mb-3">
+                <select class="form-select me-2" name="type">
+                    <option value="">Alla typer</option>
+                    <option value="User">Användare</option>
+                    <option value="Bike">Cykel</option>
+                    <option value="Station">Station</option>
+                    <option value="Bank">Bank</option>
+                </select>
+                <button class="btn btn-outline-success" type="submit">Filtrera</button>
+            </form>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Typ</th>
+                        <th scope="col">Tid</th>
+                        <th scope="col">Loggdata</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (logs && logs.length > 0) { %>
+                        <% logs.forEach(log => { %>
+                            <tr>
+                                <td><%= log.id %></td>
+                                <td><%= log.log_type %></td>
+                                <td><%= log.log_time %></td>
+                                <td><%= log.log_data %></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4">Inga loggar hittades.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> 

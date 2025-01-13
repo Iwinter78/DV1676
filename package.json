@@ -8,7 +8,8 @@
     "test": "jest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test-build": "npx webpack && node index.js"
+    "test-build": "npx webpack && node index.js",
+    "sim-build": "node index.js && node /simulation/index.js"
   },
   "repository": {
     "type": "git",

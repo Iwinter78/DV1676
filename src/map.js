@@ -1,5 +1,6 @@
 import L from "leaflet";
 import { OpenLocationCode } from "open-location-code";
+
 document.addEventListener("DOMContentLoaded", () => {
   const openLocationCode = new OpenLocationCode();
   const locateButton = document.getElementById("locate-user");
@@ -7,6 +8,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const userData = JSON.parse(
     document.querySelector('meta[name="userInfo"]').getAttribute("content"),
   );
+
+  async function getRole(user) {
+    const response = await fetch(
+      `http://localhost:1337/api/v1/user?username=${user}`,
+    );
+    const data = await response.json();
+    return data[0][0].role;
+  }
 
   navigator.geolocation.getCurrentPosition(async (position) => {
     const latitude = position.coords.latitude;
@@ -25,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const availableBikeIcon = createIcon("#00ff00");
     const bookedBikeIcon = createIcon("#ff0000");
     const simIcon = createIcon("#FF7518");
+    const needsAttentionIcon = createIcon("#FFA500");
 
     const map = L.map("map").setView([latitude, longitude], 16);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -38,23 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .bindPopup("Här är du!")
       .openPopup();
 
-    // WebSocket for bike movement
-    const bikeMarker = L.marker([latitude, longitude], {
-      icon: simIcon,
-    }).addTo(map);
-
-    const ws = new WebSocket("ws://localhost:5001"); // Connect to your WebSocket server
-    ws.onmessage = (message) => {
-      const data = JSON.parse(message.data);
-      const { id, location } = data;
-
-      // Update the bike marker's position
-      bikeMarker
-        .setLatLng([location[0], location[1]])
-        .bindPopup(`Bike ${id}`)
-        .openPopup();
-    };
-
     async function fetchBikes() {
       try {
         const response = await fetch("http://localhost:1337/api/v1/bike", {
@@ -62,7 +55,20 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
-        return response.json();
+
+        const data = await response.json();
+        console.log("Fetched bikes data:", data);
+
+        return data.map((bike) => {
+          const decoded = openLocationCode.decode(bike.gps);
+          console.log("Decoded OLC:", decoded);
+          return {
+            id: bike.id,
+            start: [decoded.latitudeCenter, decoded.longitudeCenter],
+            city: bike.city,
+            status: bike.status,
+          };
+        });
       } catch (error) {
         console.error("Error fetching bikes:", error);
         return [];
@@ -70,53 +76,61 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function displayBikes() {
-      try {
-        const data = await fetchBikes();
-        const bikes = data[0];
+      const bikes = await fetchBikes();
 
-        bikes.forEach((bike) => {
-          let lat = 0;
-          let lng = 0;
+      bikes.forEach(async (bike) => {
+        const { id, start, currentuser, status } = bike;
 
-          if (bike.city === 1) {
-            lat = 56.1;
-            lng = 15.5;
-          } else if (bike.city === 2) {
-            lat = 59.3;
-            lng = 18.1;
-          } else if (bike.city === 3) {
-            lat = 55.6;
-            lng = 13.0;
-          }
+        let markerIcon = availableBikeIcon;
 
-          // Decode Open Location Code
-          const findCode = openLocationCode.recoverNearest(bike.gps, lat, lng);
-          const decodedCoordinates = openLocationCode.decode(findCode);
-          const latitude = decodedCoordinates.latitudeCenter;
-          const longitude = decodedCoordinates.longitudeCenter;
+        if (
+          currentuser === userData.id ||
+          (await getRole(userData.id)) === "admin"
+        ) {
+          markerIcon = bookedBikeIcon;
+        } else if (status === 1) {
+          markerIcon = needsAttentionIcon;
+        }
 
-          if (bike.currentuser === userData.id) {
-            L.marker([latitude, longitude], { icon: bookedBikeIcon })
-              .addTo(map)
-              .bindPopup(
-                `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Se bokning</a>`,
-              )
-              .openPopup();
-          } else {
-            L.marker([latitude, longitude], { icon: availableBikeIcon })
-              .addTo(map)
-              .bindPopup(
-                `Cykel: ${bike.id} <br> <a href="/book/confirm/${bike.id}">Boka</a>`,
-              )
-              .openPopup();
-          }
-        });
-      } catch (error) {
-        console.error("Error displaying bikes:", error);
-      }
+        if (!bikeMarkers[id]) {
+          // Create marker if it doesn't exist
+          bikeMarkers[id] = L.marker(start, { icon: markerIcon })
+            .addTo(map)
+            .bindPopup(`Bike ${id}`);
+        }
+      });
     }
 
     displayBikes();
+
+    const bikeMarkers = {};
+
+    const ws = new WebSocket("ws://localhost:5001");
+
+    ws.onopen = () => {
+      console.log("WebSocket connection established.");
+    };
+
+    ws.onmessage = (message) => {
+      const bikeUpdates = JSON.parse(message.data);
+
+      bikeUpdates.forEach((bike) => {
+        const { id, location } = bike;
+        console.log(`Processing bike ${id} at location:`, location);
+
+        if (bikeMarkers[id]) {
+          // Update existing marker
+          bikeMarkers[id].setLatLng([location[1], location[0]]);
+        } else {
+          // Create a new marker if it doesn't exist
+          bikeMarkers[id] = L.marker([location[1], location[0]], {
+            icon: simIcon,
+          })
+            .addTo(map)
+            .bindPopup(`Bike ${id}`);
+        }
+      });
+    };
 
     async function fetchStations() {
       try {
@@ -137,15 +151,27 @@ document.addEventListener("DOMContentLoaded", () => {
         const stations = data[0];
 
         stations.forEach((station) => {
-          const [lat, lng] = station.gps
-            .split(",")
-            .map((coord) => parseFloat(coord.trim()));
+          console.log("Station data:", station);
 
-          L.circle([lat, lng], {
+          // Parse the GPS string into an array
+          let coordinates;
+
+          coordinates = JSON.parse(station.gps);
+
+          // Ensure coordinates are valid
+          if (!Array.isArray(coordinates) || coordinates.length < 3) {
+            console.error(
+              "Insufficient GPS coordinates for station:",
+              station.id,
+            );
+            return;
+          }
+
+          // Draw the polygon
+          L.polygon(coordinates, {
             color: "blue",
             fillColor: "#30a1ff",
             fillOpacity: 0.4,
-            radius: 12,
           })
             .addTo(map)
             .bindPopup(

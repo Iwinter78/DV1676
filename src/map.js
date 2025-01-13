@@ -1,5 +1,12 @@
 import L from "leaflet";
 import { OpenLocationCode } from "open-location-code";
+document.addEventListener("DOMContentLoaded", () => {
+  const openLocationCode = new OpenLocationCode();
+  const locateButton = document.getElementById("locate-user");
+  const cityDropdown = document.getElementById("city-select");
+  const userData = JSON.parse(
+    document.querySelector('meta[name="userInfo"]').getAttribute("content"),
+  );
 
 let stationCounters = {};
 let parkingZoneCounters = {};
@@ -60,6 +67,32 @@ async function fetchStations() {
   }
 }
 
+
+    async function fetchBikes() {
+      try {
+        const response = await fetch("http://localhost:1337/api/v1/bike", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        const data = await response.json();
+        console.log("Fetched bikes data:", data);
+
+        return data.map((bike) => {
+          const decoded = openLocationCode.decode(bike.gps);
+          console.log("Decoded OLC:", decoded);
+          return {
+            id: bike.id,
+            start: [decoded.latitudeCenter, decoded.longitudeCenter],
+            city: bike.city,
+            status: bike.status,
+          };
+        });
+      } catch (error) {
+        console.error("Error fetching bikes:", error);
+        return [];
+ 
 async function fetchParking() {
   try {
     const response = await fetch("http://localhost:1337/api/v1/parking", {
@@ -88,6 +121,7 @@ async function checkBikeInAnyStation(bike) {
         stationCounters[zone.id] = 1;
       } else {
         stationCounters[zone.id]++;
+
       }
 
       return {
@@ -109,6 +143,33 @@ async function checkBikeInAnyParking(bike) {
       console.error('Invalid bike data:', bike);
       return { isInParking: false, zoneId: null, bikeCount: 0 };
   }
+
+
+    async function displayBikes() {
+      const bikes = await fetchBikes();
+
+      bikes.forEach(async (bike) => {
+        const { id, start, currentuser, status } = bike;
+
+        let markerIcon = availableBikeIcon;
+
+        if (
+          currentuser === userData.id ||
+          (await getRole(userData.id)) === "admin"
+        ) {
+          markerIcon = bookedBikeIcon;
+        } else if (status === 1) {
+          markerIcon = needsAttentionIcon;
+        }
+
+        if (!bikeMarkers[id]) {
+          // Create marker if it doesn't exist
+          bikeMarkers[id] = L.marker(start, { icon: markerIcon })
+            .addTo(map)
+            .bindPopup(`Bike ${id}`);
+        }
+      });
+    }
 
   const response = await fetch("http://localhost:1337/api/v1/parking");
   const data = await response.json();
@@ -255,6 +316,7 @@ async function displayBikes(map, userData, openLocationCode, icons) {
         }
       }
 
+
       L.marker([latitude, longitude], { icon: bikeIcon })
         .addTo(map)
         .bindPopup(popupContent);
@@ -263,6 +325,48 @@ async function displayBikes(map, userData, openLocationCode, icons) {
     console.error("Error displaying bikes:", error);
   }
 }
+
+
+    const bikeMarkers = {};
+
+    const ws = new WebSocket("ws://localhost:5001");
+
+    ws.onopen = () => {
+      console.log("WebSocket connection established.");
+    };
+
+    ws.onmessage = (message) => {
+      const bikeUpdates = JSON.parse(message.data);
+
+      bikeUpdates.forEach((bike) => {
+        const { id, location } = bike;
+        console.log(`Processing bike ${id} at location:`, location);
+
+        if (bikeMarkers[id]) {
+          // Update existing marker
+          bikeMarkers[id].setLatLng([location[1], location[0]]);
+        } else {
+          // Create a new marker if it doesn't exist
+          bikeMarkers[id] = L.marker([location[1], location[0]], {
+            icon: simIcon,
+          })
+            .addTo(map)
+            .bindPopup(`Bike ${id}`);
+        }
+      });
+    };
+
+
+    async function fetchStations() {
+      try {
+        const response = await fetch("http://localhost:1337/api/v1/stations", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        return response.json();
+      } catch (error) {
+        console.error("Error fetching stations:", error);
+        return [];
 
 async function displayStations(map) {
   try {
@@ -291,6 +395,7 @@ async function displayStations(map) {
           stationCounters[station.id] = (stationCounters[station.id] || 0) + 1;
           break;
         }
+
       }
     }
 

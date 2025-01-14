@@ -1,9 +1,12 @@
 import path from "path";
 
 export default {
-  entry: "./src/map.js",
+  entry: {
+    map: "./src/map.js",
+    simmap: "./src/mapsim.js",
+  },
   output: {
-    filename: "map.bundle.js",
+    filename: "[name].bundle.js", // Dynamically names files based on entry keys
     path: path.resolve("public/js"),
     clean: true,
   },

@@ -1,0 +1,10 @@
+<%- include('../../public/header.ejs') %>
+<meta name="userInfo" content='<%= JSON.stringify(userInfo) %>' />
+    <div id="map"></div>
+    <div class="map-controls">
+        <button id="locate-user" class="btn btn-primary btn-sm btn-light">
+            <i class="bi bi-geo-alt-fill"></i>
+        </button>
+    </div>
+    <script src="/js/simmap.bundle.js" defer></script>
+<%- include('../../public/footer.ejs') %>

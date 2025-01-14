@@ -390,19 +390,6 @@ document.addEventListener("DOMContentLoaded", () => {
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    const bikeMarker = L.marker([latitude, longitude], {
-      icon: icons.sim,
-    }).addTo(map);
-
-    const ws = new WebSocket("ws://localhost:5001");
-    ws.onmessage = (message) => {
-      const data = JSON.parse(message.data);
-      const { id, location } = data;
-      bikeMarker
-        .setLatLng([location[0], location[1]])
-        .bindPopup(`Bike ${id}`)
-        .openPopup();
-    };
 
     await displayBikes(map, userData, openLocationCode, icons);
     await displayStations(map);

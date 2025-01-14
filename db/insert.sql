@@ -1,6 +1,6 @@
 
 
-LOAD DATA LOCAL INFILE './example_users.csv'
+LOAD DATA LOCAL INFILE './users.csv'
 INTO TABLE users
 CHARSET utf8
 FIELDS TERMINATED BY ','

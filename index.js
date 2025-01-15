@@ -110,6 +110,13 @@ app.get("/home", (req, res) => {
   res.render("home/index", data);
 });
 
+app.get("/sim", (req, res) => {
+  const userInfo = req.session.userInfo || {};
+  console.log("Sending userInfo:", userInfo);
+  res.render("sim/index", { userInfo: JSON.stringify(userInfo) });
+});
+
+
 // Admin first view after login
 app.get("/admin_view", async (req, res) => {
   const userInfo = req.session.userInfo;

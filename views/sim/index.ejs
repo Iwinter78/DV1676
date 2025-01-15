@@ -1,6 +1,10 @@
 <%- include('../../public/header.ejs') %>
-
     <div id="map"></div>
+    <div class="dropdown">
+        <select id="city-select" class="form-select">
+            <option value="" selected disabled>Välj en stad</option>
+        </select>
+    </div>
     <div class="map-controls">
         <button id="locate-user" class="btn btn-primary btn-sm btn-light">
             <i class="bi bi-geo-alt-fill"></i>

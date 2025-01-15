@@ -1,41 +1,33 @@
 import L from "leaflet";
 
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM loaded");
-  const locateButton = document.getElementById("locate-user");
-  const cityDropdown = document.getElementById("city-select");
+  // Default position for the map
+  const latitude = 56.161444
+  const longitude = 15.586355
 
-  navigator.geolocation.getCurrentPosition(async (position) => {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
+  // Function to create a custom marker icon
+  function createIcon(color) {
+    return L.divIcon({
+      className: "custom-marker",
+      html: `<div style="font-size: 30px; color: ${color}; font-weight: bold;">●</div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+  }
 
-    function createIcon(color) {
-      return L.divIcon({
-        className: "custom-marker",
-        html: `<div style="font-size: 30px; color: ${color}; font-weight: bold;">●</div>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
-      });
-    }
-
-    const customIcon = createIcon("#ff00ce");
     const availableBikeIcon = createIcon("#00ff00");
     const bookedBikeIcon = createIcon("#ff0000");
 
-    const map = L.map("map").setView([latitude, longitude], 16);
+    const map = L.map("map").setView([latitude, longitude], 18);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
+      maxZoom: 20,
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    L.marker([latitude, longitude], { icon: customIcon })
-      .addTo(map)
-      .bindPopup("Här är du!")
-      .openPopup();
+
 
     const bikeMarkers = {};
-
+    // Websocket connection
     const ws = new WebSocket("ws://localhost:5001");
 
     ws.onopen = () => {
@@ -125,8 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     displayStations();
 
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM loaded");
+      const locateButton = document.getElementById("locate-user");
+      const cityDropdown = document.getElementById("city-select");
+    
     locateButton.addEventListener("click", () => {
-      map.locate({ setView: true, maxZoom: 16 });
+      map.locate({ setView: true, maxZoom: 18 });
     });
 
     fetch("/cities.json")
@@ -142,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cityDropdown.addEventListener("change", (e) => {
       const selectedCity = JSON.parse(e.target.value);
-      map.setView([selectedCity.lat, selectedCity.lng], 15);
+      map.setView([selectedCity.lat, selectedCity.lng], 16);
     });
-  });
 });

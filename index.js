@@ -110,11 +110,11 @@ app.get("/home", (req, res) => {
   res.render("home/index", data);
 });
 
+// Users home page
 app.get("/sim", (req, res) => {
-  const userInfo = req.session.userInfo || {};
-  console.log("Sending userInfo:", userInfo);
-  res.render("sim/index", { userInfo: JSON.stringify(userInfo) });
+  res.render("sim/index");
 });
+
 
 
 // Admin first view after login

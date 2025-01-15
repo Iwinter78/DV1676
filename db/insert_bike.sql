@@ -1,6 +1,6 @@
 
 
-LOAD DATA LOCAL INFILE './bikes_1000.csv'
+LOAD DATA LOCAL INFILE './example_bikes.csv'
 INTO TABLE bike
 CHARSET utf8
 FIELDS TERMINATED BY ','

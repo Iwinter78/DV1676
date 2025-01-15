@@ -64,6 +64,10 @@ async function getBike(id) {
   return response[0].slice(0, -1);
 }
 
+/**
+ * Returns a bike that has been booked
+ * @param {Number} id - Id of the bike
+ */
 async function returnBike(id) {
   const db = await connect();
   const query = "CALL return_bike(?)";

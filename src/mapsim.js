@@ -1,111 +1,33 @@
 import L from "leaflet";
-import { OpenLocationCode } from "open-location-code";
 
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM loaded");
-  const openLocationCode = new OpenLocationCode();
-  const locateButton = document.getElementById("locate-user");
-  const cityDropdown = document.getElementById("city-select");
-  const userData = JSON.parse(
-    document.querySelector('meta[name="userInfo"]').getAttribute("content"),
-  );
+  // Default position for the map
+  const latitude = 56.161444
+  const longitude = 15.586355
 
-  async function getRole(user) {
-    const response = await fetch(
-      `http://localhost:1337/api/v1/user?username=${user}`,
-    );
-    const data = await response.json();
-    return data[0][0].role;
+  // Function to create a custom marker icon
+  function createIcon(color) {
+    return L.divIcon({
+      className: "custom-marker",
+      html: `<div style="font-size: 30px; color: ${color}; font-weight: bold;">●</div>`,
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
   }
 
-  navigator.geolocation.getCurrentPosition(async (position) => {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-
-    function createIcon(color) {
-      return L.divIcon({
-        className: "custom-marker",
-        html: `<div style="font-size: 30px; color: ${color}; font-weight: bold;">●</div>`,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
-      });
-    }
-
-    const customIcon = createIcon("#ff00ce");
     const availableBikeIcon = createIcon("#00ff00");
     const bookedBikeIcon = createIcon("#ff0000");
-    const simIcon = createIcon("#FF7518");
-    const needsAttentionIcon = createIcon("#FFA500");
 
-    const map = L.map("map").setView([latitude, longitude], 16);
+    const map = L.map("map").setView([latitude, longitude], 18);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
+      maxZoom: 20,
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    L.marker([latitude, longitude], { icon: customIcon })
-      .addTo(map)
-      .bindPopup("Här är du!")
-      .openPopup();
 
-    async function fetchBikes() {
-      try {
-        const response = await fetch("http://localhost:1337/api/v1/bike", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        });
-
-        const data = await response.json();
-        console.log("Fetched bikes data:", data);
-
-        return data.map((bike) => {
-          const decoded = openLocationCode.decode(bike.gps);
-          console.log("Decoded OLC:", decoded);
-          return {
-            id: bike.id,
-            start: [decoded.latitudeCenter, decoded.longitudeCenter],
-            city: bike.city,
-            status: bike.status,
-          };
-        });
-      } catch (error) {
-        console.error("Error fetching bikes:", error);
-        return [];
-      }
-    }
-
-    async function displayBikes() {
-      const bikes = await fetchBikes();
-
-      bikes.forEach(async (bike) => {
-        const { id, start, currentuser, status } = bike;
-
-        let markerIcon = availableBikeIcon;
-
-        if (
-          currentuser === userData.id ||
-          (await getRole(userData.id)) === "admin"
-        ) {
-          markerIcon = bookedBikeIcon;
-        } else if (status === 1) {
-          markerIcon = needsAttentionIcon;
-        }
-
-        if (!bikeMarkers[id]) {
-          // Create marker if it doesn't exist
-          bikeMarkers[id] = L.marker(start, { icon: markerIcon })
-            .addTo(map)
-            .bindPopup(`Bike ${id}`);
-        }
-      });
-    }
-
-    displayBikes();
 
     const bikeMarkers = {};
-
+    // Websocket connection
     const ws = new WebSocket("ws://localhost:5001");
 
     ws.onopen = () => {
@@ -114,21 +36,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ws.onmessage = (message) => {
       const bikeUpdates = JSON.parse(message.data);
+      console.log("Bike update received:", bikeUpdates);
 
       bikeUpdates.forEach((bike) => {
-        const { id, location } = bike;
-        console.log(`Processing bike ${id} at location:`, location);
+        const { id, location, currentuser } = bike;
+
+        console.log(`Processing bike ${id}:`, { location, currentuser });
 
         if (bikeMarkers[id]) {
-          // Update existing marker
           bikeMarkers[id].setLatLng([location[1], location[0]]);
+          bikeMarkers[id].setPopupContent(`
+            <div>
+              <p><strong>Bike ID:</strong> ${id}</p>
+              <p><strong>User:</strong> ${currentuser || "None"}</p>
+            </div>
+          `);
         } else {
-          // Create a new marker if it doesn't exist
           bikeMarkers[id] = L.marker([location[1], location[0]], {
-            icon: simIcon,
-          })
-            .addTo(map)
-            .bindPopup(`Bike ${id}`);
+            icon: currentuser ? bookedBikeIcon : availableBikeIcon,
+          }).addTo(map).bindPopup(`
+            <div>
+              <p><strong>Bike ID:</strong> ${id}</p>
+              <p><strong>User:</strong> ${currentuser || "None"}</p>
+            </div>
+          `);
         }
       });
     };
@@ -186,8 +117,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     displayStations();
 
+    document.addEventListener("DOMContentLoaded", () => {
+      console.log("DOM loaded");
+      const locateButton = document.getElementById("locate-user");
+      const cityDropdown = document.getElementById("city-select");
+    
     locateButton.addEventListener("click", () => {
-      map.locate({ setView: true, maxZoom: 16 });
+      map.locate({ setView: true, maxZoom: 18 });
     });
 
     fetch("/cities.json")
@@ -203,7 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cityDropdown.addEventListener("change", (e) => {
       const selectedCity = JSON.parse(e.target.value);
-      map.setView([selectedCity.lat, selectedCity.lng], 15);
+      map.setView([selectedCity.lat, selectedCity.lng], 16);
     });
-  });
 });

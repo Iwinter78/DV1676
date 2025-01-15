@@ -65,4 +65,42 @@ describe("Parking features in rest api", () => {
         expect(data[0][0].city).toBe(1);
         expect(data[0][0].gps).toBe("[\n  [56.1638, 15.59596],\n  [56.16385, 15.59615],\n  [56.16373, 15.59627],\n  [56.16367, 15.59606]\n  ]");
     });
+
+    test("Should write out an error message", async () => {
+        global.fetch.mockResolvedValue({
+            json: () => Promise.resolve({
+                message: "Något gick fel, försök igen senare",
+                status: 500,
+                error: "Procedure get_all_parking_zones does not exist",
+            }),
+        });
+
+        let response = await fetch(`${host}/api/v1/parking`);
+        let data = await response.json();
+
+        expect(data.message).toBe("Något gick fel, försök igen senare");
+        expect(data.status).toBe(500);
+        expect(data.error).toBe("Procedure get_all_parking_zones does not exist");
+
+        expect(data).toHaveProperty("message");
+        expect(data).toHaveProperty("status");
+        expect(data).toHaveProperty("error");
+    });
+
+    test("Ensure that error message return correct data types", async () => {
+        global.fetch.mockResolvedValue({
+            json: () => Promise.resolve({
+                message: "Något gick fel, försök igen senare",
+                status: 500,
+                error: "Procedure get_all_parking_zones does not exist",
+            }),
+        });
+
+        let response = await fetch(`${host}/api/v1/parking`);
+        let data = await response.json();
+
+        expect(typeof data.message).toBe("string");
+        expect(typeof data.status).toBe("number");
+        expect(typeof data.error).toBe("string");
+    });
 });

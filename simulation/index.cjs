@@ -103,7 +103,6 @@ async function broadcastBikes() {
   });
 }
 
-// Simulate movement
 setInterval(() => {
   bikes.forEach((bike) => {
     moveBike(bike);

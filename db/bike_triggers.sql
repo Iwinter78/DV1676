@@ -1,5 +1,6 @@
 DELIMITER ;;
-CREATE TRIGGER `bike_log_trigger` BEFORE UPDATE ON `bike`
+
+CREATE TRIGGER `bike_log_trigger` AFTER UPDATE ON `bike`
 FOR EACH ROW
 BEGIN
     INSERT INTO bike_log (bike_id, log_time, log_data, log_userid)
@@ -22,8 +23,6 @@ FOR EACH ROW
 BEGIN
     IF NEW.battery <= 20 THEN
         SET NEW.status = 1;
-    ELSE
-        SET NEW.status = 0;
     END IF;
 END;;
 DELIMITER ;
@@ -34,8 +33,6 @@ FOR EACH ROW
 BEGIN
     IF NEW.battery <= 20 THEN
         SET NEW.status = 1;
-    ELSE
-        SET NEW.status = 0;
     END IF;
 END;;
 DELIMITER ;

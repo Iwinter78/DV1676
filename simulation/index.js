@@ -18,26 +18,46 @@ const wss = new WebSocketServer({ port: 5001 });
 
 const savedRoutes = JSON.parse(fs.readFileSync("routes.json", "utf-8"));
 
-const bikes = savedRoutes.map((bike) => ({
-  id: bike.id,
-  route: bike.route,
-  location: bike.route[0],
-  step: 0,
-  totalSteps: bike.route.length,
-}));
+const bikes = savedRoutes.map((bike) => {
+  // Assign a random speed
+  const speedms = Math.random() * 5 + 2;
+  const speed = (speedms * 3.6).toFixed(2);
+
+  return {
+    id: bike.id,
+    route: bike.route,
+    location: bike.route[0],
+    step: 0,
+    totalSteps: bike.route.length,
+    speed, // Add speed here
+  };
+});
 
 function moveBike(bike) {
   if (bike.step < bike.totalSteps - 1) {
     const [startLng, startLat] = bike.route[bike.step];
     const [endLng, endLat] = bike.route[bike.step + 1];
 
-    const progress = 0.1;
-    const lng = startLng + (endLng - startLng) * progress;
-    const lat = startLat + (endLat - startLat) * progress;
+    // Calculate distance between points (simplified Euclidean distance)
+    const distance = Math.sqrt(
+      Math.pow(endLng - startLng, 2) + Math.pow(endLat - startLat, 2),
+    );
 
-    bike.location = [lat, lng];
-    bike.step++;
+    // Progress based on speed (distance covered in 1 second)
+    const progress = bike.speed / distance;
 
+    if (progress >= 1) {
+      // Move to the next step if the bike can cover the full distance
+      bike.location = [endLat, endLng];
+      bike.step++;
+    } else {
+      // Update location based on progress
+      const lng = startLng + (endLng - startLng) * progress;
+      const lat = startLat + (endLat - startLat) * progress;
+      bike.location = [lat, lng];
+    }
+
+    // Reset the bike's step to start over if it reaches the end of the route
     if (bike.step >= bike.totalSteps - 1) {
       bike.step = 0;
     }
@@ -64,8 +84,9 @@ async function broadcastBikes() {
 
       return {
         id: bike.id,
-        location: [bike.location[1], bike.location[0]],
+        location: [bike.location[1], bike.location[0]], // Format to [lng, lat]
         currentuser: bikeDetail ? bikeDetail.currentuser : null,
+        speed: bike.speed, // Include speed in updates
       };
     });
 

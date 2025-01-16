@@ -35,9 +35,9 @@ ws.onopen = () => {
 ws.onmessage = (message) => {
   const bikeUpdates = JSON.parse(message.data);
   bikeUpdates.forEach((bike) => {
-    const { id, location, currentuser } = bike;
+    const { id, location, speed, currentuser } = bike;
 
-    console.log(`Processing bike ${id}:`, { location, currentuser });
+    console.log(`Processing bike ${id}:`, { location, speed, currentuser });
 
     if (bikeMarkers[id]) {
       bikeMarkers[id].setLatLng([location[1], location[0]]);
@@ -45,6 +45,7 @@ ws.onmessage = (message) => {
             <div>
               <p><strong>Bike ID:</strong> ${id}</p>
               <p><strong>User:</strong> ${currentuser || "None"}</p>
+              <p><strong>Speed:</strong> ${speed} km/h</p>
             </div>
           `);
     } else {
@@ -54,6 +55,7 @@ ws.onmessage = (message) => {
           <div>
             <p><strong>Bike ID:</strong> ${id}</p>
             <p><strong>User:</strong> ${currentuser || "None"}</p>
+            <p><strong>Speed:</strong> ${speed} km/h</p>
           </div>
         `);
     }

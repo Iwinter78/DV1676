@@ -43,7 +43,7 @@ END;;
 
 CREATE PROCEDURE book_bike(
     in_bike_id INT,
-    in_user_id INT
+    in_user_id VARCHAR(255)
 )
 BEGIN
     UPDATE bike

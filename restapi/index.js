@@ -275,12 +275,11 @@ app.post("/api/v1/bike/book", async (req, res) => {
   if (!id || !userid) {
     return res.status(400).json({
       message: "Id och användarnamn krävs",
-      status: 400
+      status: 400,
     });
   }
 
   try {
-
     let userBalance = await user.getUserBalance(userid);
     console.log("User balance:", userBalance);
 

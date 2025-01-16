@@ -151,7 +151,7 @@ app.delete("/api/v1/delete/user/:username", async (req, res) => {
 
   if (!username) {
     return res.status(400).json({
-      message: "username krävs",
+      message: "Användarnamn krävs",
       status: 400,
     });
   }
@@ -311,7 +311,7 @@ app.post("/api/v1/bike/return", async (req, res) => {
 
   if (!id) {
     return res.status(400).json({
-      message: "Id krävs",
+      message: "Användar-id krävs",
       status: 400,
     });
   }

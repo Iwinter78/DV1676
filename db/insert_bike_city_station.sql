@@ -116,18 +116,17 @@ VALUES
   [55.6060040068387, 12.999798150681329]
 ]');
 
-INSERT INTO parking_zones (city, gps, bikes_in_zone)
+INSERT INTO parking_zones (city, gps)
 VALUES
 (@Karlskrona_id, '[
   [56.1638, 15.59596],
   [56.16385, 15.59615],
   [56.16373, 15.59627],
   [56.16367, 15.59606]
-  ]', DEFAULT),
+  ]'),
 (@Karlskrona_id, '[
 [56.166, 15.58494],
 [56.16599, 15.58532],
 [56.16594, 15.58532],
 [56.16597, 15.58494]
-]', DEFAULT);
-
+]');

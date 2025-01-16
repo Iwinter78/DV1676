@@ -54,6 +54,13 @@ CREATE TABLE `station` (
     FOREIGN KEY (city) REFERENCES city(id)
 );
 
+CREATE TABLE parking_zones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    city INT,
+    gps VARCHAR(255),
+    FOREIGN KEY (city) REFERENCES city(id)
+);
+
 CREATE TABLE `bank` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cashisking DECIMAL(10,2) NOT NULL DEFAULT 0.00

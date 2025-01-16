@@ -115,8 +115,6 @@ app.get("/sim", (req, res) => {
   res.render("sim/index");
 });
 
-
-
 // Admin first view after login
 app.get("/admin_view", async (req, res) => {
   const userInfo = req.session.userInfo;

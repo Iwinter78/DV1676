@@ -5,6 +5,7 @@ USE magicbike;
 SOURCE schema.sql;
 SOURCE ddl.sql;
 SOURCE user_procedures.sql;
+SOURCE parking_zone_procedures.sql;
 SOURCE bike_procedures.sql;
 SOURCE station_procedures.sql;
 --SOURCE bike_triggers.sql

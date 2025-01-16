@@ -29,7 +29,7 @@ const bikes = savedRoutes.map((bike) => {
     location: bike.route[0],
     step: 0,
     totalSteps: bike.route.length,
-    speed, // Add speed here
+    speed,
   };
 });
 
@@ -38,12 +38,11 @@ function moveBike(bike) {
     const [startLng, startLat] = bike.route[bike.step];
     const [endLng, endLat] = bike.route[bike.step + 1];
 
-    // Calculate distance between points (simplified Euclidean distance)
+
     const distance = Math.sqrt(
       Math.pow(endLng - startLng, 2) + Math.pow(endLat - startLat, 2),
     );
 
-    // Progress based on speed (distance covered in 1 second)
     const progress = bike.speed / distance;
 
     if (progress >= 1) {
@@ -86,7 +85,7 @@ async function broadcastBikes() {
         id: bike.id,
         location: [bike.location[1], bike.location[0]], // Format to [lng, lat]
         currentuser: bikeDetail ? bikeDetail.currentuser : null,
-        speed: bike.speed, // Include speed in updates
+        speed: bike.speed,
       };
     });
 
@@ -111,6 +110,3 @@ setInterval(() => {
   broadcastBikes();
 }, 1000);
 
-console.log(
-  "Simulation started. WebSocket server running on ws://localhost:5001",
-);

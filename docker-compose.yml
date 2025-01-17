@@ -35,8 +35,10 @@ services:
       dv1676-network:
         ipv4_address: 172.22.0.3
     restart: always
+    command: sh -c "sleep 10 && node index.js"
     depends_on:
-      - database
+      database:
+        condition: service_started
 
   client:
     image: dv1676-client
@@ -49,8 +51,10 @@ services:
       dv1676-network:
         ipv4_address: 172.22.0.2
     restart: always
+    command: sh -c "sleep 10 && node index.js"
     depends_on:
-      - restapi
+      restapi:
+        condition: service_started
 
   simulation:
     image: dv1676-simulation
@@ -61,8 +65,10 @@ services:
       dv1676-network:
         ipv4_address: 172.22.0.5
     restart: always
+    command: sh -c "sleep 10 && node index.js"
     depends_on:
-      - restapi
+      restapi:
+        condition: service_started
 
 networks:
     dv1676-network:

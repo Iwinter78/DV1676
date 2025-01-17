@@ -7,7 +7,8 @@ import { connect } from "./connect.js";
  */
 async function createUser(username, email) {
   const db = await connect();
-  const query = `CALL create_user(?, ?)`;
+  const query = `INSERT INTO users (email, username, balance, debt, role)
+    VALUES (?, ?, 0.00, 0.00, 'user');`;
   const values = [email, username];
   await db.query(query, values);
   db.end();
@@ -15,7 +16,7 @@ async function createUser(username, email) {
 
 async function getUser(username) {
   const db = await connect();
-  const query = `CALL get_user(?)`;
+  const query = `SELECT * FROM users WHERE username = ?;`;
   const values = [username];
   try {
     const [rows] = await db.query(query, values);
@@ -29,14 +30,18 @@ async function getUser(username) {
 
 async function getAllUsers() {
   const db = await connect();
-  const query = `call get_all_users()`;
+  const query = `SELECT * FROM users;`;
   const [rows] = await db.query(query);
   return rows;
 }
 
 async function getUserLog(username) {
   const db = await connect();
-  const query = `CALL get_user_log(?)`;
+  const query = `BEGIN
+    SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data
+    FROM users u
+    JOIN user_log ul ON u.id = ul.id
+    WHERE u.username = ?;`;
   const values = [username];
   try {
     const [rows] = await db.query(query, values);
@@ -50,7 +55,7 @@ async function getUserLog(username) {
 
 async function deleteUser(username) {
   const db = await connect();
-  const query = `CALL delete_user(?)`;
+  const query = `DELETE FROM users WHERE username = username_param;`;
   const values = [username];
   await db.query(query, values);
   db.end();
@@ -58,7 +63,9 @@ async function deleteUser(username) {
 
 async function updateUserBalance(username, balance) {
   const db = await connect();
-  const query = `CALL update_user_balance(?, ?)`;
+  const query = `UPDATE users
+    SET balance = balance + in_balance
+    WHERE username = in_username;`;
   const values = [username, balance];
   try {
     await db.query(query, values);

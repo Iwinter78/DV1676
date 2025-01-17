@@ -1,6 +1,6 @@
 services:
   database:
-    image: dv1676-database
+    image: mariadb
     container_name: database
     ports:
       - "3307:3306"
@@ -9,21 +9,28 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_COLLATION=utf8mb4_general_ci
     env_file:
       - .env
     networks:
       dv1676-network:
         ipv4_address: 172.22.0.4
+    entrypoint:
+      - docker-entrypoint.sh
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --skip-character-set-client-handshake
     volumes:
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-      - ./db/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+      - ./db/01-magicbike_backup.sql:/docker-entrypoint-initdb.d/01-magicbike_backup.sql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
     restart: always
 
   restapi:
     image: dv1676-restapi
     container_name: restapi
     ports:
-      - "5001:5001"
+      - "1337:1337"
     networks:
       dv1676-network:
         ipv4_address: 172.22.0.3
@@ -36,6 +43,8 @@ services:
     container_name: client
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     networks:
       dv1676-network:
         ipv4_address: 172.22.0.2
@@ -47,7 +56,7 @@ services:
     image: dv1676-simulation
     container_name: simulation
     ports:
-      - "1337:1337"
+      - "5001:5001"
     networks:
       dv1676-network:
         ipv4_address: 172.22.0.5

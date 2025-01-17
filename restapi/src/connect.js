@@ -4,7 +4,7 @@ import mysqlPromise from "mysql2/promise";
  * Creates a connection to the database
  * @returns {Promise<mysql.Connection>}
  */
-export async function connect() {
+async function connect() {
   const connect = mysqlPromise.createConnection({
     host: "database",
     port: 3306,
@@ -17,3 +17,5 @@ export async function connect() {
 
   return Promise.resolve(connect);
 }
+
+export { connect };

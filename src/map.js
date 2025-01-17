@@ -27,7 +27,7 @@ function isPointInStation(bikeCoords, stationCoords) {
 
 async function getRole(user) {
   const response = await fetch(
-    `http://localhost:1337/api/v1/user?username=${user}`,
+    `http://restapi:1337/api/v1/user?username=${user}`,
   );
   const data = await response.json();
   return data[0][0].role;
@@ -35,7 +35,7 @@ async function getRole(user) {
 
 async function fetchBikes() {
   try {
-    const response = await fetch("http://localhost:1337/api/v1/bike", {
+    const response = await fetch("http://restapi:1337/api/v1/bike", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -49,7 +49,7 @@ async function fetchBikes() {
 
 async function fetchStations() {
   try {
-    const response = await fetch("http://localhost:1337/api/v1/stations", {
+    const response = await fetch("http://restapi:1337/api/v1/stations", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -62,7 +62,7 @@ async function fetchStations() {
 
 async function fetchParking() {
   try {
-    const response = await fetch("http://localhost:1337/api/v1/parking", {
+    const response = await fetch("http://restapi:1337/api/v1/parking", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -74,7 +74,7 @@ async function fetchParking() {
 }
 
 async function checkBikeInAnyStation(bike) {
-  const response = await fetch("http://localhost:1337/api/v1/parking");
+  const response = await fetch("http://restapi:1337/api/v1/parking");
   const data = await response.json();
   const parkingZones = data[0];
 
@@ -110,7 +110,7 @@ async function checkBikeInAnyParking(bike) {
       return { isInParking: false, zoneId: null, bikeCount: 0 };
   }
 
-  const response = await fetch("http://localhost:1337/api/v1/parking");
+  const response = await fetch("http://restapi:1337/api/v1/parking");
   const data = await response.json();
   const parkingZones = data[0];
 

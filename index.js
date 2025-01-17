@@ -5,7 +5,6 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import process from "process";
-
 import { exchangeCodeForToken, getUserInfo } from "./src/login.js";
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -63,7 +62,7 @@ app.get("/callback", async (req, res) => {
   const email = userInfo.email || null;
   // Get user info from the database
   let profile = await fetch(
-    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
+    `http://restapi:1337/api/v1/user?username=${userInfo.login}`,
   ).then((response) => response.json());
 
   console.log("profile information from database", profile);
@@ -123,7 +122,7 @@ app.get("/admin_view", async (req, res) => {
 
   // Fetch the user data from the API
   const userresponse = await fetch(
-    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
+    `http://restapi:1337/api/v1/user?username=${userInfo.login}`,
   );
   const userData = await userresponse.json();
 
@@ -138,7 +137,7 @@ app.get("/admin_view", async (req, res) => {
 });
 
 app.get("/admin_panel/customer", async (req, res) => {
-  const response = await fetch(`http://localhost:1337/api/v1/getAllUsers`);
+  const response = await fetch(`http://restapi:1337/api/v1/getAllUsers`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -152,7 +151,7 @@ app.get("/admin_panel/customer", async (req, res) => {
 });
 // Admin bike view
 app.get("/admin_panel/bike", async (req, res) => {
-  const response = await fetch(`http://localhost:1337/api/v1/bike`);
+  const response = await fetch(`http://restapi:1337/api/v1/bike`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -166,7 +165,7 @@ app.get("/admin_panel/bike", async (req, res) => {
 });
 // Admin station view
 app.get("/admin_panel/station", async (req, res) => {
-  const response = await fetch(`http://localhost:1337/api/v1/stations`);
+  const response = await fetch(`http://restapi:1337/api/v1/stations`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -190,7 +189,7 @@ app.post("/email", async (req, res) => {
     req.session.userInfo.email = email;
     console.log("Email updated in session:", req.session.userInfo);
     const createResponse = await fetch(
-      "http://localhost:1337/api/v1/create/user",
+      "http://restapi:1337/api/v1/create/user",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -223,7 +222,7 @@ app.post("/balance", async (req, res) => {
   const username = req.session.userInfo.login;
 
   const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`,
+    `http://restapi:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`,
     {
       method: "PUT", // PUT update
       headers: { "Content-Type": "application/json" },
@@ -244,7 +243,7 @@ app.get("/profile", async (req, res) => {
     return res.redirect("/"); // Om användaren inte är inloggad, skicka dem till startsidan
   }
   const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
+    `http://restapi:1337/api/v1/user?username=${userInfo.login}`,
   );
   const profile = await profileResponse.json();
   const profileData = profile["0"][0];
@@ -263,7 +262,7 @@ app.get("/history", async (req, res) => {
   }
 
   const profileResponse = await fetch(
-    `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
+    `http://restapi:1337/api/v1/history?username=${userInfo.login}`,
   );
   const profile = await profileResponse.json();
   const trips = profile[0] || [];
@@ -279,7 +278,7 @@ app.get("/history", async (req, res) => {
 app.get("/book/confirm/:id", async (req, res) => {
   let userInfo = req.session.userInfo;
   let bikeData = await fetch(
-    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+    `http://restapi:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
   let data = {
@@ -293,14 +292,14 @@ app.get("/book/confirm/:id", async (req, res) => {
 app.post("/book/confirm/:id", async (req, res) => {
   let userInfo = req.session.userInfo;
   let bikeData = await fetch(
-    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+    `http://restapi:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
   if (Boolean(bikeData[0][0].bike_status) === false) {
     return res.redirect("/home");
   }
 
-  await fetch(`http://localhost:1337/api/v1/bike/book`, {
+  await fetch(`http://restapi:1337/api/v1/bike/book`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -315,14 +314,14 @@ app.post("/book/confirm/:id", async (req, res) => {
 
 app.post("/book/return/:id", async (req, res) => {
   let bikeData = await fetch(
-    `http://localhost:1337/api/v1/bike/${req.params.id}`,
+    `http://restapi:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
   if (Boolean(bikeData[0][0].bike_status) === true) {
     return res.redirect("/home");
   }
 
-  await fetch(`http://localhost:1337/api/v1/bike/return`, {
+  await fetch(`http://restapi:1337/api/v1/bike/return`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

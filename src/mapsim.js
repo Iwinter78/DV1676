@@ -66,7 +66,7 @@ import L from "leaflet";
 
     async function fetchStations() {
       try {
-        const response = await fetch("http://localhost:1337/api/v1/stations", {
+        const response = await fetch("http://restapi:1337/api/v1/stations", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });

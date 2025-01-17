@@ -11,7 +11,7 @@ COPY restapi/index.js .
 
 COPY restapi/src/* ./src/
 
-EXPOSE 5000
+EXPOSE 1337
 
 RUN npm install
 

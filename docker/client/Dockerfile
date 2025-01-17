@@ -9,6 +9,12 @@ COPY package.json /client
 
 COPY index.js /client
 
+COPY public /client/public
+
+COPY views /client/views
+
+COPY src /client/src
+
 RUN npm install
 
 EXPOSE 3000

@@ -7,10 +7,10 @@ WORKDIR /simulation
 
 COPY package.json .
 
-COPY simulation/index.js .
+COPY simulation/* .
 
 RUN npm install
 
 EXPOSE 5001
 
-CMD ["node", "index.js"]
+CMD ["node", "index.cjs"]

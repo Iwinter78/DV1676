@@ -6,7 +6,7 @@ import { connect } from "./connect.js";
  */
 async function allParking() {
   const db = await connect();
-  const query = "CALL get_all_parking_zones()";
+  const query = `SELECT * FROM parking_zones;`;
   const response = await db.query(query);
   db.end();
   return response[0];

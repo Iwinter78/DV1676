@@ -172,9 +172,6 @@ app.delete("/api/v1/delete/user/:username", async (req, res) => {
   }
 });
 
-
-
-
 app.get("/api/v1/bike", async (req, res) => {
   try {
     let response = await bike.getAllBikes();
@@ -278,12 +275,11 @@ app.post("/api/v1/bike/book", async (req, res) => {
   if (!id || !userid) {
     return res.status(400).json({
       message: "Id och användarnamn krävs",
-      status: 400
+      status: 400,
     });
   }
 
   try {
-
     let userBalance = await user.getUserBalance(userid);
     console.log("User balance:", userBalance);
 
@@ -398,46 +394,44 @@ app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
   const newSize = req.body.charging_size;
   try {
     let result = await station.editChargingSize(id, newSize);
-  
-    if (result.affectedRows > 0) { // Assuming affectedRows is returned from the DB operation
+
+    if (result.affectedRows > 0) {
+      // Assuming affectedRows is returned from the DB operation
       return res.status(200).send("Charging size changed");
     } else {
       return res.status(404).send("Station not found or no change made");
     }
   } catch (error) {
-    console.error('Error in editChargingSize API:', error); // Added for debugging
+    console.error("Error in editChargingSize API:", error); // Added for debugging
     res.status(500).send("Internal Server Error");
   }
 });
 
 app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
-  console.log("Request Body:", req.body);  
+  console.log("Request Body:", req.body);
 
   const usernameFromUrl = req.params.username;
   const balance = req.body.balance;
   const debt = req.body.debt;
-
 
   console.log("Before calling editUser");
 
   try {
     let result = await user.editUser(usernameFromUrl, balance, debt);
 
-    if(result.affectedRows > 0) {
+    if (result.affectedRows > 0) {
       return res.status(200).send("Fixed");
     } else {
-      return res.status(404).send("User not found or no changes made")
+      return res.status(404).send("User not found or no changes made");
     }
   } catch (error) {
-    console.error('Error in editUserAdminPanel API:', error)
+    console.error("Error in editUserAdminPanel API:", error);
     res.status(500).send("Internal Server Error");
   }
 
   console.log("After calling editUser");
 
   console.log("User updated successfully");
-
-
 });
 
 app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
@@ -445,38 +439,37 @@ app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
   const newSize = req.body.charging_size;
   try {
     let result = await station.editChargingSize(id, newSize);
-  
+
     if (result.affectedRows > 0) {
       return res.status(200).send("Charging size changed");
     } else {
       return res.status(404).send("Station not found or no change made");
     }
   } catch (error) {
-    console.error('Error in editChargingSize API:', error); // Added for debugging
+    console.error("Error in editChargingSize API:", error); // Added for debugging
     res.status(500).send("Internal Server Error");
   }
 });
 
 app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
-  console.log("Request Body:", req.body);  
+  console.log("Request Body:", req.body);
 
   const usernameFromUrl = req.params.username;
   const balance = req.body.balance;
   const debt = req.body.debt;
-
 
   console.log("Before calling editUser");
 
   try {
     let result = await user.editUser(usernameFromUrl, balance, debt);
 
-    if(result.affectedRows > 0) {
+    if (result.affectedRows > 0) {
       return res.status(200).send("Fixed");
     } else {
-      return res.status(404).send("User not found or no changes made")
+      return res.status(404).send("User not found or no changes made");
     }
   } catch (error) {
-    console.error('Error in editUserAdminPanel API:', error)
+    console.error("Error in editUserAdminPanel API:", error);
     res.status(500).send("Internal Server Error");
   }
 

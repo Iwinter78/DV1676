@@ -1,68 +1,66 @@
 import L from "leaflet";
 
-  // Default position for the map
-  const latitude = 56.161444
-  const longitude = 15.586355
+// Default position for the map
+const latitude = 56.161444;
+const longitude = 15.586355;
 
-  // Function to create a custom marker icon
-  function createIcon(color) {
-    return L.divIcon({
-      className: "custom-marker",
-      html: `<div style="font-size: 30px; color: ${color}; font-weight: bold;">●</div>`,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10],
-    });
-  }
+// Function to create a custom marker icon
+function createIcon(color) {
+  return L.divIcon({
+    className: "custom-marker",
+    html: `<div style="font-size: 30px; color: ${color}; font-weight: bold;">●</div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+}
 
-    const availableBikeIcon = createIcon("#00ff00");
-    const bookedBikeIcon = createIcon("#ff0000");
+const availableBikeIcon = createIcon("#00ff00");
+const bookedBikeIcon = createIcon("#ff0000");
 
-    const map = L.map("map").setView([latitude, longitude], 18);
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 20,
-      attribution:
-        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(map);
+const map = L.map("map").setView([latitude, longitude], 18);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 20,
+  attribution:
+    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+}).addTo(map);
 
+const bikeMarkers = {};
+// Websocket connection
+const ws = new WebSocket("ws://localhost:5001");
 
+ws.onopen = () => {
+  console.log("WebSocket connection established.");
+};
 
-    const bikeMarkers = {};
-    // Websocket connection
-    const ws = new WebSocket("ws://localhost:5001");
+ws.onmessage = (message) => {
+  const bikeUpdates = JSON.parse(message.data);
+  bikeUpdates.forEach((bike) => {
+    const { id, location, speed, currentuser } = bike;
 
-    ws.onopen = () => {
-      console.log("WebSocket connection established.");
-    };
+    console.log(`Processing bike ${id}:`, { location, speed, currentuser });
 
-    ws.onmessage = (message) => {
-      const bikeUpdates = JSON.parse(message.data);
-      console.log("Bike update received:", bikeUpdates);
-
-      bikeUpdates.forEach((bike) => {
-        const { id, location, currentuser } = bike;
-
-        console.log(`Processing bike ${id}:`, { location, currentuser });
-
-        if (bikeMarkers[id]) {
-          bikeMarkers[id].setLatLng([location[1], location[0]]);
-          bikeMarkers[id].setPopupContent(`
+    if (bikeMarkers[id]) {
+      bikeMarkers[id].setLatLng([location[1], location[0]]);
+      bikeMarkers[id].setPopupContent(`
             <div>
               <p><strong>Bike ID:</strong> ${id}</p>
               <p><strong>User:</strong> ${currentuser || "None"}</p>
+              <p><strong>Speed:</strong> ${speed} km/h</p>
             </div>
           `);
-        } else {
-          bikeMarkers[id] = L.marker([location[1], location[0]], {
-            icon: currentuser ? bookedBikeIcon : availableBikeIcon,
-          }).addTo(map).bindPopup(`
-            <div>
-              <p><strong>Bike ID:</strong> ${id}</p>
-              <p><strong>User:</strong> ${currentuser || "None"}</p>
-            </div>
-          `);
-        }
-      });
-    };
+    } else {
+      bikeMarkers[id] = L.marker([location[1], location[0]], {
+        icon: currentuser ? bookedBikeIcon : availableBikeIcon,
+      }).addTo(map).bindPopup(`
+          <div>
+            <p><strong>Bike ID:</strong> ${id}</p>
+            <p><strong>User:</strong> ${currentuser || "None"}</p>
+            <p><strong>Speed:</strong> ${speed} km/h</p>
+          </div>
+        `);
+    }
+  });
+};
 
     async function fetchStations() {
       try {
@@ -137,8 +135,8 @@ import L from "leaflet";
         });
       });
 
-    cityDropdown.addEventListener("change", (e) => {
-      const selectedCity = JSON.parse(e.target.value);
-      map.setView([selectedCity.lat, selectedCity.lng], 16);
-    });
+  cityDropdown.addEventListener("change", (e) => {
+    const selectedCity = JSON.parse(e.target.value);
+    map.setView([selectedCity.lat, selectedCity.lng], 16);
+  });
 });

@@ -7,7 +7,8 @@ import { connect } from "./connect.js";
  */
 async function createBike(gps, city) {
   const db = await connect();
-  const query = "CALL create_bike(?, ?)";
+  const query = `INSERT INTO bike (gps, city)
+    VALUES (?, ?);`;
   const values = [gps, city];
   db.query(query, values);
   db.end();
@@ -18,7 +19,7 @@ async function createBike(gps, city) {
  */
 async function getAllBikes() {
   const db = await connect();
-  const query = "CALL get_all_bikes()";
+  const query = `SELECT * FROM bike;`;
   const response = await db.query(query);
   db.end();
   return response[0].slice(0, -1);
@@ -31,8 +32,10 @@ async function getAllBikes() {
  */
 async function updateBikePosition(id, gps) {
   const db = await connect();
-  const query = "CALL update_bike_position(?, ?)";
-  const values = [id, gps];
+  const query = `UPDATE bike
+    SET gps = ?
+    WHERE id = ?;`;
+  const values = [gps, id];
   db.query(query, values);
   db.end();
 }
@@ -42,10 +45,12 @@ async function updateBikePosition(id, gps) {
  * @param {String} id - Id of the bike
  * @param {String} username - Name of the user who is booking the bike
  */
-async function bookBike(id, username) {
+async function bookBike(id, bikeId) {
   const db = await connect();
-  const query = "CALL book_bike(?, ?)";
-  const values = [id, username];
+  const query = `UPDATE bike
+    set bike_status = false, currentuser = ?
+    WHERE id = ?;`;
+  const values = [id, bikeId];
   db.query(query, values);
   db.end();
 }
@@ -57,7 +62,7 @@ async function bookBike(id, username) {
  */
 async function getBike(id) {
   const db = await connect();
-  const query = "CALL get_bike_by_id(?)";
+  const query = `SELECT * FROM bike WHERE id = ?;`;
   const values = [id];
   const response = await db.query(query, values);
   db.end();
@@ -70,7 +75,9 @@ async function getBike(id) {
  */
 async function returnBike(id) {
   const db = await connect();
-  const query = "CALL return_bike(?)";
+  const query = `UPDATE bike
+    set bike_status = true, currentuser = null
+    WHERE id = ?;`;
   const values = [id];
   db.query(query, values);
   db.end();

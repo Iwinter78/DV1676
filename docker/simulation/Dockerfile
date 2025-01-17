@@ -3,6 +3,12 @@
 
 FROM node:20
 
+COPY restapi/src /restapi/src
+
+COPY package.json . 
+
+RUN npm install
+
 WORKDIR /simulation
 
 COPY package.json .
@@ -13,4 +19,4 @@ RUN npm install
 
 EXPOSE 5001
 
-CMD ["node", "index.cjs"]
+CMD ["node", "index.js"]

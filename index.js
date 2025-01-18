@@ -14,6 +14,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+/*
 app.use(
   cors({
     origin: true,
@@ -26,8 +27,7 @@ app.use(
     credentials: true,
   }),
 );
-
-app.options("*", cors());
+*/
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
@@ -43,6 +43,15 @@ app.use(
     cookie: { secure: false },
   }),
 );
+
+const apiUrl = `http://172.22.0.6:8080/api/user?username=Iwinter78`;
+
+// Example fetch request
+fetch(apiUrl)
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+
 // Login page
 app.get("/", (req, res) => {
   const data = {
@@ -62,7 +71,7 @@ app.get("/callback", async (req, res) => {
   const email = userInfo.email || null;
   // Get user info from the database
   let profile = await fetch(
-    `http://restapi:1337/api/v1/user?username=${userInfo.login}`,
+    `http://172.22.0.6:8080/api/user?username=${userInfo.login}`,
   ).then((response) => response.json());
 
   console.log("profile information from database", profile);
@@ -96,6 +105,15 @@ app.get("/logout", (req, res) => {
 });
 // Users home page
 app.get("/home", (req, res) => {
+
+  const apiUrl = `http://172.22.0.6:8080/api/user?username=Iwinter78`;
+
+  // Example fetch request
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
+
   const userInfo = req.session.userInfo;
   if (!userInfo) {
     res.redirect("/");
@@ -120,7 +138,7 @@ app.get("/admin_view", async (req, res) => {
 
   // Fetch the user data from the API
   const userresponse = await fetch(
-    `http://restapi:1337/api/v1/user?username=${userInfo.login}`,
+    `http://172.22.0.6:8080/api/user?username=${userInfo.login}`,
   );
   const userData = await userresponse.json();
 
@@ -135,7 +153,7 @@ app.get("/admin_view", async (req, res) => {
 });
 
 app.get("/admin_panel/customer", async (req, res) => {
-  const response = await fetch(`http://restapi:1337/api/v1/getAllUsers`);
+  const response = await fetch(`http://172.22.0.6:8080/api/getAllUsers`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -149,7 +167,7 @@ app.get("/admin_panel/customer", async (req, res) => {
 });
 // Admin bike view
 app.get("/admin_panel/bike", async (req, res) => {
-  const response = await fetch(`http://restapi:1337/api/v1/bike`);
+  const response = await fetch(`http://172.22.0.6:8080/api/bike`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -163,7 +181,7 @@ app.get("/admin_panel/bike", async (req, res) => {
 });
 // Admin station view
 app.get("/admin_panel/station", async (req, res) => {
-  const response = await fetch(`http://restapi:1337/api/v1/stations`);
+  const response = await fetch(`http://172.22.0.6:8080/api/stations`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
@@ -187,7 +205,7 @@ app.post("/email", async (req, res) => {
     req.session.userInfo.email = email;
     console.log("Email updated in session:", req.session.userInfo);
     const createResponse = await fetch(
-      "http://restapi:1337/api/v1/create/user",
+      "http://172.22.0.6:8080/api/create/user",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -220,7 +238,7 @@ app.post("/balance", async (req, res) => {
   const username = req.session.userInfo.login;
 
   const profileResponse = await fetch(
-    `http://restapi:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`,
+    `http://172.22.0.6:8080/api/update/user/balance?username=${username}&balance=${balance}`,
     {
       method: "PUT", // PUT update
       headers: { "Content-Type": "application/json" },
@@ -241,7 +259,7 @@ app.get("/profile", async (req, res) => {
     return res.redirect("/"); // Om användaren inte är inloggad, skicka dem till startsidan
   }
   const profileResponse = await fetch(
-    `http://restapi:1337/api/v1/user?username=${userInfo.login}`,
+    `http://172.22.0.6:8080/api/user?username=${userInfo.login}`,
   );
   const profile = await profileResponse.json();
   const profileData = profile["0"][0];
@@ -260,7 +278,7 @@ app.get("/history", async (req, res) => {
   }
 
   const profileResponse = await fetch(
-    `http://restapi:1337/api/v1/history?username=${userInfo.login}`,
+    `http://172.22.0.6:8080/api/history?username=${userInfo.login}`,
   );
   const profile = await profileResponse.json();
   const trips = profile[0] || [];
@@ -276,7 +294,7 @@ app.get("/history", async (req, res) => {
 app.get("/book/confirm/:id", async (req, res) => {
   let userInfo = req.session.userInfo;
   let bikeData = await fetch(
-    `http://restapi:1337/api/v1/bike/${req.params.id}`,
+    `http://172.22.0.6:8080/api/bike/${req.params.id}`,
   ).then((response) => response.json());
 
   let data = {
@@ -290,14 +308,14 @@ app.get("/book/confirm/:id", async (req, res) => {
 app.post("/book/confirm/:id", async (req, res) => {
   let userInfo = req.session.userInfo;
   let bikeData = await fetch(
-    `http://restapi:1337/api/v1/bike/${req.params.id}`,
+    `http://172.22.0.6:8080/api/bike/${req.params.id}`,
   ).then((response) => response.json());
 
   if (Boolean(bikeData[0][0].bike_status) === false) {
     return res.redirect("/home");
   }
 
-  await fetch(`http://restapi:1337/api/v1/bike/book`, {
+  await fetch(`http://172.22.0.6:8080/api/bike/book`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -312,14 +330,14 @@ app.post("/book/confirm/:id", async (req, res) => {
 
 app.post("/book/return/:id", async (req, res) => {
   let bikeData = await fetch(
-    `http://restapi:1337/api/v1/bike/${req.params.id}`,
+    `http://172.22.0.6:8080/api/bike/${req.params.id}`,
   ).then((response) => response.json());
 
   if (Boolean(bikeData[0][0].bike_status) === true) {
     return res.redirect("/home");
   }
 
-  await fetch(`http://restapi:1337/api/v1/bike/return`, {
+  await fetch(`http://172.22.0.6:8080/api/bike/return`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

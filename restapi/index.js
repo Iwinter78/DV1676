@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import * as user from "./src/user.js";
 import * as bike from "./src/bike.js";
 import * as station from "./src/station.js";
@@ -9,18 +8,6 @@ const app = express();
 
 const port = 1337;
 
-app.use(
-  cors({
-    origin: true,
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Access-Control-Allow-Origin",
-    ],
-    esposedHeaders: "*",
-    credentials: true,
-  }),
-);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

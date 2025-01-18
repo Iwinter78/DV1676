@@ -11,8 +11,8 @@ COPY restapi/index.js .
 
 COPY restapi/src/* ./src/
 
-EXPOSE 1337
-
 RUN npm install
 
 CMD ["node", "index.js"]
+
+EXPOSE 1337

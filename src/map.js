@@ -1,6 +1,10 @@
 import L from "leaflet";
 import { OpenLocationCode } from "open-location-code";
 
+import cors from "cors";
+
+cors();
+
 let stationCounters = {};
 let parkingZoneCounters = {};
 
@@ -29,15 +33,15 @@ function isPointInStation(bikeCoords, stationCoords) {
 // see if user is admin or not
 async function getRole(user) {
   const response = await fetch(
-    `http://restapi:1337/api/v1/user?username=${user}`,
+    `http://172.22.0.6:8080/api/user?username=${user}`,
   );
   const data = await response.json();
-  return data[0][0].role;
+  return data[0].role;
 }
 // fetch bikes from database
 async function fetchBikes() {
   try {
-    const response = await fetch("http://restapi:1337/api/v1/bike", {
+    const response = await fetch("http://172.22.0.6:8080/api/bike", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -51,9 +55,10 @@ async function fetchBikes() {
 // fetch stations from database
 async function fetchStations() {
   try {
-    const response = await fetch("http://restapi:1337/api/v1/stations", {
+    const response = await fetch("http://172.22.0.6:8080/api/stations", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
     return response.json();
   } catch (error) {
@@ -64,9 +69,10 @@ async function fetchStations() {
 // fetch parking from database
 async function fetchParking() {
   try {
-    const response = await fetch("http://restapi:1337/api/v1/parking", {
+    const response = await fetch("http://172.22.0.6:8080/api/parking", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
     return response.json();
   } catch (error) {
@@ -76,9 +82,13 @@ async function fetchParking() {
 }
 
 async function checkBikeInAnyStation(bike) {
-  const response = await fetch("http://restapi:1337/api/v1/parking");
+  const response = await fetch("http://172.22.0.6:8080/api/parking", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
   const data = await response.json();
-  const parkingZones = data[0];
+  const parkingZones = data;
 
   for (const zone of parkingZones) {
     const zoneCoordinates = JSON.parse(zone.gps);
@@ -112,9 +122,13 @@ async function checkBikeInAnyParking(bike) {
     return { isInParking: false, zoneId: null, bikeCount: 0 };
   }
 
-  const response = await fetch("http://restapi:1337/api/v1/parking");
+  const response = await fetch("http://172.22.0.6:8080/api/parking", {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  });
   const data = await response.json();
-  const parkingZones = data[0];
+  const parkingZones = data;
 
   const bikePoint = {
     lat: bike[0],
@@ -154,13 +168,16 @@ async function checkBikeInAnyParking(bike) {
 async function displayBikes(map, userData, openLocationCode, icons) {
   try {
     const data = await fetchBikes();
-    const bikes_unfiltered = data[0];
+    const bikes_unfiltered = data;
     const userRole = await getRole(userData.login);
     // Filter out bikes for display
     const bikes = bikes_unfiltered.filter(
-      (bike) => bike.id >= 1000 && bike.id <= 1013,
+      (bike) => bike.id >= 1 && bike.id <= 13
     );
+    console.log(bikes);
     bikes.forEach(async (bike) => {
+
+      console.log(bike);
       let lat = 0;
       let lng = 0;
 
@@ -280,8 +297,10 @@ async function displayStations(map) {
       fetchStations(),
     ]);
 
-    const bikes = bikesResponse[0];
-    const stations = stationsResponse[0];
+    const bikes = bikesResponse;
+    console.log(bikes);
+    const stations = stationsResponse;
+    console.log(stations);
 
     // Count bikes in stations first
     for (const bike of bikes) {
@@ -340,8 +359,10 @@ async function drawParkingZones(map) {
     fetchParking(),
   ]);
 
-  const bikes = bikesResponse[0];
-  const parkingZones = parkingResponse[0];
+  const bikes = bikesResponse;
+  console.log(bikes);
+  const parkingZones = parkingResponse;
+  console.log(parkingZones);
 
   for (const bike of bikes) {
     const findCode = new OpenLocationCode().recoverNearest(

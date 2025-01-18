@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test-build": "npx webpack && node index.js",
-    "sim-build": "node index.js && node /simulation/index.js"
+    "sim-build": "node index.js && node /simulation/index.js",
+    "start": "node index.js && node /restapi/index.js"
   },
   "repository": {
     "type": "git",

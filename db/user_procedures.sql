@@ -74,4 +74,24 @@ BEGIN
     WHERE username = in_username;
 END;;
 
+CREATE PROCEDURE pay_trip(IN IN_trip_id INT)
+BEGIN
+    DECLARE userId INT;
+    DECLARE tripCost DECIMAL(10,2);
+
+    SELECT total_price, user_id INTO tripCost, userId
+    FROM trips
+    WHERE trip_id = IN_trip_id;
+
+    UPDATE users
+    SET balance = balance - tripCost
+    WHERE id = userId;
+
+    UPDATE bank
+    SET cashisking = cashisking + tripCost;
+
+END;;
+
+
+
 DELIMITER ;

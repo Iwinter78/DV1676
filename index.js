@@ -51,6 +51,7 @@ app.get("/", (req, res) => {
   const data = {
     client_id: process.env.GITHUB_CLIENT_ID,
   };
+
   res.render("login/index", data);
 });
 
@@ -297,11 +298,16 @@ app.get("/book/confirm/:id", async (req, res) => {
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
+
   let data = {
     id: req.params.id,
     userInfo,
-    bike: bikeData[0][0],
+    bike: bikeData
   };
+
+  console.log(bikeData);
+
+
   res.render("client/client_book", data);
 });
 
@@ -314,7 +320,7 @@ app.post("/book/confirm/:id", async (req, res) => {
   if (Boolean(bikeData[0][0].bike_status) === false) {
     return res.redirect("/home");
   }
-
+  console.log("Before: /book/confirm/:id")
   const response = await fetch(`http://localhost:1337/api/v1/bike/book`, {
     method: "POST",
     headers: {
@@ -326,6 +332,7 @@ app.post("/book/confirm/:id", async (req, res) => {
     }),
   });
 
+  
   if (response.status === 402) {
     return res.send(`
       <script>
@@ -338,6 +345,7 @@ app.post("/book/confirm/:id", async (req, res) => {
 });
 
 app.post("/book/return/:id", async (req, res) => {
+  const tripId = req.body.tripId;
   let bikeData = await fetch(
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
@@ -356,7 +364,7 @@ app.post("/book/return/:id", async (req, res) => {
     }),
   });
 
-  res.redirect("/home");
+  res.redirect(`/book/pay/${tripId}`);
 });
 
 app.post("/deleteUser/:username", async (req, res) => {
@@ -451,6 +459,66 @@ app.put("/editChargingSize/:id", async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 });
+
+app.get("/book/pay/:id", async (req, res) => {
+  const tripId = req.params.id;
+  
+  let tripData = await fetch (`http://localhost:1337/api/v1/book/pay/${tripId}`,
+  ).then((response) => response.json());
+
+  
+  let data = {
+    id: req.params.id,
+    tripData: tripData
+  };
+
+  console.log("Data from route book/pay/:id", data);
+
+  res.render("client/trip_summary", data);
+  
+
+});
+
+app.get("/thank-you", async (req, res) => {
+  res.render("client/thank-you");
+})
+
+app.post("/book/pay/confirm/:tripId", async (req, res) => {
+  const tripId = req.body.tripId;
+
+  console.log("index.js trip id: ", tripId)
+  console.log("Before index.js")
+  try {
+    const response = await fetch(
+      `http://localhost:1337/api/v1/book/pay/confirm/${tripId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    )
+
+    if(response.ok) {
+      return res.redirect("/thank-you");
+    }
+
+  } catch (error) {
+    return res.status(500).send("Internal Server Error");
+  }
+
+  
+})
+
+// app.get("/payment/:id", async (req, res) => {
+//   const id = req.params.id;
+  
+//   try {
+//     const response = await fetch(`http://localhost:1337/api/v1/payment/${id}`);
+
+
+//   }
+// })
 
 // Start the server
 app.listen(port, () => {

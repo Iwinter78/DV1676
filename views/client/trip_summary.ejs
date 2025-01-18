@@ -1,0 +1,18 @@
+<%- include('../../public/header.ejs') %>
+<main>
+    <div class="booking-container">
+        <p>Start tid: <%= new Date(tripData.tripDetails.start_time).toISOString().split('T')[0] %> <%= new Date(tripData.tripDetails.start_time).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' }) %></p>
+        <p>Slut tid: <%= new Date(tripData.tripDetails.end_time).toISOString().split('T')[0] %> <%= new Date(tripData.tripDetails.end_time).toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' }) %></p>
+        <p>Kostnad: <%= tripData.tripDetails.total_price %></p>
+        <p>Trip ID: <%= id %></p>
+
+        <form id="payForm" action="/book/pay/confirm/<%= id %>" method="POST">
+            <input type="hidden" name="tripId" value="<%= id %>">
+            <input class="booking-button btn btn-primary" type="submit" value="Betala">
+            
+        </form>
+
+    </div>
+</main>
+
+<%- include('../../public/footer.ejs') %>

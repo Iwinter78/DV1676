@@ -95,6 +95,16 @@ async function editUser(username, balance, debt) {
   return response[0];
 }
 
+async function payTrip(tripId) {
+  const db = await connect();
+  console.log("Recieved trip id from api:", tripId);
+  const query = `CALL pay_trip(?)`;
+  const value = [tripId];
+  await db.query(query, value);
+  db.end();
+  return;
+}
+
 export {
   createUser,
   getUser,
@@ -103,5 +113,6 @@ export {
   updateUserBalance,
   getAllUsers,
   editUser,
-  getUserBalance
+  getUserBalance,
+  payTrip
 };

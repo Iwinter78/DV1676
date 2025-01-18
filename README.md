@@ -51,7 +51,7 @@ Om du använder WSL, kör istället:
     source setup.sql;
 - Avsluta MariaDB:
     ```sql
-    exit;´´
+    exit;
 - Gå tillbaka till huvudkatalogen:
     ```bash
     cd ..

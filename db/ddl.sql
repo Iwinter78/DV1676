@@ -12,6 +12,7 @@ DROP TABLE IF EXISTS `bank`;
 DROP TABLE IF EXISTS `users`;
 DROP TABLE IF EXISTS `trips`;
 
+
 -- Primary tables
 CREATE TABLE `users` (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -51,15 +52,13 @@ CREATE TABLE `station` (
     city INT,
     charging_size INT,
     gps VARCHAR(255),
-    bikes_in_station INT DEFAULT 0,
     FOREIGN KEY (city) REFERENCES city(id)
 );
 
-CREATE TABLE `parking_zones` (
+CREATE TABLE parking_zones (
     id INT AUTO_INCREMENT PRIMARY KEY,
     city INT,
     gps VARCHAR(255),
-    bikes_in_zone INT DEFAULT 0,
     FOREIGN KEY (city) REFERENCES city(id)
 );
 
@@ -81,7 +80,6 @@ CREATE TABLE `trips` (
 -- Log tables
 CREATE TABLE `user_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    log_type VARCHAR(255) NOT NULL DEFAULT "User",
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES users(id)
@@ -89,7 +87,6 @@ CREATE TABLE `user_log` (
 
 CREATE TABLE `bike_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    log_type VARCHAR(255) NOT NULL DEFAULT "Bike",
     bike_id INT,
     log_time TIMESTAMP,
     log_data VARCHAR(255),
@@ -100,7 +97,6 @@ CREATE TABLE `bike_log` (
 
 CREATE TABLE `station_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    log_type VARCHAR(255) NOT NULL DEFAULT "Station",
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES station(id)
@@ -108,7 +104,6 @@ CREATE TABLE `station_log` (
 
 CREATE TABLE `bank_log` (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    log_type VARCHAR(255) NOT NULL DEFAULT "Bank",
     log_time TIMESTAMP,
     log_data VARCHAR(255),
     FOREIGN KEY (id) REFERENCES bank(id)

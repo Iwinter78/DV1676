@@ -27,21 +27,6 @@ async function getUser(username) {
   }
 }
 
-async function getUserBalance(userid) {
-  const db = await connect();
-  const query = `CALL get_user_balance(?)`;
-  const values = [userid];
-  const [rows] = await db.query(query, values);
-  db.end();
-  console.log("Full result from get_user_balance:", rows[0]);
-  if (rows.length > 0) {
-    const balance = rows[0][0].balance;
-    console.log("User has balance:", balance);
-    return parseFloat(balance);
-  } else {
-    throw new Error("User not found");
-  }
-}
 async function getAllUsers() {
   const db = await connect();
   const query = `call get_all_users()`;
@@ -50,18 +35,16 @@ async function getAllUsers() {
 }
 
 async function getUserLog(username) {
-  let db;
+  const db = await connect();
+  const query = `CALL get_user_log(?)`;
+  const values = [username];
   try {
-    db = await connect();
-    const query = `CALL get_user_log(?)`;
-    const values = [username];
     const [rows] = await db.query(query, values);
+    db.end();
     return rows;
   } catch (error) {
-    console.error("Error fetching user log:", error);
+    db.end();
     throw error;
-  } finally {
-    if (db) await db.end();
   }
 }
 

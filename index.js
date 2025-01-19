@@ -5,7 +5,6 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import process from "process";
-import { showLogs } from "./src/functions.js";
 
 import { exchangeCodeForToken, getUserInfo } from "./src/login.js";
 // Define __dirname for ES modules
@@ -14,7 +13,6 @@ const __dirname = dirname(__filename);
 dotenv.config();
 
 const app = express();
-app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use(
@@ -113,6 +111,11 @@ app.get("/home", (req, res) => {
   res.render("home/index", data);
 });
 
+// Users home page
+app.get("/sim", (req, res) => {
+  res.render("sim/index");
+});
+
 // Admin first view after login
 app.get("/admin_view", async (req, res) => {
   const userInfo = req.session.userInfo;
@@ -173,19 +176,6 @@ app.get("/admin_panel/station", async (req, res) => {
   console.log(data[0]);
 
   res.render("admin_panel/station", { stations });
-});
-
-app.get('/admin_panel/log', async (req, res) => {
-  const type = req.query.type || null;
-  try {
-    const logs = await showLogs(type);
-    console.log("Fetched logs:", logs);
-    res.render('admin_panel/log', { logs, type });
-  } catch (error) {
-    console.error("Error fetching logs:", error);
-    res.status(500).send("Internal Server Error")
-  }
-
 });
 
 app.get("/email", (req, res) => {
@@ -270,26 +260,19 @@ app.get("/history", async (req, res) => {
   if (!userInfo) {
     return res.redirect("/"); //back to home if the user is not logd in
   }
-  try {
-    const profileResponse = await fetch(
-      `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
-    );
 
-    if (!profileResponse.ok) {
-      console.error("Faild to fetch history", profileResponse.statusText);
-      return res.status(500).send("Error fetching history.");
-    }
+  const profileResponse = await fetch(
+    `http://localhost:1337/api/v1/history?username=${userInfo.login}`,
+  );
+  const profile = await profileResponse.json();
+  const trips = profile[0] || [];
+  const data = {
+    ...userInfo,
+    trips,
+  };
 
-    const profile = await profileResponse.json();
-    const trips = profile[0] || [];
-    const data = {
-      ...userInfo,
-      trips,
-    };
-
-    console.log(trips);
-    res.render("client/client_travel_history", data);
-  } catch(error) {}
+  console.log(trips);
+  res.render("client/client_travel_history", data);
 });
 
 app.get("/book/confirm/:id", async (req, res) => {
@@ -333,7 +316,7 @@ app.post("/book/confirm/:id", async (req, res) => {
     },
     body: JSON.stringify({
       id: req.params.id,
-      userid: userInfo.id,
+      username: userInfo.id,
     }),
   });
 

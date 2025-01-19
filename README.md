@@ -20,7 +20,7 @@ När repot är klonat skappa din `.env` fil
    MYSQL_DATABASE=magicbike
    MYSQL_USER=admin
    MYSQL_PASSWORD=123123
-   
+
    GITHUB_CLIENT_ID=
    GITHUB_CLIENT_SECRET=
    ```
@@ -68,8 +68,7 @@ Efter detta kommer du att få tillgång till din GITHUB_CLIENT_ID och GITHUB_CLI
     ```bash
     mariadb -uroot -p
 Om du använder WSL, kör istället:
-    ```bash
-    sudo mariadb
+    `sudo mariadb`
 - Sätt upp databasen:
     ```sql
     source setup.sql;

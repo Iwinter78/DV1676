@@ -88,8 +88,7 @@ Om du använder WSL, kör istället:
 
 #### Lokalt
 Starta applikationen med:
-    ```bash
-    npm start
+    `npm start`
 
 #### Med Docker
 Applikationen startades automatiskt när den byggdes.

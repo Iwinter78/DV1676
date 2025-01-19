@@ -89,7 +89,13 @@ BEGIN
 
     UPDATE bank
     SET cashisking = cashisking + tripCost;
+END;;
 
+CREATE PROCEDURE get_trip_details_user(IN IN_userid INT)
+BEGIN
+    SELECT trip_id, bike_id, start_time, end_time, total_price
+    FROM trips
+    WHERE user_id = IN_userid;
 END;;
 
 

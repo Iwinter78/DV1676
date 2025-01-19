@@ -48,6 +48,36 @@ async function getUserLog(username) {
   }
 }
 
+async function getUserBalance(userid) {
+  try {
+    const db = await connect();
+    const query = `CALL get_user_balance(?)`;
+    const value = [userid];
+    const [rows] = await db.query(query, value);
+
+    if (rows && rows[0] && rows[0][0]) {
+      const balance = rows[0][0].balance;
+      console.log("User has balance:", balance);
+      return parseFloat(balance); // Convert to number for comparison
+    } else {
+      console.log("No balance found for this user.");
+      return 0; // Return 0 if no balance is found
+    }
+  } catch (error) {
+    console.error("Error in getUserBalance:", error.message);
+    throw error; // Re-throw the error to be caught in the calling function
+  }
+}
+
+// async function getUserBalance(userid) {
+//   const db = await connect();
+//   let sql = `CALL get_user_balance(?)`;
+//   let [res] = await db.query(sql, userid);
+//   console.table(res);
+
+//   return {balance : res[0].balance};
+// }
+
 async function deleteUser(username) {
   const db = await connect();
   const query = `CALL delete_user(?)`;
@@ -96,6 +126,6 @@ export {
   updateUserBalance,
   getAllUsers,
   editUser,
-  getUserBalance,
-  payTrip
+  payTrip,
+  getUserBalance
 };

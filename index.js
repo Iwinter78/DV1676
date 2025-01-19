@@ -137,9 +137,18 @@ app.get("/admin_view", async (req, res) => {
 
 app.get("/admin_panel/customer", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/getAllUsers`);
+  const userInfo = req.session.userInfo;
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
+  }
+
+  const userresponse = await fetch(
+    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
+  );
+  const userData = await userresponse.json();
+  if (userData[0][0].role !== "admin") { 
+    return res.redirect("/home");
   }
 
   const data = await response.json();
@@ -151,9 +160,18 @@ app.get("/admin_panel/customer", async (req, res) => {
 // Admin bike view
 app.get("/admin_panel/bike", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/bike`);
+  const userInfo = req.session.userInfo;
 
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
+  }
+
+  const userresponse = await fetch(
+    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
+  );
+  const userData = await userresponse.json();
+  if (userData[0][0].role !== "admin") { 
+    return res.redirect("/home");
   }
 
   const data = await response.json();
@@ -164,15 +182,22 @@ app.get("/admin_panel/bike", async (req, res) => {
 
 // Admin station view
 app.get("/admin_panel/station", async (req, res) => {
+  const userInfo = req.session.userInfo;
   const response = await fetch(`http://localhost:1337/api/v1/stations`);
-
+  
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
+  }
+  const userresponse = await fetch(
+    `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
+  );
+  const userData = await userresponse.json();
+  if (userData[0][0].role !== "admin") { 
+    return res.redirect("/home");
   }
 
   const data = await response.json();
   const stations = data[0];
-
   res.render("admin_panel/station", { stations });
 });
 

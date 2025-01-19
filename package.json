@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --fix",
     "test-build": "npx webpack && node index.js",
     "sim-build": "node index.js && node /simulation/index.js",
-    "start": "node index.js && node /restapi/index.js"
+    "start": "concurrently \"node index.js\" \"node ./restapi/index.js\""
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "@babel/preset-env": "^7.26.0",
     "@eslint/js": "^9.14.0",
     "babel-jest": "^29.7.0",
+    "concurrently": "^9.1.2",
     "eslint": "^9.14.0",
     "globals": "^15.12.0",
     "jest": "^29.7.0",

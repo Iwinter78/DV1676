@@ -66,7 +66,7 @@ async function getBike(id) {
   const values = [id];
   const response = await db.query(query, values);
   db.end();
-  return response[0].slice(0, -1);
+  return response[0];
 }
 
 /**

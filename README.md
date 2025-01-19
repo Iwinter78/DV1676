@@ -12,6 +12,30 @@ Se till att du har följande installerat på din dator:
 - **Node.js** och **npm**:
   - Installera från [Node.js officiella hemsida](https://nodejs.org/en/download/package-manager).
 
+#### Skapa .env fil:
+När repot är klonat skappa din `.env` fil
+
+   ```env
+   MYSQL_ROOT_PASSWORD=root
+   MYSQL_DATABASE=magicbike
+   MYSQL_USER=admin
+   MYSQL_PASSWORD=123123
+   
+   GITHUB_CLIENT_ID=
+   GITHUB_CLIENT_SECRET=
+   ```
+
+Så här skapar du GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET:
+1. Logga in på din GitHub-profil.
+2. Gå till **Settings** (Inställningar) på din profil.
+3. Navigera till **Developer Settings**.
+4. Klicka på **OAuth Apps** i menyn.
+5. Klicka på **New OAuth App**.
+6. Fyll i de obligatoriska fälten i formuläret.
+7. Se till så fälten **Authorization callback URL** slutar med ***/callback***
+8. När allt är ifyllt och korrekt, slutför genom att skapa appen.
+Efter detta kommer du att få tillgång till din GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET.
+
 #### Om du vill köra lokalt
 
 - Installera **MariaDB** på din dator.
@@ -36,29 +60,7 @@ Se till att du har följande installerat på din dator:
    ```bash
     npm install
 
-4. Skapa .env fil:
-   ```env
-   MYSQL_ROOT_PASSWORD=root
-   MYSQL_DATABASE=magicbike
-   MYSQL_USER=admin
-   MYSQL_PASSWORD=123123
-   
-   GITHUB_CLIENT_ID=
-   GITHUB_CLIENT_SECRET=
-
-Så här skapar du GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET:
-1. Logga in på din GitHub-profil.
-2. Gå till **Settings** (Inställningar) på din profil.
-3. Navigera till **Developer Settings**.
-4. Klicka på **OAuth Apps** i menyn.
-5. Klicka på **New OAuth App**.
-6. Fyll i de obligatoriska fälten i formuläret.
-7. Se till så fälten **Authorization callback URL** slutar med ***/callback***
-8. När allt är ifyllt och korrekt, slutför genom att skapa appen.
-
-Efter detta kommer du att få tillgång till din GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET.
-
-5. Ställ in databasen:
+4. Ställ in databasen:
 - Navigera till databaskatalogen:
     ```bash
     cd db

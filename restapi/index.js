@@ -279,8 +279,8 @@ app.put("/api/v1/update/bike", async (req, res) => {
 
 app.post("/api/v1/bike/book", async (req, res) => {
   const { id, userid } = req.body;
-  console.log(id);
-  console.log(userid);
+  console.log("Bike id from bike/book: ",id);
+  console.log("User ID from bike/book: ",userid);
 
   if (!id || !userid) {
     return res.status(400).json({

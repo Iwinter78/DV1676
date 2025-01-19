@@ -28,6 +28,11 @@ BEGIN
     DELETE FROM users WHERE username = username_param;
 END;;
 
+CREATE PROCEDURE get_user_balance(IN userid_param INT)
+BEGIN
+    SELECT balance FROM users WHERE id = userid_param;
+END;;
+
 CREATE PROCEDURE get_user_log(IN username_param VARCHAR(255))
 BEGIN
     SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data

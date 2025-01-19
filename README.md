@@ -96,7 +96,7 @@ Starta sedan applikationen med:
 
 Om du istället vill starta applikationen manuellt, följ dessa steg:
 
-1.Kör `node index.` för att starta den första delen av applikationen
+1. Kör `node index.` för att starta den första delen av applikationen
 2. Öppna en ny terminalflik och navigera till `restapi`-mappen med `cd restapi`.
 3. Kör sedan `node index.js` för att starta den andra delen av applikationen.
 

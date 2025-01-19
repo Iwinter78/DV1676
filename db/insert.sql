@@ -1,4 +1,4 @@
-
+INSERT INTO bank (cashisking) VALUES (0.00);
 
 LOAD DATA LOCAL INFILE './users.csv'
 INTO TABLE users

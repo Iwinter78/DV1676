@@ -8,4 +8,13 @@ async function AllStations() {
   return response[0];
 }
 
-export { AllStations };
+async function editChargingSize(stationId, newSize) {
+  const db = await connect();
+  const query = `CALL edit_charging_size(?,?)`;
+  const values = [stationId, newSize];
+  const response = await db.query(query, values);
+  db.end();
+  return response[0];
+}
+
+export { AllStations, editChargingSize };

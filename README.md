@@ -34,7 +34,7 @@ Så här skapar du GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET:
 6. Fyll i de obligatoriska fälten i formuläret.
 7. Se till så fälten **Authorization callback URL** slutar med ***/callback***
 8. När allt är ifyllt och korrekt, slutför genom att skapa appen.
-Efter detta kommer du att få tillgång till din GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET.
+Efter detta kommer du att få tillgång till din `GITHUB_CLIENT_ID` och `GITHUB_CLIENT_SECRET`.
 
 #### Om du vill köra lokalt
 

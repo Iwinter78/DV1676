@@ -26,18 +26,20 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 const bikeMarkers = {};
 // Websocket connection
-const ws = new WebSocket("ws://localhost:5001");
+const ws = new WebSocket("ws://172.22.0.6:8080/ws/");
 
 ws.onopen = () => {
   console.log("WebSocket connection established.");
 };
 
 ws.onmessage = (message) => {
+  console.log(message);
   const bikeUpdates = JSON.parse(message.data);
   bikeUpdates.forEach((bike) => {
+    //console.log(bike);
     const { id, location, speed, currentuser } = bike;
 
-    console.log(`Processing bike ${id}:`, { location, speed, currentuser });
+    //console.log(`Processing bike ${id}:`, { location, speed, currentuser });
 
     if (bikeMarkers[id]) {
       bikeMarkers[id].setLatLng([location[1], location[0]]);
@@ -64,7 +66,7 @@ ws.onmessage = (message) => {
 
     async function fetchStations() {
       try {
-        const response = await fetch("http://restapi:1337/api/v1/stations", {
+        const response = await fetch("http://172.22.0.6:8080/api/stations", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -78,7 +80,7 @@ ws.onmessage = (message) => {
     async function displayStations() {
       try {
         const data = await fetchStations();
-        const stations = data[0];
+        const stations = data;
 
         stations.forEach((station) => {
           console.log("Station data:", station);

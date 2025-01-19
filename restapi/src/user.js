@@ -57,26 +57,17 @@ async function getUserBalance(userid) {
 
     if (rows && rows[0] && rows[0][0]) {
       const balance = rows[0][0].balance;
-      console.log("User has balance:", balance);
-      return parseFloat(balance); // Convert to number for comparison
+      return parseFloat(balance);
     } else {
       console.log("No balance found for this user.");
-      return 0; // Return 0 if no balance is found
+      return 0;
     }
   } catch (error) {
     console.error("Error in getUserBalance:", error.message);
-    throw error; // Re-throw the error to be caught in the calling function
+    throw error; 
   }
 }
 
-// async function getUserBalance(userid) {
-//   const db = await connect();
-//   let sql = `CALL get_user_balance(?)`;
-//   let [res] = await db.query(sql, userid);
-//   console.table(res);
-
-//   return {balance : res[0].balance};
-// }
 
 async function deleteUser(username) {
   const db = await connect();
@@ -110,12 +101,21 @@ async function editUser(username, balance, debt) {
 
 async function payTrip(tripId) {
   const db = await connect();
-  console.log("Recieved trip id from api:", tripId);
   const query = `CALL pay_trip(?)`;
   const value = [tripId];
   await db.query(query, value);
   db.end();
   return;
+}
+
+async function getTripDetailsForUser(userId) {
+  const db = await connect();
+  const query = `CALL get_trip_details_user(?)`;
+  const value = [userId];
+  const [rows] = await db.query(query, value);
+  db.end();
+
+  return rows[0];
 }
 
 export {
@@ -127,5 +127,6 @@ export {
   getAllUsers,
   editUser,
   payTrip,
-  getUserBalance
+  getUserBalance,
+  getTripDetailsForUser
 };

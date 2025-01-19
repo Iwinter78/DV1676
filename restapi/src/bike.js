@@ -107,12 +107,9 @@ async function getTrip(bikeId) {
   const response = await db.query(query, value);
   db.end();
 
-  console.log(response); // Log the entire response to inspect the structure
-
-  // Check if the response contains any data
   if (response && response[0] && response[0][0] && response[0][0][0]) {
     const tripId = response[0][0][0].trip_id;
-    console.log("Trip ID is", tripId);
+
     return tripId;
   } else {
     console.log("No active trip found for the bike");
@@ -128,11 +125,12 @@ async function getTripDetails(tripId) {
   db.end();
 
   const tripDetails = rows[0][0];
-  //console.log(tripDetails);
   return {
       tripDetails
   };
 }
+
+
 export {
   createBike,
   getAllBikes,

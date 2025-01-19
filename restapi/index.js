@@ -28,8 +28,6 @@ app.post("/api/v1/create/user", async (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
 
-  console.log("hello my user is ", username);
-
   if (!email || !username) {
     return res.status(400).json({
       message: "Email och användarnamn krävs",
@@ -96,10 +94,11 @@ app.get("/api/v1/getAllUsers", async (req, res) => {
 });
 
 app.get("/api/v1/history", async (req, res) => {
-  const username = req.query.username;
-  console.log("Username:", username);
+  const userId = req.query.id;
 
-  if (!username) {
+  console.log("what is my user id: ",userId);
+
+  if (!userId) {
     return res.status(400).json({
       message: "Användarnamn krävs",
       status: 400,
@@ -107,8 +106,7 @@ app.get("/api/v1/history", async (req, res) => {
   }
 
   try {
-    let response = await user.getUserLog(username);
-    console.log("Database Response:", response);
+    let response = await user.getTripDetailsForUser(userId);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
@@ -201,9 +199,7 @@ app.get("/api/v1/bike/:id", async (req, res) => {
   try {
     let bikeResponse = await bike.getBike(id);
     let tripResponse = await bike.getTrip(id); // Hämta trip id om det finns
-    console.log(bikeResponse);
-    console.log("------");
-    console.log(tripResponse);
+
     let response = {
       ...bikeResponse,
       trip_id: tripResponse || null
@@ -279,8 +275,6 @@ app.put("/api/v1/update/bike", async (req, res) => {
 
 app.post("/api/v1/bike/book", async (req, res) => {
   const { id, userid } = req.body;
-  console.log("Bike id from bike/book: ",id);
-  console.log("User ID from bike/book: ",userid);
 
   if (!id || !userid) {
     return res.status(400).json({
@@ -291,7 +285,6 @@ app.post("/api/v1/bike/book", async (req, res) => {
 
   try {
     let userBalance = await user.getUserBalance(userid);
-    console.log("User balance:", userBalance);
 
     if (userBalance <= 0) {
       return res.status(402).json({
@@ -303,11 +296,11 @@ app.post("/api/v1/bike/book", async (req, res) => {
     await bike.bookBike(id, userid);
     await bike.bookTrip(id, userid);
 
-
     res.status(200).json({
       message: "Cykel bokad",
       status: 200,
     });
+
   } catch (error) {
     res.status(500).json({
       message: "Något gick fel, försök igen senare",
@@ -409,13 +402,12 @@ app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
     let result = await station.editChargingSize(id, newSize);
 
     if (result.affectedRows > 0) {
-      // Assuming affectedRows is returned from the DB operation
       return res.status(200).send("Charging size changed");
     } else {
       return res.status(404).send("Station not found or no change made");
     }
   } catch (error) {
-    console.error("Error in editChargingSize API:", error); // Added for debugging
+    console.error("Error in editChargingSize API:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -426,8 +418,6 @@ app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
   const usernameFromUrl = req.params.username;
   const balance = req.body.balance;
   const debt = req.body.debt;
-
-  console.log("Before calling editUser");
 
   try {
     let result = await user.editUser(usernameFromUrl, balance, debt);
@@ -441,8 +431,6 @@ app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
     console.error("Error in editUserAdminPanel API:", error);
     res.status(500).send("Internal Server Error");
   }
-
-  console.log("After calling editUser");
 
   console.log("User updated successfully");
 });
@@ -459,7 +447,7 @@ app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
       return res.status(404).send("Station not found or no change made");
     }
   } catch (error) {
-    console.error("Error in editChargingSize API:", error); // Added for debugging
+    console.error("Error in editChargingSize API:", error); 
     res.status(500).send("Internal Server Error");
   }
 });
@@ -470,8 +458,6 @@ app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
   const usernameFromUrl = req.params.username;
   const balance = req.body.balance;
   const debt = req.body.debt;
-
-  console.log("Before calling editUser");
 
   try {
     let result = await user.editUser(usernameFromUrl, balance, debt);
@@ -486,15 +472,13 @@ app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 
-  console.log("After calling editUser");
-
   console.log("User updated successfully");
 });
 
 app.get("/api/v1/trip/:bikeId", async (req, res) => {
   const bikeId = req.params.bikeId;
   let result = await bike.getTrip(bikeId);
-  console.log("API: Trip ID is", result)
+
   return result;
 });
 
@@ -502,7 +486,6 @@ app.get("/api/v1/book/pay/:tripId", async (req, res) => {
   const tripId = req.params.tripId;
   try {
     let result = await bike.getTripDetails(tripId);
-    console.log("Trip details: ", result)
     return res.status(200).json(result);
   } catch (error) {
     console.error('Error while retrieving trip details in API call', error);
@@ -513,8 +496,7 @@ app.get("/api/v1/book/pay/:tripId", async (req, res) => {
 
 app.post("/api/v1/book/pay/confirm/:tripId", async (req, res) => {
   const tripId = req.params.tripId;
-  console.log("Before api call with tripID: ",tripId);
-  console.log("Before api call");
+
   try {
     await user.payTrip(tripId);
     
@@ -526,5 +508,5 @@ app.post("/api/v1/book/pay/confirm/:tripId", async (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`REST API is listning on ${port}`);
+  console.log(`REST API is listening on ${port}`);
 });

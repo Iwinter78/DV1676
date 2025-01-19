@@ -38,7 +38,7 @@ async function getUserInfo(token) {
     },
   });
   const userInfo = await response.json();
-  //console.log(userInfo);
+  
   return userInfo;
 }
 

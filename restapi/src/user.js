@@ -69,6 +69,25 @@ async function updateUserBalance(username, balance) {
   }
 }
 
+async function editUser(username, balance, debt) {
+  const db = await connect();
+  const query = `CALL edit_user(?, ?, ?)`;
+  const values = [username, balance, debt];
+  const response = await db.query(query, values);
+  db.end();
+  return response[0];
+}
+
+async function payTrip(tripId) {
+  const db = await connect();
+  console.log("Recieved trip id from api:", tripId);
+  const query = `CALL pay_trip(?)`;
+  const value = [tripId];
+  await db.query(query, value);
+  db.end();
+  return;
+}
+
 export {
   createUser,
   getUser,
@@ -76,4 +95,7 @@ export {
   getUserLog,
   updateUserBalance,
   getAllUsers,
+  editUser,
+  getUserBalance,
+  payTrip
 };

@@ -49,6 +49,7 @@ app.get("/", (req, res) => {
   const data = {
     client_id: process.env.GITHUB_CLIENT_ID,
   };
+
   res.render("login/index", data);
 });
 
@@ -280,12 +281,22 @@ app.get("/book/confirm/:id", async (req, res) => {
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
+
   let data = {
     id: req.params.id,
     userInfo,
-    bike: bikeData[0][0],
+    bike: bikeData
   };
+
+  console.log(bikeData);
+
+
   res.render("client/client_book", data);
+});
+
+// Users home page
+app.get("/sim", (req, res) => {
+  res.render("sim/index");
 });
 
 app.post("/book/confirm/:id", async (req, res) => {
@@ -297,8 +308,8 @@ app.post("/book/confirm/:id", async (req, res) => {
   if (Boolean(bikeData[0][0].bike_status) === false) {
     return res.redirect("/home");
   }
-
-  await fetch(`http://localhost:1337/api/v1/bike/book`, {
+  console.log("Before: /book/confirm/:id")
+  const response = await fetch(`http://localhost:1337/api/v1/bike/book`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -308,10 +319,21 @@ app.post("/book/confirm/:id", async (req, res) => {
       username: userInfo.id,
     }),
   });
+
+  
+  if (response.status === 402) {
+    return res.send(`
+      <script>
+        alert("Fyll på saldot innan du boka en cykel");
+        window.location.href = "/balance";
+      </script>
+    `);
+  }
   res.redirect("/home");
 });
 
 app.post("/book/return/:id", async (req, res) => {
+  const tripId = req.body.tripId;
   let bikeData = await fetch(
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
@@ -330,8 +352,161 @@ app.post("/book/return/:id", async (req, res) => {
     }),
   });
 
-  res.redirect("/home");
+  res.redirect(`/book/pay/${tripId}`);
 });
+
+app.post("/deleteUser/:username", async (req, res) => {
+  const username = req.params.username;
+
+  try {
+    const response = await fetch(
+      `http://localhost:1337/api/v1/delete/user/${username}`,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (response.ok) {
+      console.log(`User ${username} deleted successfully`);
+    } else {
+      console.log(`Failed to delete user: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error("Error occurred while trying to delete the user:", error);
+  }
+
+  res.redirect("/admin_panel/customer");
+});
+
+app.put("/editUser/:username", async (req, res) => {
+  console.log("Route hit: /editUser/:username");
+  const username = req.params.username;
+  const balance = req.body.balance;
+  const debt = req.body.debt;
+
+  console.log("Balance:", balance);
+  console.log("Debt:", debt);
+
+  try {
+    // Making the request to the other API endpoint inside the backend
+    const response = await fetch(
+      `http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          balance: balance,
+          debt: debt,
+        }),
+      },
+    );
+
+    if (response.ok) {
+      // If the API call fails, respond with an error
+      return res.status(200).send("done");
+    }
+
+    console.log("User updated successfully");
+
+    // Redirect after successful update, appending a timestamp to prevent cache issues
+  } catch (error) {
+    // Catch any errors during fetch or other operations
+    console.error("Error during fetch:", error);
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+app.put("/editChargingSize/:id", async (req, res) => {
+  const id = req.params.id;
+  const charging_size = req.body.charging_size;
+
+  try {
+    const response = await fetch(
+      `http://localhost:1337/api/v1/stations/editChargingSize/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          charging_size: charging_size,
+        }),
+      },
+    );
+
+    if (response.ok) {
+      return res.status(200).send("done");
+    }
+
+    res.redirect("/admin_panel/station");
+  } catch (error) {
+    console.error("Error in /editChargingSize:", error); // Added for debugging
+    return res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/book/pay/:id", async (req, res) => {
+  const tripId = req.params.id;
+  
+  let tripData = await fetch (`http://localhost:1337/api/v1/book/pay/${tripId}`,
+  ).then((response) => response.json());
+
+  
+  let data = {
+    id: req.params.id,
+    tripData: tripData
+  };
+
+  console.log("Data from route book/pay/:id", data);
+
+  res.render("client/trip_summary", data);
+  
+
+});
+
+app.get("/thank-you", async (req, res) => {
+  res.render("client/thank-you");
+})
+
+app.post("/book/pay/confirm/:tripId", async (req, res) => {
+  const tripId = req.body.tripId;
+
+  console.log("index.js trip id: ", tripId)
+  console.log("Before index.js")
+  try {
+    const response = await fetch(
+      `http://localhost:1337/api/v1/book/pay/confirm/${tripId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    )
+
+    if(response.ok) {
+      return res.redirect("/thank-you");
+    }
+
+  } catch (error) {
+    return res.status(500).send("Internal Server Error");
+  }
+
+  
+})
+
+// app.get("/payment/:id", async (req, res) => {
+//   const id = req.params.id;
+  
+//   try {
+//     const response = await fetch(`http://localhost:1337/api/v1/payment/${id}`);
+
+
+//   }
+// })
 
 // Start the server
 app.listen(port, () => {

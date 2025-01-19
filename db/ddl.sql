@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS `station`;
 DROP TABLE IF EXISTS `city`;
 DROP TABLE IF EXISTS `bank`;
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `trips`;
 
 
 -- Primary tables
@@ -64,6 +65,16 @@ CREATE TABLE parking_zones (
 CREATE TABLE `bank` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     cashisking DECIMAL(10,2) NOT NULL DEFAULT 0.00
+);
+
+CREATE TABLE `trips` (
+    trip_id INT AUTO_INCREMENT PRIMARY KEY,
+    bike_id INT,
+    user_id INT,
+    start_time DATETIME,
+    end_time DATETIME,
+    total_price DECIMAL(10,2),
+    active BOOLEAN DEFAULT FALSE
 );
 
 -- Log tables

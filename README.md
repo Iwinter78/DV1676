@@ -87,11 +87,8 @@ Om du använder WSL, kör istället:
 ### Kör applikationen
 
 #### Lokalt
-För att snabbt komma igång, kör följande kommando för att installera concurrently som utvecklingsberoende:
 
- `npm install concurrently --save-dev`
-
-Starta sedan applikationen med:
+För snabb starta på applikationen kör:
     `npm start`
 
 Om du istället vill starta applikationen manuellt, följ dessa steg:

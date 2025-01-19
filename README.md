@@ -25,7 +25,7 @@ När repot är klonat skappa din `.env` fil
    GITHUB_CLIENT_SECRET=
    ```
 
-Så här skapar du GITHUB_CLIENT_ID och GITHUB_CLIENT_SECRET:
+Så här skapar du `GITHUB_CLIENT_ID` och `GITHUB_CLIENT_SECRET`:
 1. Logga in på din GitHub-profil.
 2. Gå till **Settings** (Inställningar) på din profil.
 3. Navigera till **Developer Settings**.

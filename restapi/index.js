@@ -28,6 +28,8 @@ app.post("/api/v1/create/user", async (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
 
+  console.log("hello my user is ", username);
+
   if (!email || !username) {
     return res.status(400).json({
       message: "Email och användarnamn krävs",
@@ -197,7 +199,15 @@ app.get("/api/v1/bike/:id", async (req, res) => {
   }
 
   try {
-    let response = await bike.getBike(id);
+    let bikeResponse = await bike.getBike(id);
+    let tripResponse = await bike.getTrip(id); // Hämta trip id om det finns
+    console.log(bikeResponse);
+    console.log("------");
+    console.log(tripResponse);
+    let response = {
+      ...bikeResponse,
+      trip_id: tripResponse || null
+    };
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
@@ -269,8 +279,8 @@ app.put("/api/v1/update/bike", async (req, res) => {
 
 app.post("/api/v1/bike/book", async (req, res) => {
   const { id, userid } = req.body;
-  console.log(id);
-  console.log(userid);
+  console.log("Bike id from bike/book: ",id);
+  console.log("User ID from bike/book: ",userid);
 
   if (!id || !userid) {
     return res.status(400).json({
@@ -291,6 +301,8 @@ app.post("/api/v1/bike/book", async (req, res) => {
     }
 
     await bike.bookBike(id, userid);
+    await bike.bookTrip(id, userid);
+
 
     res.status(200).json({
       message: "Cykel bokad",
@@ -316,10 +328,11 @@ app.post("/api/v1/bike/return", async (req, res) => {
   }
 
   try {
+    await bike.endTrip(id);
     await bike.returnBike(id);
 
     res.status(200).json({
-      message: "Cykel återlämnad",
+      message: "Cykel resan avslutat",
       status: 200,
     });
   } catch (error) {
@@ -477,6 +490,40 @@ app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
 
   console.log("User updated successfully");
 });
+
+app.get("/api/v1/trip/:bikeId", async (req, res) => {
+  const bikeId = req.params.bikeId;
+  let result = await bike.getTrip(bikeId);
+  console.log("API: Trip ID is", result)
+  return result;
+});
+
+app.get("/api/v1/book/pay/:tripId", async (req, res) => {
+  const tripId = req.params.tripId;
+  try {
+    let result = await bike.getTripDetails(tripId);
+    console.log("Trip details: ", result)
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('Error while retrieving trip details in API call', error);
+    res.status(500).send("Internal Server Error")
+  }
+  
+});
+
+app.post("/api/v1/book/pay/confirm/:tripId", async (req, res) => {
+  const tripId = req.params.tripId;
+  console.log("Before api call with tripID: ",tripId);
+  console.log("Before api call");
+  try {
+    await user.payTrip(tripId);
+    
+    return res.status(200).send("Payment done from api");
+  } catch (error) {
+    console.error('Error in payment', error)
+    res.status(500).send("Internal Server Error")
+  }
+})
 
 app.listen(port, () => {
   console.log(`REST API is listning on ${port}`);

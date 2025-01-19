@@ -48,6 +48,18 @@ async function bookBike(id, username) {
   const values = [id, username];
   db.query(query, values);
   db.end();
+
+  return;
+}
+
+async function bookTrip(id, username) {
+  const db = await connect();
+  const query = `CALL book_trip(?, ?)`;
+  const values = [id, username];
+  db.query(query, values);
+  db.end();
+
+  return;
 }
 
 /**
@@ -74,8 +86,53 @@ async function returnBike(id) {
   const values = [id];
   db.query(query, values);
   db.end();
+
+  return;
 }
 
+async function endTrip(bikeId) {
+  const db = await connect();
+  const query = `CALL end_trip(?)`;
+  const value = [bikeId];
+  db.query(query, value);
+  db.end();
+
+  return;
+}
+
+async function getTrip(bikeId) {
+  const db = await connect();
+  const query = `CALL get_trip(?)`;
+  const value = [bikeId];
+  const response = await db.query(query, value);
+  db.end();
+
+  console.log(response); // Log the entire response to inspect the structure
+
+  // Check if the response contains any data
+  if (response && response[0] && response[0][0] && response[0][0][0]) {
+    const tripId = response[0][0][0].trip_id;
+    console.log("Trip ID is", tripId);
+    return tripId;
+  } else {
+    console.log("No active trip found for the bike");
+    return null;
+  }
+}
+
+async function getTripDetails(tripId) {
+  const db = await connect();
+  const query = `CALL get_trip_details(?)`;
+  const value = [tripId];
+  const [rows] = await db.query(query, value);
+  db.end();
+
+  const tripDetails = rows[0][0];
+  //console.log(tripDetails);
+  return {
+      tripDetails
+  };
+}
 export {
   createBike,
   getAllBikes,
@@ -83,4 +140,8 @@ export {
   bookBike,
   getBike,
   returnBike,
+  bookTrip,
+  endTrip,
+  getTripDetails,
+  getTrip
 };

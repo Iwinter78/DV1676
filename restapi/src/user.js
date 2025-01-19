@@ -48,6 +48,36 @@ async function getUserLog(username) {
   }
 }
 
+async function getUserBalance(userid) {
+  try {
+    const db = await connect();
+    const query = `CALL get_user_balance(?)`;
+    const value = [userid];
+    const [rows] = await db.query(query, value);
+
+    if (rows && rows[0] && rows[0][0]) {
+      const balance = rows[0][0].balance;
+      console.log("User has balance:", balance);
+      return parseFloat(balance); // Convert to number for comparison
+    } else {
+      console.log("No balance found for this user.");
+      return 0; // Return 0 if no balance is found
+    }
+  } catch (error) {
+    console.error("Error in getUserBalance:", error.message);
+    throw error; // Re-throw the error to be caught in the calling function
+  }
+}
+
+// async function getUserBalance(userid) {
+//   const db = await connect();
+//   let sql = `CALL get_user_balance(?)`;
+//   let [res] = await db.query(sql, userid);
+//   console.table(res);
+
+//   return {balance : res[0].balance};
+// }
+
 async function deleteUser(username) {
   const db = await connect();
   const query = `CALL delete_user(?)`;
@@ -69,6 +99,25 @@ async function updateUserBalance(username, balance) {
   }
 }
 
+async function editUser(username, balance, debt) {
+  const db = await connect();
+  const query = `CALL edit_user(?, ?, ?)`;
+  const values = [username, balance, debt];
+  const response = await db.query(query, values);
+  db.end();
+  return response[0];
+}
+
+async function payTrip(tripId) {
+  const db = await connect();
+  console.log("Recieved trip id from api:", tripId);
+  const query = `CALL pay_trip(?)`;
+  const value = [tripId];
+  await db.query(query, value);
+  db.end();
+  return;
+}
+
 export {
   createUser,
   getUser,
@@ -76,4 +125,7 @@ export {
   getUserLog,
   updateUserBalance,
   getAllUsers,
+  editUser,
+  payTrip,
+  getUserBalance
 };

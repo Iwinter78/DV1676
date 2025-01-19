@@ -28,6 +28,11 @@ BEGIN
     DELETE FROM users WHERE username = username_param;
 END;;
 
+CREATE PROCEDURE get_user_balance(IN userid_param INT)
+BEGIN
+    SELECT balance FROM users WHERE id = userid_param;
+END;;
+
 CREATE PROCEDURE get_user_log(IN username_param VARCHAR(255))
 BEGIN
     SELECT u.id AS user_id, u.username, ul.log_time, ul.log_data
@@ -56,5 +61,37 @@ BEGIN
     SELECT role FROM users
     where username = username_param;
 END;;
+
+CREATE PROCEDURE edit_user(
+    IN in_username VARCHAR(255),
+    IN in_balance DECIMAL(10,2),
+    IN in_debt DECIMAL(10,2)
+)
+BEGIN
+    UPDATE users
+    SET balance = in_balance,
+        debt = in_debt
+    WHERE username = in_username;
+END;;
+
+CREATE PROCEDURE pay_trip(IN IN_trip_id INT)
+BEGIN
+    DECLARE userId INT;
+    DECLARE tripCost DECIMAL(10,2);
+
+    SELECT total_price, user_id INTO tripCost, userId
+    FROM trips
+    WHERE trip_id = IN_trip_id;
+
+    UPDATE users
+    SET balance = balance - tripCost
+    WHERE id = userId;
+
+    UPDATE bank
+    SET cashisking = cashisking + tripCost;
+
+END;;
+
+
 
 DELIMITER ;

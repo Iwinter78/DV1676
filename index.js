@@ -29,7 +29,6 @@ app.use(
 );
 
 app.options("*", cors());
-
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("src"));
@@ -44,6 +43,7 @@ app.use(
     cookie: { secure: false },
   }),
 );
+
 // Login page
 app.get("/", (req, res) => {
   const data = {
@@ -53,6 +53,7 @@ app.get("/", (req, res) => {
   res.render("login/index", data);
 });
 
+//Callback page
 app.get("/callback", async (req, res) => {
   const code = req.query.code;
 
@@ -62,13 +63,13 @@ app.get("/callback", async (req, res) => {
   const token = await exchangeCodeForToken(code);
   const userInfo = await getUserInfo(token);
   const email = userInfo.email || null;
-  // Get user info from the database
+  
   let profile = await fetch(
     `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
   ).then((response) => response.json());
 
   console.log("profile information from database", profile);
-  // Check if the user exists in the database or if the email is missing
+
   if (!profile || profile.length === 0 || !profile[0][0]?.email) {
     console.log("Profile is empty or missing email...");
     req.session.userInfo = {
@@ -91,11 +92,13 @@ app.get("/callback", async (req, res) => {
   };
   return res.redirect("/home");
 });
+
 // Logout page
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
 });
+
 // Users home page
 app.get("/home", (req, res) => {
   const userInfo = req.session.userInfo;
@@ -107,7 +110,6 @@ app.get("/home", (req, res) => {
     userInfo: userInfo,
   };
 
-  console.log(data);
   res.render("home/index", data);
 });
 
@@ -120,16 +122,13 @@ app.get("/sim", (req, res) => {
 app.get("/admin_view", async (req, res) => {
   const userInfo = req.session.userInfo;
 
-  // Fetch the user data from the API
   const userresponse = await fetch(
     `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
   );
   const userData = await userresponse.json();
 
-  // Check if the user is an admin
   const isAdmin = userData.role === "admin";
 
-  // Render the admin panel with dynamic meta tag behavior
   res.render("admin_panel/main", {
     userInfo: isAdmin ? null : JSON.stringify(userData),
     isAdmin,
@@ -145,10 +144,10 @@ app.get("/admin_panel/customer", async (req, res) => {
 
   const data = await response.json();
   const users = data[0];
-  console.log(data[0]);
 
   res.render("admin_panel/customer", { users });
 });
+
 // Admin bike view
 app.get("/admin_panel/bike", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/bike`);
@@ -159,10 +158,10 @@ app.get("/admin_panel/bike", async (req, res) => {
 
   const data = await response.json();
   const bikes = data[0];
-  console.log(data[0]);
 
   res.render("admin_panel/bike", { bikes });
 });
+
 // Admin station view
 app.get("/admin_panel/station", async (req, res) => {
   const response = await fetch(`http://localhost:1337/api/v1/stations`);
@@ -173,7 +172,6 @@ app.get("/admin_panel/station", async (req, res) => {
 
   const data = await response.json();
   const stations = data[0];
-  console.log(data[0]);
 
   res.render("admin_panel/station", { stations });
 });
@@ -187,7 +185,6 @@ app.post("/email", async (req, res) => {
 
   if (email) {
     req.session.userInfo.email = email;
-    console.log("Email updated in session:", req.session.userInfo);
     const createResponse = await fetch(
       "http://localhost:1337/api/v1/create/user",
       {
@@ -204,7 +201,6 @@ app.post("/email", async (req, res) => {
     );
 
     const result = await createResponse.json();
-    console.log("User creation response:", result);
 
     return res.redirect("/home");
   }
@@ -224,18 +220,16 @@ app.post("/balance", async (req, res) => {
   const profileResponse = await fetch(
     `http://localhost:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`,
     {
-      method: "PUT", // PUT update
+      method: "PUT", 
       headers: { "Content-Type": "application/json" },
     },
   );
   const profile = await profileResponse.json();
 
-  console.log(profile);
 
   res.redirect("/profile");
 });
 
-// Route to show the users profile
 app.get("/profile", async (req, res) => {
   const userInfo = req.session.userInfo;
 
@@ -271,7 +265,6 @@ app.get("/history", async (req, res) => {
     trips,
   };
 
-  console.log(trips);
   res.render("client/client_travel_history", data);
 });
 
@@ -287,9 +280,6 @@ app.get("/book/confirm/:id", async (req, res) => {
     userInfo,
     bike: bikeData
   };
-
-  console.log(bikeData);
-
 
   res.render("client/client_book", data);
 });
@@ -308,7 +298,6 @@ app.post("/book/confirm/:id", async (req, res) => {
   if (Boolean(bikeData[0][0].bike_status) === false) {
     return res.redirect("/home");
   }
-  console.log("Before: /book/confirm/:id")
   const response = await fetch(`http://localhost:1337/api/v1/bike/book`, {
     method: "POST",
     headers: {
@@ -379,16 +368,11 @@ app.post("/deleteUser/:username", async (req, res) => {
 });
 
 app.put("/editUser/:username", async (req, res) => {
-  console.log("Route hit: /editUser/:username");
   const username = req.params.username;
   const balance = req.body.balance;
   const debt = req.body.debt;
 
-  console.log("Balance:", balance);
-  console.log("Debt:", debt);
-
   try {
-    // Making the request to the other API endpoint inside the backend
     const response = await fetch(
       `http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`,
       {
@@ -404,15 +388,10 @@ app.put("/editUser/:username", async (req, res) => {
     );
 
     if (response.ok) {
-      // If the API call fails, respond with an error
       return res.status(200).send("done");
     }
 
-    console.log("User updated successfully");
-
-    // Redirect after successful update, appending a timestamp to prevent cache issues
   } catch (error) {
-    // Catch any errors during fetch or other operations
     console.error("Error during fetch:", error);
     return res.status(500).send("Internal Server Error");
   }
@@ -443,7 +422,7 @@ app.put("/editChargingSize/:id", async (req, res) => {
 
     res.redirect("/admin_panel/station");
   } catch (error) {
-    console.error("Error in /editChargingSize:", error); // Added for debugging
+    console.error("Error in /editChargingSize:", error);
     return res.status(500).send("Internal Server Error");
   }
 });
@@ -454,17 +433,12 @@ app.get("/book/pay/:id", async (req, res) => {
   let tripData = await fetch (`http://localhost:1337/api/v1/book/pay/${tripId}`,
   ).then((response) => response.json());
 
-  
   let data = {
     id: req.params.id,
     tripData: tripData
   };
 
-  console.log("Data from route book/pay/:id", data);
-
   res.render("client/trip_summary", data);
-  
-
 });
 
 app.get("/thank-you", async (req, res) => {
@@ -474,8 +448,6 @@ app.get("/thank-you", async (req, res) => {
 app.post("/book/pay/confirm/:tripId", async (req, res) => {
   const tripId = req.body.tripId;
 
-  console.log("index.js trip id: ", tripId)
-  console.log("Before index.js")
   try {
     const response = await fetch(
       `http://localhost:1337/api/v1/book/pay/confirm/${tripId}`,
@@ -494,19 +466,8 @@ app.post("/book/pay/confirm/:tripId", async (req, res) => {
   } catch (error) {
     return res.status(500).send("Internal Server Error");
   }
-
-  
 })
 
-// app.get("/payment/:id", async (req, res) => {
-//   const id = req.params.id;
-  
-//   try {
-//     const response = await fetch(`http://localhost:1337/api/v1/payment/${id}`);
-
-
-//   }
-// })
 
 // Start the server
 app.listen(port, () => {

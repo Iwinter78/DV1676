@@ -130,7 +130,7 @@ app.get("/admin_view", async (req, res) => {
   const isAdmin = userData.role === "admin";
 
   res.render("admin_panel/main", {
-    userInfo: isAdmin ? null : JSON.stringify(userData),
+    userInfo: userData[0][0],
     isAdmin,
   });
 });

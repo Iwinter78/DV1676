@@ -19,7 +19,6 @@ const wss = new WebSocketServer({ port: 5001 });
 const savedRoutes = JSON.parse(fs.readFileSync("routes.json", "utf-8"));
 
 const bikes = savedRoutes.map((bike) => {
-
   const speedms = Math.random() * 5 + 2;
   const speed = (speedms * 3.6).toFixed(2);
 
@@ -38,7 +37,6 @@ function moveBike(bike) {
     const [startLng, startLat] = bike.route[bike.step];
     const [endLng, endLat] = bike.route[bike.step + 1];
 
-
     const distance = Math.sqrt(
       Math.pow(endLng - startLng, 2) + Math.pow(endLat - startLat, 2),
     );
@@ -49,7 +47,6 @@ function moveBike(bike) {
       bike.location = [endLat, endLng];
       bike.step++;
     } else {
-
       const lng = startLng + (endLng - startLng) * progress;
       const lat = startLat + (endLat - startLat) * progress;
       bike.location = [lat, lng];
@@ -107,4 +104,3 @@ setInterval(() => {
 
   broadcastBikes();
 }, 1000);
-

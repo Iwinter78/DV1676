@@ -64,10 +64,9 @@ async function getUserBalance(userid) {
     }
   } catch (error) {
     console.error("Error in getUserBalance:", error.message);
-    throw error; 
+    throw error;
   }
 }
-
 
 async function deleteUser(username) {
   const db = await connect();
@@ -128,5 +127,5 @@ export {
   editUser,
   payTrip,
   getUserBalance,
-  getTripDetailsForUser
+  getTripDetailsForUser,
 };

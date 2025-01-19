@@ -126,10 +126,9 @@ async function getTripDetails(tripId) {
 
   const tripDetails = rows[0][0];
   return {
-      tripDetails
+    tripDetails,
   };
 }
-
 
 export {
   createBike,
@@ -141,5 +140,5 @@ export {
   bookTrip,
   endTrip,
   getTripDetails,
-  getTrip
+  getTrip,
 };

@@ -64,7 +64,7 @@ app.get("/callback", async (req, res) => {
   const token = await exchangeCodeForToken(code);
   const userInfo = await getUserInfo(token);
   const email = userInfo.email || null;
-  
+
   let profile = await fetch(
     `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
   ).then((response) => response.json());
@@ -148,7 +148,7 @@ app.get("/admin_panel/customer", async (req, res) => {
     `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
   );
   const userData = await userresponse.json();
-  if (userData[0][0].role !== "admin") { 
+  if (userData[0][0].role !== "admin") {
     return res.redirect("/home");
   }
 
@@ -171,7 +171,7 @@ app.get("/admin_panel/bike", async (req, res) => {
     `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
   );
   const userData = await userresponse.json();
-  if (userData[0][0].role !== "admin") { 
+  if (userData[0][0].role !== "admin") {
     return res.redirect("/home");
   }
 
@@ -185,7 +185,7 @@ app.get("/admin_panel/bike", async (req, res) => {
 app.get("/admin_panel/station", async (req, res) => {
   const userInfo = req.session.userInfo;
   const response = await fetch(`http://localhost:1337/api/v1/stations`);
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch data: ${response.statusText}`);
   }
@@ -193,7 +193,7 @@ app.get("/admin_panel/station", async (req, res) => {
     `http://localhost:1337/api/v1/user?username=${userInfo.login}`,
   );
   const userData = await userresponse.json();
-  if (userData[0][0].role !== "admin") { 
+  if (userData[0][0].role !== "admin") {
     return res.redirect("/home");
   }
 
@@ -211,22 +211,17 @@ app.post("/email", async (req, res) => {
 
   if (email) {
     req.session.userInfo.email = email;
-    const createResponse = await fetch(
-      "http://localhost:1337/api/v1/create/user",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: req.session.userInfo.login,
-          email: req.session.userInfo.email,
-          balance: 0,
-          debt: 0,
-          role: "user",
-        }),
-      },
-    );
-
-    const result = await createResponse.json();
+    await fetch("http://localhost:1337/api/v1/create/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: req.session.userInfo.login,
+        email: req.session.userInfo.email,
+        balance: 0,
+        debt: 0,
+        role: "user",
+      }),
+    });
 
     return res.redirect("/home");
   }
@@ -243,15 +238,13 @@ app.post("/balance", async (req, res) => {
   const { balance } = req.body;
   const username = req.session.userInfo.login;
 
-  const profileResponse = await fetch(
+  await fetch(
     `http://localhost:1337/api/v1/update/user/balance?username=${username}&balance=${balance}`,
     {
-      method: "PUT", 
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
     },
   );
-  const profile = await profileResponse.json();
-
 
   res.redirect("/profile");
 });
@@ -287,10 +280,9 @@ app.get("/history", async (req, res) => {
     `http://localhost:1337/api/v1/history?id=${userInfo.id}`,
   );
   const trips = await profileResponse.json();
-  console.log("Profile from /history:", trips)
+  console.log("Profile from /history:", trips);
 
-  let data = {trips}
-  
+  let data = { trips };
 
   res.render("client/client_travel_history", data);
 });
@@ -301,11 +293,10 @@ app.get("/book/confirm/:id", async (req, res) => {
     `http://localhost:1337/api/v1/bike/${req.params.id}`,
   ).then((response) => response.json());
 
-
   let data = {
     id: req.params.id,
     userInfo,
-    bike: bikeData
+    bike: bikeData,
   };
 
   res.render("client/client_book", data);
@@ -336,7 +327,6 @@ app.post("/book/confirm/:id", async (req, res) => {
     }),
   });
 
-  
   if (response.status === 402) {
     return res.send(`
       <script>
@@ -464,13 +454,14 @@ app.put("/editChargingSize/:id", async (req, res) => {
 
 app.get("/book/pay/:id", async (req, res) => {
   const tripId = req.params.id;
-  
-  let tripData = await fetch (`http://localhost:1337/api/v1/book/pay/${tripId}`,
+
+  let tripData = await fetch(
+    `http://localhost:1337/api/v1/book/pay/${tripId}`,
   ).then((response) => response.json());
 
   let data = {
     id: req.params.id,
-    tripData: tripData
+    tripData: tripData,
   };
 
   res.render("client/trip_summary", data);
@@ -478,7 +469,7 @@ app.get("/book/pay/:id", async (req, res) => {
 
 app.get("/thank-you", async (req, res) => {
   res.render("client/thank-you");
-})
+});
 
 app.post("/book/pay/confirm/:tripId", async (req, res) => {
   const tripId = req.body.tripId;
@@ -489,20 +480,18 @@ app.post("/book/pay/confirm/:tripId", async (req, res) => {
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    )
+          "Content-Type": "application/json",
+        },
+      },
+    );
 
-    if(response.ok) {
+    if (response.ok) {
       return res.redirect("/thank-you");
     }
-
   } catch (error) {
-    return res.status(500).send("Internal Server Error");
+    return res.status(500).send(`Error occurred: ${error}`);
   }
-})
-
+});
 
 // Start the server
 app.listen(port, () => {

@@ -69,6 +69,7 @@ services:
     depends_on:
       - client
       - restapi
+      - simulation
 
   simulation:
     image: dv1676-simulation

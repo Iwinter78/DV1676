@@ -96,7 +96,7 @@ app.get("/api/v1/getAllUsers", async (req, res) => {
 app.get("/api/v1/history", async (req, res) => {
   const userId = req.query.id;
 
-  console.log("what is my user id: ",userId);
+  console.log("what is my user id: ", userId);
 
   if (!userId) {
     return res.status(400).json({
@@ -202,7 +202,7 @@ app.get("/api/v1/bike/:id", async (req, res) => {
 
     let response = {
       ...bikeResponse,
-      trip_id: tripResponse || null
+      trip_id: tripResponse || null,
     };
     res.status(200).json(response);
   } catch (error) {
@@ -300,7 +300,6 @@ app.post("/api/v1/bike/book", async (req, res) => {
       message: "Cykel bokad",
       status: 200,
     });
-
   } catch (error) {
     res.status(500).json({
       message: "Något gick fel, försök igen senare",
@@ -447,7 +446,7 @@ app.put("/api/v1/stations/editChargingSize/:id", async (req, res) => {
       return res.status(404).send("Station not found or no change made");
     }
   } catch (error) {
-    console.error("Error in editChargingSize API:", error); 
+    console.error("Error in editChargingSize API:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -478,6 +477,7 @@ app.put("/api/v1/update/editUserAdminPanel/:username", async (req, res) => {
 app.get("/api/v1/trip/:bikeId", async (req, res) => {
   const bikeId = req.params.bikeId;
   let result = await bike.getTrip(bikeId);
+  console.log("res:", res);
 
   return result;
 });
@@ -488,10 +488,9 @@ app.get("/api/v1/book/pay/:tripId", async (req, res) => {
     let result = await bike.getTripDetails(tripId);
     return res.status(200).json(result);
   } catch (error) {
-    console.error('Error while retrieving trip details in API call', error);
-    res.status(500).send("Internal Server Error")
+    console.error("Error while retrieving trip details in API call", error);
+    res.status(500).send("Internal Server Error");
   }
-  
 });
 
 app.post("/api/v1/book/pay/confirm/:tripId", async (req, res) => {
@@ -499,13 +498,13 @@ app.post("/api/v1/book/pay/confirm/:tripId", async (req, res) => {
 
   try {
     await user.payTrip(tripId);
-    
+
     return res.status(200).send("Payment done from api");
   } catch (error) {
-    console.error('Error in payment', error)
-    res.status(500).send("Internal Server Error")
+    console.error("Error in payment", error);
+    res.status(500).send("Internal Server Error");
   }
-})
+});
 
 app.listen(port, () => {
   console.log(`REST API is listening on ${port}`);

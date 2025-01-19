@@ -155,7 +155,9 @@ async function displayBikes(map, userData, openLocationCode, icons) {
   try {
     const data = await fetchBikes();
     const bikes_unfiltered = data[0];
-    const userRole = userData.login ? await getRole(userData.login) : await getRole(userData.username);
+    const userRole = userData.login
+      ? await getRole(userData.login)
+      : await getRole(userData.username);
     const bikes = bikes_unfiltered.filter(
       (bike) => bike.id >= 1000 && bike.id <= 1013,
     );

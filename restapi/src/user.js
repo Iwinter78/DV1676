@@ -55,7 +55,7 @@ async function getUserLog(username) {
 
 async function deleteUser(username) {
   const db = await connect();
-  const query = `DELETE FROM users WHERE username = username_param;`;
+  const query = `DELETE FROM users WHERE username = ?;`;
   const values = [username];
   await db.query(query, values);
   db.end();
@@ -64,9 +64,9 @@ async function deleteUser(username) {
 async function updateUserBalance(username, balance) {
   const db = await connect();
   const query = `UPDATE users
-    SET balance = balance + in_balance
-    WHERE username = in_username;`;
-  const values = [username, balance];
+    SET balance = balance + ?
+    WHERE username = ?;`;
+  const values = [balance, username];
   try {
     await db.query(query, values);
     db.end();

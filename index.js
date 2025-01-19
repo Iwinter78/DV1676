@@ -1,6 +1,5 @@
 import express from "express";
 import session from "express-session";
-import cors from "cors";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
@@ -13,21 +12,6 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-
-/*
-app.use(
-  cors({
-    origin: true,
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "Access-Control-Allow-Origin",
-      "default-src",
-    ],
-    credentials: true,
-  }),
-);
-*/
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
@@ -43,14 +27,6 @@ app.use(
     cookie: { secure: false },
   }),
 );
-
-const apiUrl = `http://172.22.0.6:8080/api/user?username=Iwinter78`;
-
-// Example fetch request
-fetch(apiUrl)
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error('Error:', error));
 
 // Login page
 app.get("/", (req, res) => {
@@ -76,7 +52,7 @@ app.get("/callback", async (req, res) => {
 
   console.log("profile information from database", profile);
   // Check if the user exists in the database or if the email is missing
-  if (!profile || profile.length === 0 || !profile[0][0]?.email) {
+  if (!profile || profile.length === 0 || !profile[0]?.email) {
     console.log("Profile is empty or missing email...");
     req.session.userInfo = {
       login: userInfo.login,
@@ -89,6 +65,7 @@ app.get("/callback", async (req, res) => {
     return res.redirect("/email");
   }
   const profileData = profile[0][0];
+  console.log(profileData);
   req.session.userInfo = {
     login: userInfo.login,
     id: profileData.id,
@@ -105,16 +82,8 @@ app.get("/logout", (req, res) => {
 });
 // Users home page
 app.get("/home", (req, res) => {
-
-  const apiUrl = `http://172.22.0.6:8080/api/user?username=Iwinter78`;
-
-  // Example fetch request
-  fetch(apiUrl)
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error('Error:', error));
-
   const userInfo = req.session.userInfo;
+  
   if (!userInfo) {
     res.redirect("/");
   }
@@ -262,7 +231,9 @@ app.get("/profile", async (req, res) => {
     `http://172.22.0.6:8080/api/user?username=${userInfo.login}`,
   );
   const profile = await profileResponse.json();
-  const profileData = profile["0"][0];
+  console.log(profile);
+  const profileData = profile[0];
+  console.log(profileData);
   const data = {
     ...userInfo,
     ...profileData,
@@ -300,7 +271,7 @@ app.get("/book/confirm/:id", async (req, res) => {
   let data = {
     id: req.params.id,
     userInfo,
-    bike: bikeData[0][0],
+    bike: bikeData[0],
   };
   res.render("client/client_book", data);
 });
@@ -311,7 +282,7 @@ app.post("/book/confirm/:id", async (req, res) => {
     `http://172.22.0.6:8080/api/bike/${req.params.id}`,
   ).then((response) => response.json());
 
-  if (Boolean(bikeData[0][0].bike_status) === false) {
+  if (Boolean(bikeData[0].bike_status) === false) {
     return res.redirect("/home");
   }
 
@@ -333,7 +304,7 @@ app.post("/book/return/:id", async (req, res) => {
     `http://172.22.0.6:8080/api/bike/${req.params.id}`,
   ).then((response) => response.json());
 
-  if (Boolean(bikeData[0][0].bike_status) === true) {
+  if (Boolean(bikeData[0].bike_status) === true) {
     return res.redirect("/home");
   }
 

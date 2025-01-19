@@ -311,6 +311,11 @@ app.get("/book/confirm/:id", async (req, res) => {
   res.render("client/client_book", data);
 });
 
+// Users home page
+app.get("/sim", (req, res) => {
+  res.render("sim/index");
+});
+
 app.post("/book/confirm/:id", async (req, res) => {
   let userInfo = req.session.userInfo;
   let bikeData = await fetch(

@@ -94,9 +94,11 @@ app.get("/api/v1/getAllUsers", async (req, res) => {
 });
 
 app.get("/api/v1/history", async (req, res) => {
-  const username = req.query.username;
+  const userId = req.query.id;
 
-  if (!username) {
+  console.log("what is my user id: ",userId);
+
+  if (!userId) {
     return res.status(400).json({
       message: "Användarnamn krävs",
       status: 400,
@@ -104,7 +106,7 @@ app.get("/api/v1/history", async (req, res) => {
   }
 
   try {
-    let response = await user.getUserLog(username);
+    let response = await user.getTripDetailsForUser(userId);
     res.status(200).json(response);
   } catch (error) {
     res.status(500).json({

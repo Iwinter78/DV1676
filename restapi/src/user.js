@@ -108,6 +108,16 @@ async function payTrip(tripId) {
   return;
 }
 
+async function getTripDetailsForUser(userId) {
+  const db = await connect();
+  const query = `CALL get_trip_details_user(?)`;
+  const value = [userId];
+  const [rows] = await db.query(query, value);
+  db.end();
+
+  return rows[0];
+}
+
 export {
   createUser,
   getUser,
@@ -117,5 +127,6 @@ export {
   getAllUsers,
   editUser,
   payTrip,
-  getUserBalance
+  getUserBalance,
+  getTripDetailsForUser
 };

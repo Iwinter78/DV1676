@@ -109,7 +109,7 @@ async function getTrip(bikeId) {
 
   if (response && response[0] && response[0][0] && response[0][0][0]) {
     const tripId = response[0][0][0].trip_id;
-    
+
     return tripId;
   } else {
     console.log("No active trip found for the bike");
@@ -129,6 +129,8 @@ async function getTripDetails(tripId) {
       tripDetails
   };
 }
+
+
 export {
   createBike,
   getAllBikes,

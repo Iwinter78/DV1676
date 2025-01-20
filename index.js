@@ -270,8 +270,6 @@ app.get("/profile", async (req, res) => {
 app.get("/history", async (req, res) => {
   const userInfo = req.session.userInfo;
 
-  console.log("user id from /history", userInfo.id);
-
   if (!userInfo) {
     return res.redirect("/"); //back to home if the user is not logd in
   }
@@ -384,7 +382,7 @@ app.post("/deleteUser/:username", async (req, res) => {
   res.redirect("/admin_panel/customer");
 });
 
-app.put('/editUser/:username', async (req, res) => {
+app.put("/editUser/:username", async (req, res) => {
   console.log("Route hit: /editUser/:username");
   const username = req.params.username;
   const balance = req.body.balance;
@@ -394,27 +392,25 @@ app.put('/editUser/:username', async (req, res) => {
   console.log("Debt:", debt);
 
   try {
-    // Making the request to the other API endpoint inside the backend
-    const response = await fetch(`http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `http://localhost:1337/api/v1/update/editUserAdminPanel/${username}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          balance: balance,
+          debt: debt,
+        }),
       },
-      body: JSON.stringify({ 
-        balance: balance,
-        debt: debt 
-      })
-    });
+    );
 
     if (response.ok) {
-      // If the API call fails, respond with an error
       return res.status(200).send("done");
     }
 
     console.log("User updated successfully");
-
-    // Redirect after successful update, appending a timestamp to prevent cache issues
-
   } catch (error) {
     // Catch any errors during fetch or other operations
     console.error("Error during fetch:", error);

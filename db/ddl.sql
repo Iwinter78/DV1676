@@ -63,6 +63,7 @@ CREATE TABLE parking_zones (
 );
 
 CREATE TABLE `bank` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     cashisking DECIMAL(10,2) NOT NULL DEFAULT 0.00
 );
 
